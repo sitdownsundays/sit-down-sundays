@@ -17,7 +17,7 @@ dist-ssr
 *.local
 src/tailwind.config.vibe.json
 
-# Environment and secrets
+# Environment / secrets — never commit
 .env
 .env.*
 !.env.example

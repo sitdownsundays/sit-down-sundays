@@ -207,7 +207,13 @@ class MockAuthRepository implements AuthRepository {
     return {
       ok: true,
       cookie,
-      user: toSessionUser(account.id, account.email, true, this.mockProfile(account), "guest"),
+      user: toSessionUser(
+        account.id,
+        account.email,
+        true,
+        this.mockProfile(account),
+        account.roleKey,
+      ),
     };
   }
 
@@ -267,9 +273,42 @@ class MockAuthRepository implements AuthRepository {
         account.email,
         account.emailVerified,
         this.mockProfile(account),
-        "guest",
+        account.roleKey,
       ),
     };
+  }
+
+  /**
+   * Test-only: seed an authenticated mock session with a given role so that
+   * server-function authorization can be exercised in mock mode without real
+   * auth. NOT SECURITY. Mock mode only; throws outside mock mode via the
+   * __getMockAuthRepository() guard.
+   */
+  __seedMockSession(roleKey: RoleKey): { id: string; email: string } {
+    const email = `mock-${roleKey}@example.test`;
+    let account = this.find(email);
+    if (!account) {
+      account = {
+        id: crypto.randomUUID(),
+        email,
+        password: "mock-password",
+        firstName: "Mock",
+        lastName: roleKey,
+        emailVerified: true,
+        status: "active",
+        roleKey,
+        sessionToken: null,
+      };
+      this.accounts.push(account);
+    } else {
+      account.roleKey = roleKey;
+      account.status = "active";
+      account.emailVerified = true;
+    }
+    const token = crypto.randomUUID();
+    account.sessionToken = token;
+    this.currentSessionToken = token;
+    return { id: account.id, email: account.email };
   }
 
   /** Test helper: mark a mock account as email-verified. */
