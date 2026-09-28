@@ -291,7 +291,12 @@ export class MockMenuRepository implements MenuRepository {
     input: MenuSectionInput,
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
-    if (!this.menus.some((m) => m.id === input.menuId)) return notFound();
+    const m = this.menus.find((x) => x.id === input.menuId);
+    if (!m) return notFound();
+    // Server-side archived protection: an archived menu cannot have sections
+    // created. (The UI also hides the action, but this is the authoritative
+    // guard — a caller bypassing the UI is still rejected.)
+    if (m.status === "archived") return { ok: false, message: "Archived menus cannot be edited." };
     const now = this.now();
     const id = crypto.randomUUID();
     this.sections.push({
@@ -319,13 +324,22 @@ export class MockMenuRepository implements MenuRepository {
     const s = this.sections.find((x) => x.id === id);
     if (!s) return notFound();
     if (s.updatedAt !== expectedUpdatedAt) return conflict();
+    // Server-side archived protection: sections of an archived menu cannot be
+    // edited. menuId is never changed by an ordinary section edit (the UI
+    // never offers it), so the parent menu is the section's current menu.
+    const parentMenu = this.menus.find((x) => x.id === s.menuId);
+    if (parentMenu?.status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
     const oldMenuId = s.menuId;
     const before = { ...s };
     if (input.name !== undefined) s.name = input.name;
     if (input.description !== undefined) s.description = input.description;
     if (input.displayOrder !== undefined) s.displayOrder = input.displayOrder;
-    if (input.isActive !== undefined) s.isActive = input.isActive;
-    if (input.menuId !== undefined) s.menuId = input.menuId;
+    // isActive is intentionally NOT applied here: the strict section-patch
+    // schema rejects it, and activation changes must go through setSectionActive.
+    // menuId is intentionally NOT applied here: a section's menu is fixed at
+    // creation. Moving a section across menus is not supported in this phase.
     s.updatedAt = this.now();
     if (!this.suppressInvariant) {
       const affected = [oldMenuId, s.menuId];
@@ -346,10 +360,18 @@ export class MockMenuRepository implements MenuRepository {
     actorId: string | null,
     id: string,
     isActive: boolean,
+    expectedUpdatedAt: string,
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
     const s = this.sections.find((x) => x.id === id);
     if (!s) return notFound();
+    if (s.updatedAt !== expectedUpdatedAt) return conflict();
+    // Server-side archived protection: sections of an archived menu cannot be
+    // activated or deactivated.
+    const parentMenu = this.menus.find((x) => x.id === s.menuId);
+    if (parentMenu?.status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
     const before = { ...s };
     s.isActive = isActive;
     s.updatedAt = this.now();
@@ -375,11 +397,20 @@ export class MockMenuRepository implements MenuRepository {
     input: MenuItemInput,
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
-    if (!this.menus.some((m) => m.id === input.menuId)) return notFound();
+    const m = this.menus.find((x) => x.id === input.menuId);
+    if (!m) return notFound();
+    // Server-side archived protection: an archived menu cannot have items
+    // created. (The UI also hides the action, but this is the authoritative
+    // guard — a caller bypassing the UI is still rejected.)
+    if (m.status === "archived") return { ok: false, message: "Archived menus cannot be edited." };
     if (input.sectionId != null) {
       const s = this.sections.find((x) => x.id === input.sectionId);
       if (!s || s.menuId !== input.menuId) {
         return { ok: false, message: "That section does not belong to this menu." };
+      }
+      // An item may only be assigned to an ACTIVE section of the same menu.
+      if (!s.isActive) {
+        return { ok: false, message: "That section is inactive." };
       }
     }
     const now = this.now();
@@ -396,7 +427,9 @@ export class MockMenuRepository implements MenuRepository {
       imageAlt: input.imageAlt ?? null,
       dietaryTags: input.dietaryTags ?? [],
       allergens: input.allergens ?? [],
-      isActive: input.isActive ?? true,
+      // isActive is forced to true on creation — a caller cannot create an
+      // inactive item by supplying isActive.
+      isActive: true,
       isFeatured: input.isFeatured ?? false,
       displayOrder: input.displayOrder ?? 0,
       createdAt: now,
@@ -417,6 +450,13 @@ export class MockMenuRepository implements MenuRepository {
     const i = this.items.find((x) => x.id === id);
     if (!i) return notFound();
     if (i.updatedAt !== expectedUpdatedAt) return conflict();
+    // Server-side archived protection: items of an archived menu cannot be
+    // edited. The parent menu is the item's current menu (menuId is never
+    // changed through the browser-facing patch schema).
+    const parentMenu = this.menus.find((x) => x.id === i.menuId);
+    if (parentMenu?.status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
     const oldMenuId = i.menuId;
     const before = { ...i };
     if (input.sectionId !== undefined) {
@@ -426,9 +466,15 @@ export class MockMenuRepository implements MenuRepository {
         if (!s || s.menuId !== newMenuId) {
           return { ok: false, message: "That section does not belong to this menu." };
         }
+        // An item may only be assigned to an ACTIVE section of the same menu.
+        if (!s.isActive) {
+          return { ok: false, message: "That section is inactive." };
+        }
       }
       i.sectionId = input.sectionId;
     }
+    // menuId is applied here only for the invariant transaction helper and
+    // direct repository tests; the browser-facing patch schema strips it.
     if (input.menuId !== undefined) i.menuId = input.menuId;
     if (input.name !== undefined) i.name = input.name;
     if (input.description !== undefined) i.description = input.description;
@@ -438,9 +484,26 @@ export class MockMenuRepository implements MenuRepository {
     if (input.imageAlt !== undefined) i.imageAlt = input.imageAlt;
     if (input.dietaryTags !== undefined) i.dietaryTags = input.dietaryTags;
     if (input.allergens !== undefined) i.allergens = input.allergens;
+    // isActive is applied here only for direct repository tests; the
+    // browser-facing patch schema strips it. Activation changes must use
+    // setItemActive.
     if (input.isActive !== undefined) i.isActive = input.isActive;
     if (input.isFeatured !== undefined) i.isFeatured = input.isFeatured;
     if (input.displayOrder !== undefined) i.displayOrder = input.displayOrder;
+    // Accessibility constraint on the MERGED final state (mirrors the DB
+    // CHECK in 0003): a present (nonblank) image requires nonblank alt text.
+    // The patch schema's superRefine only checks when imageUrl is non-null,
+    // so a patch that clears imageAlt while an existing imageUrl remains
+    // must be rejected here to match Supabase behavior.
+    const mergedHasImage = i.imageUrl != null && i.imageUrl !== "";
+    const mergedHasAlt = i.imageAlt != null && i.imageAlt !== "";
+    if (mergedHasImage && !mergedHasAlt) {
+      Object.assign(i, before);
+      return {
+        ok: false,
+        message: "Descriptive alt text is required when an image is provided.",
+      };
+    }
     i.updatedAt = this.now();
     if (!this.suppressInvariant) {
       const affected = [oldMenuId, i.menuId];
@@ -461,10 +524,18 @@ export class MockMenuRepository implements MenuRepository {
     actorId: string | null,
     id: string,
     isActive: boolean,
+    expectedUpdatedAt: string,
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
     const i = this.items.find((x) => x.id === id);
     if (!i) return notFound();
+    if (i.updatedAt !== expectedUpdatedAt) return conflict();
+    // Server-side archived protection: items of an archived menu cannot be
+    // activated or deactivated.
+    const parentMenu = this.menus.find((x) => x.id === i.menuId);
+    if (parentMenu?.status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
     const before = { ...i };
     i.isActive = isActive;
     i.updatedAt = this.now();
@@ -487,7 +558,11 @@ export class MockMenuRepository implements MenuRepository {
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
     if (actorId == null) return { ok: false, message: "Actor is required." };
-    if (!this.menus.some((m) => m.id === menuId)) return notFound();
+    const m = this.menus.find((x) => x.id === menuId);
+    if (!m) return notFound();
+    // Server-side archived protection: sections of an archived menu cannot be
+    // reordered.
+    if (m.status === "archived") return { ok: false, message: "Archived menus cannot be edited." };
     if (orderedSectionIds.length === 0) {
       return { ok: false, message: "No sections provided." };
     }
@@ -523,7 +598,11 @@ export class MockMenuRepository implements MenuRepository {
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
     if (actorId == null) return { ok: false, message: "Actor is required." };
-    if (!this.menus.some((m) => m.id === menuId)) return notFound();
+    const m = this.menus.find((x) => x.id === menuId);
+    if (!m) return notFound();
+    // Server-side archived protection: items of an archived menu cannot be
+    // reordered.
+    if (m.status === "archived") return { ok: false, message: "Archived menus cannot be edited." };
     if (orderedItemIds.length === 0) {
       return { ok: false, message: "No items provided." };
     }

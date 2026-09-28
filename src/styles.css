@@ -7,8 +7,8 @@
 /*
  * Sit Down Sundays — Design System
  *
- * Provisional palette: warm cream, terracotta/clay, muted sage,
- * deep warm charcoal, restrained gold/amber accents.
+ * Brand palette: D.A.'s Banquets & Events burgundy (#6B1116 / oklch(0.38 0.135 25)),
+ * warm cream, muted sage, deep warm charcoal, restrained gold/amber accents.
  * All colors use oklch. Tokens are centralized and replaceable.
  */
 
@@ -89,8 +89,8 @@
   --popover: oklch(0.995 0.008 85);
   --popover-foreground: oklch(0.26 0.018 50);
 
-  /* Terracotta / clay primary */
-  --primary: oklch(0.58 0.135 38);
+  /* Dominant D.A.'s Burgundy primary (#6B1116) */
+  --primary: oklch(0.38 0.135 25);
   --primary-foreground: oklch(0.985 0.012 85);
 
   /* Muted sage secondary */
@@ -109,11 +109,11 @@
 
   --border: oklch(0.9 0.015 80);
   --input: oklch(0.9 0.015 80);
-  --ring: oklch(0.58 0.135 38);
+  --ring: oklch(0.38 0.135 25);
 
   /* Brand */
   --cream: oklch(0.985 0.012 85);
-  --clay: oklch(0.58 0.135 38);
+  --clay: oklch(0.38 0.135 25);
   --sage: oklch(0.62 0.06 150);
   --charcoal: oklch(0.26 0.018 50);
   --gold: oklch(0.78 0.13 78);
@@ -135,12 +135,12 @@
 
   --sidebar: oklch(0.97 0.014 85);
   --sidebar-foreground: oklch(0.26 0.018 50);
-  --sidebar-primary: oklch(0.58 0.135 38);
+  --sidebar-primary: oklch(0.38 0.135 25);
   --sidebar-primary-foreground: oklch(0.985 0.012 85);
   --sidebar-accent: oklch(0.93 0.02 85);
   --sidebar-accent-foreground: oklch(0.32 0.03 145);
   --sidebar-border: oklch(0.9 0.015 80);
-  --sidebar-ring: oklch(0.58 0.135 38);
+  --sidebar-ring: oklch(0.38 0.135 25);
 }
 
 .dark {
@@ -150,8 +150,8 @@
   --card-foreground: oklch(0.96 0.012 85);
   --popover: oklch(0.27 0.018 50);
   --popover-foreground: oklch(0.96 0.012 85);
-  --primary: oklch(0.68 0.13 40);
-  --primary-foreground: oklch(0.22 0.015 50);
+  --primary: oklch(0.52 0.15 25);
+  --primary-foreground: oklch(0.985 0.012 85);
   --secondary: oklch(0.34 0.03 145);
   --secondary-foreground: oklch(0.96 0.012 85);
   --muted: oklch(0.32 0.018 50);
@@ -162,10 +162,10 @@
   --destructive-foreground: oklch(0.96 0.012 85);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.68 0.13 40);
+  --ring: oklch(0.52 0.15 25);
 
   --cream: oklch(0.22 0.015 50);
-  --clay: oklch(0.68 0.13 40);
+  --clay: oklch(0.52 0.15 25);
   --sage: oklch(0.55 0.06 150);
   --charcoal: oklch(0.96 0.012 85);
   --gold: oklch(0.8 0.13 78);
@@ -186,12 +186,12 @@
 
   --sidebar: oklch(0.25 0.016 50);
   --sidebar-foreground: oklch(0.96 0.012 85);
-  --sidebar-primary: oklch(0.68 0.13 40);
-  --sidebar-primary-foreground: oklch(0.22 0.015 50);
+  --sidebar-primary: oklch(0.52 0.15 25);
+  --sidebar-primary-foreground: oklch(0.985 0.012 85);
   --sidebar-accent: oklch(0.32 0.02 50);
   --sidebar-accent-foreground: oklch(0.96 0.012 85);
   --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.68 0.13 40);
+  --sidebar-ring: oklch(0.52 0.15 25);
 }
 
 @layer base {
@@ -204,6 +204,8 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    /* Offset sticky public header (≈112px desktop / ≈84px mobile) for in-page anchors */
+    scroll-padding-top: 7rem;
   }
 
   h1,

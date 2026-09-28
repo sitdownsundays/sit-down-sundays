@@ -6,7 +6,7 @@
  * buttons are disabled while an action is pending for that menu to prevent
  * double-submits.
  */
-import { Archive, Pencil, Send } from "lucide-react";
+import { Archive, Layers, Pencil, Send, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/layout/status-badge";
 import type { MenuWithContentDTO } from "@/lib/menu/types";
@@ -17,12 +17,22 @@ interface MenuTableProps {
   onEdit: (menu: MenuWithContentDTO) => void;
   onPublish: (menu: MenuWithContentDTO) => void;
   onArchive: (menu: MenuWithContentDTO) => void;
+  onManageSections: (menu: MenuWithContentDTO) => void;
+  onManageItems: (menu: MenuWithContentDTO) => void;
   /** Menu id currently undergoing a publish/archive action; its action
    *  buttons are disabled to prevent double-submits. */
   pendingId?: string | null;
 }
 
-export function MenuTable({ menus, onEdit, onPublish, onArchive, pendingId }: MenuTableProps) {
+export function MenuTable({
+  menus,
+  onEdit,
+  onPublish,
+  onArchive,
+  onManageSections,
+  onManageItems,
+  pendingId,
+}: MenuTableProps) {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card shadow">
       {/* Desktop / tablet table */}
@@ -71,6 +81,28 @@ export function MenuTable({ menus, onEdit, onPublish, onArchive, pendingId }: Me
                   <td className="px-4 py-3 text-muted-foreground">{formatDate(menu.updatedAt)}</td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
+                      {menu.status !== "archived" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onManageItems(menu)}
+                          disabled={busy}
+                        >
+                          <UtensilsCrossed className="size-3.5" aria-hidden />
+                          Items
+                        </Button>
+                      )}
+                      {menu.status !== "archived" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onManageSections(menu)}
+                          disabled={busy}
+                        >
+                          <Layers className="size-3.5" aria-hidden />
+                          Sections
+                        </Button>
+                      )}
                       {menu.status !== "archived" && (
                         <Button
                           variant="outline"
@@ -132,6 +164,28 @@ export function MenuTable({ menus, onEdit, onPublish, onArchive, pendingId }: Me
                 <dd>{formatDate(menu.updatedAt)}</dd>
               </dl>
               <div className="mt-4 flex flex-wrap gap-2">
+                {menu.status !== "archived" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onManageItems(menu)}
+                    disabled={busy}
+                  >
+                    <UtensilsCrossed className="size-3.5" aria-hidden />
+                    Items
+                  </Button>
+                )}
+                {menu.status !== "archived" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onManageSections(menu)}
+                    disabled={busy}
+                  >
+                    <Layers className="size-3.5" aria-hidden />
+                    Sections
+                  </Button>
+                )}
                 {menu.status !== "archived" && (
                   <Button variant="outline" size="sm" onClick={() => onEdit(menu)} disabled={busy}>
                     <Pencil className="size-3.5" aria-hidden />

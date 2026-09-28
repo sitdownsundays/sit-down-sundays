@@ -30,10 +30,11 @@ import { resolveMenuActor } from "@/lib/server/menu-auth.server";
 import { hasDraftReadRole, hasMutationRole } from "@/lib/server/menu-shared.server";
 import {
   menuInputSchema,
-  menuItemInputSchema,
+  menuItemCreateSchema,
   menuItemPatchSchema,
   menuPatchSchema,
-  menuSectionInputSchema,
+  menuSectionCreateSchema,
+  menuSectionPatchSchema,
   publishingRuleViolations,
 } from "@/lib/menu/schema";
 import { MAX_PRICE_CENTS } from "@/lib/menu/constants";
@@ -222,7 +223,7 @@ export const archiveMenu = createServerFn({ method: "POST" })
   });
 
 export const createSection = createServerFn({ method: "POST" })
-  .validator((raw: unknown) => menuSectionInputSchema.parse(raw))
+  .validator((raw: unknown) => menuSectionCreateSchema.parse(raw))
   .handler(async ({ data }): Promise<MenuActionResult> => {
     try {
       const guard = await requireMutationActor();
@@ -238,7 +239,7 @@ export const createSection = createServerFn({ method: "POST" })
 const updateSectionSchema = z
   .object({
     id: z.string().uuid(),
-    patch: menuSectionInputSchema.partial(),
+    patch: menuSectionPatchSchema,
     expectedUpdatedAt: z.string(),
   })
   .strict();
@@ -263,7 +264,9 @@ export const updateSection = createServerFn({ method: "POST" })
     }
   });
 
-const setActiveSchema = z.object({ id: z.string().uuid(), isActive: z.boolean() }).strict();
+const setActiveSchema = z
+  .object({ id: z.string().uuid(), isActive: z.boolean(), expectedUpdatedAt: z.string() })
+  .strict();
 
 export const setSectionActive = createServerFn({ method: "POST" })
   .validator((raw: unknown) => setActiveSchema.parse(raw))
@@ -277,6 +280,7 @@ export const setSectionActive = createServerFn({ method: "POST" })
         guard.actor.userId,
         data.id,
         data.isActive,
+        data.expectedUpdatedAt,
       );
       return toActionResult(result);
     } catch {
@@ -285,7 +289,7 @@ export const setSectionActive = createServerFn({ method: "POST" })
   });
 
 export const createItem = createServerFn({ method: "POST" })
-  .validator((raw: unknown) => menuItemInputSchema.parse(raw))
+  .validator((raw: unknown) => menuItemCreateSchema.parse(raw))
   .handler(async ({ data }): Promise<MenuActionResult> => {
     try {
       const guard = await requireMutationActor();
@@ -322,8 +326,12 @@ export const updateItem = createServerFn({ method: "POST" })
     }
   });
 
+const setItemActiveSchema = z
+  .object({ id: z.string().uuid(), isActive: z.boolean(), expectedUpdatedAt: z.string() })
+  .strict();
+
 export const setItemActive = createServerFn({ method: "POST" })
-  .validator((raw: unknown) => setActiveSchema.parse(raw))
+  .validator((raw: unknown) => setItemActiveSchema.parse(raw))
   .handler(async ({ data }): Promise<MenuActionResult> => {
     try {
       const guard = await requireMutationActor();
@@ -334,6 +342,7 @@ export const setItemActive = createServerFn({ method: "POST" })
         guard.actor.userId,
         data.id,
         data.isActive,
+        data.expectedUpdatedAt,
       );
       return toActionResult(result);
     } catch {

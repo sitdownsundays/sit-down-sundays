@@ -11,6 +11,7 @@ import { ROLE_LABELS } from "@/lib/domain/roles";
 import { ROLE_KEYS } from "@/lib/domain";
 import { AREA_NAV, filterNavByRole, type NavSection } from "@/components/layout/internal-nav";
 import type { RoleKey } from "@/lib/domain/types";
+import { BRAND_LOGO_SRC } from "@/components/layout/public-layout";
 
 interface InternalShellProps {
   area: "guest" | "staff" | "kitchen" | "admin";
@@ -59,14 +60,27 @@ export function InternalShell({ area, areaLabel, homeTo }: InternalShellProps) {
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
-          <Link to={homeTo as never} className="flex items-center gap-2">
-            <span className="inline-flex size-8 items-center justify-center rounded-full bg-clay text-cream font-display font-bold">
-              S
+        <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-3 sm:px-4">
+          <Link
+            to={homeTo as never}
+            className="group flex items-center gap-2.5 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-md"
+          >
+            <span className="flex h-10 shrink-0 items-center justify-center rounded-md border border-sidebar-border/80 bg-white px-2 py-1 shadow-2xs">
+              <img
+                src={BRAND_LOGO_SRC}
+                alt="D.A.'s Banquets & Events"
+                className="h-7 w-auto max-w-[90px] object-contain"
+                loading="eager"
+              />
             </span>
-            <span className="font-display text-sm font-bold text-sidebar-foreground">
-              {areaLabel}
-            </span>
+            <div className="flex flex-col min-w-0">
+              <span className="font-display text-xs font-bold leading-tight text-sidebar-foreground truncate">
+                {areaLabel}
+              </span>
+              <span className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground truncate">
+                Sit Down Sundays
+              </span>
+            </div>
           </Link>
           <button
             type="button"

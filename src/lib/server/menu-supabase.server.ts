@@ -265,10 +265,16 @@ export class SupabaseMenuRepository implements MenuRepository {
     const admin = getAdminClient();
     const { data: menu } = await admin
       .from("menus")
-      .select("id")
+      .select("id, status")
       .eq("id", input.menuId)
       .maybeSingle();
     if (!menu) return notFound();
+    // Server-side archived protection: an archived menu cannot have sections
+    // created. (The UI also hides the action, but this is the authoritative
+    // guard — a caller bypassing the UI is still rejected.)
+    if ((menu as { status: string }).status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
     const { error } = await admin.from("menu_sections").insert({
       menu_id: input.menuId,
       name: input.name,
@@ -291,11 +297,30 @@ export class SupabaseMenuRepository implements MenuRepository {
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
     const admin = getAdminClient();
+    // Server-side archived protection: fetch the section's parent menu and
+    // reject edits when the menu is archived. menuId is never changed by an
+    // ordinary section edit (the UI never offers it).
+    const { data: sectionRow } = await admin
+      .from("menu_sections")
+      .select("menu_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (!sectionRow) return notFound();
+    const { data: menuRow } = await admin
+      .from("menus")
+      .select("status")
+      .eq("id", (sectionRow as { menu_id: string }).menu_id)
+      .maybeSingle();
+    if (!menuRow) return notFound();
+    if ((menuRow as { status: string }).status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
     const patch: Record<string, unknown> = {};
     if (input.name !== undefined) patch.name = input.name;
     if (input.description !== undefined) patch.description = input.description;
     if (input.displayOrder !== undefined) patch.display_order = input.displayOrder;
-    if (input.isActive !== undefined) patch.is_active = input.isActive;
+    // isActive is intentionally NOT set here: the strict section-patch schema
+    // rejects it, and activation changes must go through setSectionActive.
     patch.updated_by = actorId;
     const { data, error } = await admin
       .from("menu_sections")
@@ -321,13 +346,33 @@ export class SupabaseMenuRepository implements MenuRepository {
     actorId: string | null,
     id: string,
     isActive: boolean,
+    expectedUpdatedAt: string,
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
     const admin = getAdminClient();
+    // Server-side archived protection: fetch the section's parent menu and
+    // reject activation/deactivation when the menu is archived.
+    const { data: sectionRow } = await admin
+      .from("menu_sections")
+      .select("menu_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (!sectionRow) return notFound();
+    const { data: menuRow } = await admin
+      .from("menus")
+      .select("status")
+      .eq("id", (sectionRow as { menu_id: string }).menu_id)
+      .maybeSingle();
+    if (!menuRow) return notFound();
+    if ((menuRow as { status: string }).status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
+    // Optimistic concurrency: require the expected updated_at.
     const { data, error } = await admin
       .from("menu_sections")
       .update({ is_active: isActive, updated_by: actorId })
       .eq("id", id)
+      .eq("updated_at", expectedUpdatedAt)
       .select("id")
       .maybeSingle();
     if (error) return safeMutationError();
@@ -355,16 +400,21 @@ export class SupabaseMenuRepository implements MenuRepository {
       .eq("id", input.menuId)
       .maybeSingle();
     if (!menu) return notFound();
-    // Cross-menu protection: validate an assigned section belongs to the menu
-    // server-side, in addition to the composite FK enforced in the DB.
+    // Cross-menu + inactive-section protection: validate an assigned section
+    // belongs to the menu AND is active, server-side, in addition to the
+    // composite FK enforced in the DB. Mirrors the mock implementation.
     if (input.sectionId != null) {
       const { data: section } = await admin
         .from("menu_sections")
-        .select("id, menu_id")
+        .select("id, menu_id, is_active")
         .eq("id", input.sectionId)
         .maybeSingle();
       if (!section || (section as { menu_id: string }).menu_id !== input.menuId) {
         return { ok: false, message: "That section does not belong to this menu." };
+      }
+      // An item may only be assigned to an ACTIVE section of the same menu.
+      if (!(section as { is_active: boolean }).is_active) {
+        return { ok: false, message: "That section is inactive." };
       }
     }
     const { error } = await admin.from("menu_items").insert({
@@ -378,7 +428,9 @@ export class SupabaseMenuRepository implements MenuRepository {
       image_alt: input.imageAlt ?? null,
       dietary_tags: input.dietaryTags ?? [],
       allergens: input.allergens ?? [],
-      is_active: input.isActive ?? true,
+      // isActive is forced to true on creation — the strict create schema
+      // omits isActive, so a caller cannot create an inactive item.
+      is_active: true,
       is_featured: input.isFeatured ?? false,
       display_order: input.displayOrder ?? 0,
       created_by: actorId,
@@ -400,16 +452,30 @@ export class SupabaseMenuRepository implements MenuRepository {
     const { data: prev } = await admin.from("menu_items").select("*").eq("id", id).maybeSingle();
     if (!prev) return notFound();
     const currentItem = prev as { menu_id: string };
+    // Server-side archived protection: items of an archived menu cannot be
+    // edited. menuId is never changed through the browser-facing patch schema.
+    const { data: menuRow } = await admin
+      .from("menus")
+      .select("status")
+      .eq("id", currentItem.menu_id)
+      .maybeSingle();
+    if (!menuRow) return notFound();
+    if ((menuRow as { status: string }).status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
     if (input.sectionId !== undefined) {
-      const newMenuId = input.menuId ?? currentItem.menu_id;
       if (input.sectionId != null) {
         const { data: section } = await admin
           .from("menu_sections")
-          .select("id, menu_id")
+          .select("id, menu_id, is_active")
           .eq("id", input.sectionId)
           .maybeSingle();
-        if (!section || (section as { menu_id: string }).menu_id !== newMenuId) {
+        if (!section || (section as { menu_id: string }).menu_id !== currentItem.menu_id) {
           return { ok: false, message: "That section does not belong to this menu." };
+        }
+        // An item may only be assigned to an ACTIVE section of the same menu.
+        if (!(section as { is_active: boolean }).is_active) {
+          return { ok: false, message: "That section is inactive." };
         }
       }
     }
@@ -452,13 +518,33 @@ export class SupabaseMenuRepository implements MenuRepository {
     actorId: string | null,
     id: string,
     isActive: boolean,
+    expectedUpdatedAt: string,
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
     const admin = getAdminClient();
+    // Server-side archived protection: fetch the item's parent menu and
+    // reject activation/deactivation when the menu is archived.
+    const { data: itemRow } = await admin
+      .from("menu_items")
+      .select("menu_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (!itemRow) return notFound();
+    const { data: menuRow } = await admin
+      .from("menus")
+      .select("status")
+      .eq("id", (itemRow as { menu_id: string }).menu_id)
+      .maybeSingle();
+    if (!menuRow) return notFound();
+    if ((menuRow as { status: string }).status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
+    // Optimistic concurrency: require the expected updated_at.
     const { data, error } = await admin
       .from("menu_items")
       .update({ is_active: isActive, updated_by: actorId })
       .eq("id", id)
+      .eq("updated_at", expectedUpdatedAt)
       .select("id")
       .maybeSingle();
     if (error) return safeMutationError();
@@ -481,6 +567,18 @@ export class SupabaseMenuRepository implements MenuRepository {
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
     const admin = getAdminClient();
+    // Server-side archived protection: sections of an archived menu cannot be
+    // reordered. (The atomic RPC also locks the menu row, but this check
+    // returns a clear message before invoking it.)
+    const { data: menuRow } = await admin
+      .from("menus")
+      .select("status")
+      .eq("id", menuId)
+      .maybeSingle();
+    if (!menuRow) return notFound();
+    if ((menuRow as { status: string }).status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
     // Atomic reorder RPC (service-role only). Validates unique, same-menu IDs
     // and updates all orders in one transaction; invalid input leaves every
     // previous order unchanged.
@@ -503,6 +601,18 @@ export class SupabaseMenuRepository implements MenuRepository {
   ): Promise<MenuMutationResult> {
     if (!hasMutationRole(callerRole)) return unauthorized();
     const admin = getAdminClient();
+    // Server-side archived protection: items of an archived menu cannot be
+    // reordered. (The atomic RPC also locks the menu row, but this check
+    // returns a clear message before invoking it.)
+    const { data: menuRow } = await admin
+      .from("menus")
+      .select("status")
+      .eq("id", menuId)
+      .maybeSingle();
+    if (!menuRow) return notFound();
+    if ((menuRow as { status: string }).status === "archived") {
+      return { ok: false, message: "Archived menus cannot be edited." };
+    }
     const { data, error } = await admin.rpc("reorder_menu_items_atomic", {
       p_menu_id: menuId,
       p_item_ids: orderedItemIds,

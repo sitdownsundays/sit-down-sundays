@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth/auth-context";
 import { signOut } from "@/lib/auth.functions";
 
+export const BRAND_LOGO_SRC =
+  "https://vibe.filesafe.space/1790115564962639543/attachments/d7410d81-221b-4e4e-88c0-d5eb14a02b7b.jpg";
+
 const NAV = [
   { label: "Home", to: "/" },
   { label: "The Experience", to: "/the-experience" },
@@ -54,15 +57,23 @@ export function PublicLayout() {
       </div>
 
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-        <Container className="flex h-16 items-center justify-between">
-          <Link to="/" className="flex items-center gap-2" aria-label="Sit Down Sundays home">
-            <span className="inline-flex size-9 items-center justify-center rounded-full bg-clay text-cream font-display text-lg font-bold">
-              S
+        <Container className="flex h-[84px] items-center justify-between lg:h-[112px]">
+          <Link
+            to="/"
+            className="group flex items-center focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-md"
+            aria-label="Sit Down Sundays home"
+          >
+            <span className="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-white">
+              <img
+                src={BRAND_LOGO_SRC}
+                alt="D.A.'s Banquets & Events"
+                className="block w-[140px] -mx-3 -my-1 object-contain lg:w-[195px] lg:-mx-4 lg:-my-2"
+                loading="eager"
+              />
             </span>
-            <span className="font-display text-lg font-bold text-foreground">Sit Down Sundays</span>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary">
             {NAV.map((item) => (
               <Link
                 key={item.to}
@@ -77,7 +88,7 @@ export function PublicLayout() {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-2 lg:flex">
+          <div className="hidden items-center gap-2 xl:flex">
             {authenticated ? (
               <>
                 <Link
@@ -111,7 +122,7 @@ export function PublicLayout() {
 
           <button
             type="button"
-            className="inline-flex size-10 items-center justify-center rounded-md text-foreground hover:bg-accent lg:hidden"
+            className="inline-flex size-10 items-center justify-center rounded-md text-foreground hover:bg-accent xl:hidden"
             aria-label="Toggle menu"
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
@@ -121,7 +132,7 @@ export function PublicLayout() {
         </Container>
 
         {open && (
-          <div className="border-t border-border bg-background lg:hidden">
+          <div className="border-t border-border bg-background xl:hidden">
             <Container className="space-y-1 py-4">
               {NAV.map((item) => (
                 <Link
@@ -186,14 +197,24 @@ function PublicFooter() {
     <footer className="border-t border-border bg-muted/40">
       <Container className="grid gap-8 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex size-8 items-center justify-center rounded-full bg-clay text-cream font-display font-bold">
-              S
+          <Link to="/" className="group flex items-center gap-2.5">
+            <span className="flex h-10 shrink-0 items-center justify-center rounded-md border border-border/80 bg-white px-2 py-1 shadow-xs">
+              <img
+                src={BRAND_LOGO_SRC}
+                alt="D.A.'s Banquets & Events"
+                className="h-7 w-auto max-w-[110px] object-contain"
+                loading="lazy"
+              />
             </span>
-            <span className="font-display text-base font-bold text-foreground">
-              Sit Down Sundays
-            </span>
-          </div>
+            <div className="flex flex-col">
+              <span className="font-display text-base font-bold text-foreground">
+                Sit Down Sundays
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                D.A.&apos;s Banquets &amp; Events
+              </span>
+            </div>
+          </Link>
           <p className="text-sm text-muted-foreground">
             A curated Sunday dining experience. Provisional content — final details coming soon.
           </p>

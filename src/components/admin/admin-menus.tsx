@@ -44,6 +44,8 @@ import {
 import { MenuTable } from "./menu-table";
 import { CreateMenuDialog } from "./menu-create-dialog";
 import { EditMenuDialog } from "./menu-edit-dialog";
+import { MenuSectionsPanel } from "./menu-sections-panel";
+import { MenuItemsPanel } from "./menu-items-panel";
 
 export function AdminMenusPage() {
   const listAllMenusFn = useServerFn(listAllMenus);
@@ -58,6 +60,10 @@ export function AdminMenusPage() {
   const [editTarget, setEditTarget] = useState<MenuWithContentDTO | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [archiveTarget, setArchiveTarget] = useState<MenuWithContentDTO | null>(null);
+  /** When set, the sections management panel is shown for this menu. */
+  const [sectionsMenu, setSectionsMenu] = useState<MenuWithContentDTO | null>(null);
+  /** When set, the items management panel is shown for this menu. */
+  const [itemsMenu, setItemsMenu] = useState<MenuWithContentDTO | null>(null);
   /** Menu id with an in-flight publish/archive action (rendering disabled state). */
   const [pendingId, setPendingId] = useState<string | null>(null);
   /** Synchronous lock: checked and set before awaiting to prevent double-submits. */
@@ -152,6 +158,22 @@ export function AdminMenusPage() {
     }
   }
 
+  if (itemsMenu) {
+    return (
+      <div className="space-y-8">
+        <MenuItemsPanel menu={itemsMenu} onBack={() => setItemsMenu(null)} />
+      </div>
+    );
+  }
+
+  if (sectionsMenu) {
+    return (
+      <div className="space-y-8">
+        <MenuSectionsPanel menu={sectionsMenu} onBack={() => setSectionsMenu(null)} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <PageHeader
@@ -205,6 +227,8 @@ export function AdminMenusPage() {
             }}
             onPublish={handlePublish}
             onArchive={(m) => setArchiveTarget(m)}
+            onManageSections={(m) => setSectionsMenu(m)}
+            onManageItems={(m) => setItemsMenu(m)}
             pendingId={pendingId}
           />
         )}

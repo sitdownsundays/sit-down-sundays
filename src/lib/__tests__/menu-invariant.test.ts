@@ -193,7 +193,7 @@ describe("0004 — published-menu invariant", () => {
   it("a last eligible item cannot be deactivated after a menu is published", async () => {
     const { itemId } = seedPublishedMenuWithOneItem();
     const repo = getMenuRepository();
-    const r = await repo.setItemActive("administrator", "actor-1", itemId, false);
+    const r = await repo.setItemActive("administrator", "actor-1", itemId, false, BASE_TIME);
     expect(r.ok).toBe(false);
     expect(r.message).toMatch(/no active items/i);
     // Item remains active (rolled back).
@@ -204,7 +204,7 @@ describe("0004 — published-menu invariant", () => {
   it("an active section containing the last eligible items cannot be deactivated", async () => {
     const { sectionId } = seedPublishedMenuWithOneSectionedItem();
     const repo = getMenuRepository();
-    const r = await repo.setSectionActive("administrator", "actor-1", sectionId, false);
+    const r = await repo.setSectionActive("administrator", "actor-1", sectionId, false, BASE_TIME);
     expect(r.ok).toBe(false);
     expect(r.message).toMatch(/no active items/i);
     const mock = __getMockMenuRepositoryForSeed();
@@ -217,7 +217,7 @@ describe("0004 — published-menu invariant", () => {
     const repo = getMenuRepository();
     // Deactivate the last item AND add a replacement in one transaction.
     await mock.transaction(async (r) => {
-      await r.setItemActive("administrator", "actor-1", itemId, false);
+      await r.setItemActive("administrator", "actor-1", itemId, false, BASE_TIME);
       await r.createItem("administrator", "actor-1", {
         menuId,
         name: "Replacement",
@@ -254,7 +254,7 @@ describe("0004 — published-menu invariant", () => {
     const { itemId } = seedPublishedMenuWithOneItem();
     const repo = getMenuRepository();
     const before = __getMockMenuRepositoryForSeed().auditLogs.length;
-    await repo.setItemActive("administrator", "actor-1", itemId, false);
+    await repo.setItemActive("administrator", "actor-1", itemId, false, BASE_TIME);
     const after = __getMockMenuRepositoryForSeed().auditLogs.length;
     // No new audit row for the rejected deactivation.
     expect(after).toBe(before);
@@ -266,7 +266,7 @@ describe("0004 — published-menu invariant", () => {
     const repo = getMenuRepository();
     await expect(
       mock.transaction(async (r) => {
-        await r.setItemActive("administrator", "actor-1", itemId, false);
+        await r.setItemActive("administrator", "actor-1", itemId, false, BASE_TIME);
       }),
     ).rejects.toBeInstanceOf(PublishedMenuEmptyError);
     // Rolled back: item still active.

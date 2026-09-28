@@ -61,6 +61,7 @@ export interface MenuRepository {
     actorId: string | null,
     id: string,
     isActive: boolean,
+    expectedUpdatedAt: string,
   ): Promise<MenuMutationResult>;
   createItem(
     callerRole: RoleKey,
@@ -79,6 +80,7 @@ export interface MenuRepository {
     actorId: string | null,
     id: string,
     isActive: boolean,
+    expectedUpdatedAt: string,
   ): Promise<MenuMutationResult>;
   reorderSections(
     callerRole: RoleKey,

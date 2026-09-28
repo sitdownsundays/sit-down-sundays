@@ -536,7 +536,13 @@ describe("archive & deactivation", () => {
       ],
       [],
     );
-    await getMenuRepository().setSectionActive("ops_manager", "actor-1", sectionId, false);
+    await getMenuRepository().setSectionActive(
+      "ops_manager",
+      "actor-1",
+      sectionId,
+      false,
+      "2025-09-01T10:00:00Z",
+    );
     expect(repo.sections.find((s) => s.id === sectionId)!.isActive).toBe(false);
   });
 
@@ -581,7 +587,13 @@ describe("archive & deactivation", () => {
         },
       ],
     );
-    await getMenuRepository().setItemActive("ops_manager", "actor-1", itemId, false);
+    await getMenuRepository().setItemActive(
+      "ops_manager",
+      "actor-1",
+      itemId,
+      false,
+      "2025-09-01T10:00:00Z",
+    );
     expect(repo.items.find((i) => i.id === itemId)!.isActive).toBe(false);
   });
 
