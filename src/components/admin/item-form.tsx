@@ -5,6 +5,10 @@
  * Image URL requires meaningful alt text when present; clearing the image
  * permits clearing alt text. Dietary tags and allergens are comma-separated
  * and normalized server-side.
+ *
+ * Image source: staff may either upload a photo (ImageUploadField) or paste a
+ * URL for an already-hosted photo. The upload keeps the existing image until
+ * the replacement uploads AND the item save succeeds.
  */
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -19,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { MENU_CATEGORIES, MENU_LIMITS } from "@/lib/menu/constants";
 import type { MenuSectionDTO } from "@/lib/menu/types";
+import { ImageUploadField } from "./image-upload-field";
 import type { ItemFormErrors, ItemFormValues } from "./item-form-helpers";
 
 interface ItemFormProps {
@@ -27,6 +32,8 @@ interface ItemFormProps {
   onChange: (patch: Partial<ItemFormValues>) => void;
   sections: MenuSectionDTO[];
   disabled?: boolean;
+  /** Item ID for storage path namespacing. For new items, a throwaway UUID. */
+  itemId: string;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -38,7 +45,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   children: "Children",
 };
 
-export function ItemForm({ values, errors, onChange, sections, disabled }: ItemFormProps) {
+export function ItemForm({ values, errors, onChange, sections, disabled, itemId }: ItemFormProps) {
   const activeSections = sections.filter((s) => s.isActive);
   return (
     <div className="space-y-4">
@@ -171,44 +178,64 @@ export function ItemForm({ values, errors, onChange, sections, disabled }: ItemF
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="item-image-url">Image URL</Label>
-          <Input
-            id="item-image-url"
-            type="url"
-            value={values.imageUrl}
-            onChange={(e) => onChange({ imageUrl: e.target.value })}
-            aria-invalid={!!errors.imageUrl}
-            aria-describedby={errors.imageUrl ? "item-image-url-error" : undefined}
-            maxLength={MENU_LIMITS.imageUrl}
-            disabled={disabled}
-          />
-          {errors.imageUrl && (
-            <p id="item-image-url-error" className="text-xs text-destructive" role="alert">
-              {errors.imageUrl}
-            </p>
-          )}
-        </div>
+      {/* Image source: upload a photo, or paste a URL for an already-hosted
+          photo. The upload keeps the existing image until the replacement
+          uploads AND succeeds. Alt text is required when an image is present. */}
+      <fieldset className="space-y-3 rounded-lg border border-border bg-muted/20 p-4">
+        <legend className="px-1 text-sm font-medium">Photograph</legend>
+        <ImageUploadField
+          imageUrl={values.imageUrl}
+          imageAlt={values.imageAlt}
+          itemId={itemId}
+          onUploaded={(url) => onChange({ imageUrl: url })}
+          onRemoved={() => onChange({ imageUrl: "", imageAlt: "" })}
+          disabled={disabled}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="item-image-alt">Image alt text</Label>
-          <Input
-            id="item-image-alt"
-            value={values.imageAlt}
-            onChange={(e) => onChange({ imageAlt: e.target.value })}
-            aria-invalid={!!errors.imageAlt}
-            aria-describedby={errors.imageAlt ? "item-image-alt-error" : undefined}
-            maxLength={MENU_LIMITS.imageAlt}
-            disabled={disabled}
-          />
-          {errors.imageAlt && (
-            <p id="item-image-alt-error" className="text-xs text-destructive" role="alert">
-              {errors.imageAlt}
-            </p>
-          )}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="item-image-url">Image URL</Label>
+            <Input
+              id="item-image-url"
+              type="url"
+              value={values.imageUrl}
+              onChange={(e) => onChange({ imageUrl: e.target.value })}
+              aria-invalid={!!errors.imageUrl}
+              aria-describedby={errors.imageUrl ? "item-image-url-error" : "item-image-url-help"}
+              maxLength={MENU_LIMITS.imageUrl}
+              disabled={disabled}
+            />
+            {errors.imageUrl ? (
+              <p id="item-image-url-error" className="text-xs text-destructive" role="alert">
+                {errors.imageUrl}
+              </p>
+            ) : (
+              <p id="item-image-url-help" className="text-xs text-muted-foreground">
+                Set automatically when you upload a photo, or paste a URL for an already-hosted
+                image.
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="item-image-alt">Image alt text</Label>
+            <Input
+              id="item-image-alt"
+              value={values.imageAlt}
+              onChange={(e) => onChange({ imageAlt: e.target.value })}
+              aria-invalid={!!errors.imageAlt}
+              aria-describedby={errors.imageAlt ? "item-image-alt-error" : undefined}
+              maxLength={MENU_LIMITS.imageAlt}
+              disabled={disabled}
+            />
+            {errors.imageAlt && (
+              <p id="item-image-alt-error" className="text-xs text-destructive" role="alert">
+                {errors.imageAlt}
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+      </fieldset>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">

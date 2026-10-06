@@ -5,6 +5,10 @@
  * status field — the server schema rejects it and the repository forces
  * "draft". When the user edits the slug field, it is marked as manually
  * edited so subsequent name edits do not overwrite the custom slug.
+ *
+ * Scheduling uses split date/time ScheduleField controls in an optional
+ * "Publication schedule" section. A draft saves successfully with both
+ * boundaries unset.
  */
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -22,8 +26,9 @@ import { normalizeSlug } from "@/lib/menu/constants";
 import type { MenuActionResult } from "@/lib/menu/types";
 import { MenuForm } from "./menu-form";
 import {
+  browserTimezoneLabel,
   emptyFormValues,
-  fromDatetimeLocalValue,
+  scheduleBoundaryToIso,
   validateForm,
   type FormErrors,
   type MenuFormValues,
@@ -86,8 +91,8 @@ export function CreateMenuDialog({ open, onOpenChange, onCreated }: CreateMenuDi
           slug: normalizeSlug(v.slug),
           description: v.description.trim(),
           displayOrder: Number(v.displayOrder),
-          publishAt: fromDatetimeLocalValue(v.publishAt),
-          unpublishAt: fromDatetimeLocalValue(v.unpublishAt),
+          publishAt: scheduleBoundaryToIso(v.publishAt),
+          unpublishAt: scheduleBoundaryToIso(v.unpublishAt),
         },
       });
       if (res.ok) {
@@ -119,6 +124,7 @@ export function CreateMenuDialog({ open, onOpenChange, onCreated }: CreateMenuDi
               onChange={update}
               disabled={submitting}
               slugHint="Lowercase letters, numbers, and hyphens. Used in the public menu URL."
+              timezoneLabel={browserTimezoneLabel()}
             />
           </div>
           {serverError && (

@@ -24,19 +24,40 @@ describe("internal navigation filtering", () => {
     expect(labels).toContain("Dietary Notes");
   });
 
-  it("administrator sees all admin sections", () => {
+  it("administrator sees all five admin service areas", () => {
     const sections = filterNavByRole(ADMIN_NAV, "administrator");
-    expect(sections.length).toBe(4);
+    // Overview, Reservations, Menus & Meals, Sundays & Seating, Settings
+    expect(sections.length).toBe(5);
     const labels = sections.flatMap((s) => s.items.map((i) => i.label));
     expect(labels).toContain("Audit Log");
     expect(labels).toContain("Users");
+    expect(labels).toContain("Venue Spaces");
+    expect(labels).toContain("Feast Offerings");
   });
 
-  it("foh staff cannot see audit log (admin nav filtered)", () => {
+  it("foh staff cannot see audit log or roles (admin nav filtered)", () => {
     const sections = filterNavByRole(ADMIN_NAV, "foh_staff");
     const labels = sections.flatMap((s) => s.items.map((i) => i.label));
     expect(labels).not.toContain("Audit Log");
     expect(labels).not.toContain("Roles");
+  });
+
+  it("content manager sees menus & feast offerings but not spaces or users", () => {
+    const sections = filterNavByRole(ADMIN_NAV, "content_manager");
+    const labels = sections.flatMap((s) => s.items.map((i) => i.label));
+    expect(labels).toContain("Menus");
+    expect(labels).toContain("Feast Offerings");
+    expect(labels).not.toContain("Venue Spaces");
+    expect(labels).not.toContain("Users");
+  });
+
+  it("ops manager sees venue spaces and reservations but not menus", () => {
+    const sections = filterNavByRole(ADMIN_NAV, "ops_manager");
+    const labels = sections.flatMap((s) => s.items.map((i) => i.label));
+    expect(labels).toContain("Venue Spaces");
+    expect(labels).toContain("Reservations");
+    expect(labels).toContain("Payments");
+    expect(labels).not.toContain("Menus");
   });
 
   it("filterNavByRole removes empty sections", () => {

@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
-import { MenuItemCard } from "@/components/layout/menu-item-card";
 import { ButtonLink } from "@/components/layout/button-link";
-import { MOCK_MENU_ITEMS } from "@/lib/mock";
-import type { MenuCategory } from "@/lib/domain/types";
+import { ErrorState } from "@/components/layout/error-state";
+import { PublicMenuView } from "@/components/public/public-menu-view";
+import {
+  publishedMenusQueryOptions,
+  publishedMenuBySlugQueryOptions,
+} from "@/components/public/public-menu-data";
 
 export const Route = createFileRoute("/_public/menu")({
   head: () => ({
@@ -13,49 +16,58 @@ export const Route = createFileRoute("/_public/menu")({
       {
         name: "description",
         content:
-          "A provisional look at the Sit Down Sundays menu. Final items and prices to be confirmed.",
+          "A look at the Sit Down Sundays menu — shared dishes gathered around one table. Items and prices are provisional until finalized.",
       },
       { property: "og:title", content: "Menu — Sit Down Sundays" },
-      { property: "og:description", content: "A provisional look at the Sit Down Sundays menu." },
+      {
+        property: "og:description",
+        content: "A look at the Sit Down Sundays menu — shared dishes gathered around one table.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  loader: async ({ context }) => {
+    // Prime the published-menu list cache for SSR + hydration. The single-menu
+    // query is fetched on demand by the selector; both use staleTime: 0 so CMS
+    // edits are reflected on return navigation.
+    await context.queryClient.ensureQueryData(publishedMenusQueryOptions());
+  },
+  errorComponent: ({ error, reset }) => (
+    <Container className="py-16">
+      <ErrorState
+        title="Menu could not be loaded"
+        message="Something went wrong while loading the menu. Please try again."
+        action={
+          <button
+            type="button"
+            onClick={() => {
+              reset();
+            }}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Try again
+          </button>
+        }
+      />
+      <p className="sr-only">{error instanceof Error ? error.message : "Unexpected error"}</p>
+    </Container>
+  ),
   component: MenuPage,
 });
-
-const CATEGORIES: { key: MenuCategory; label: string }[] = [
-  { key: "starter", label: "Starters" },
-  { key: "main", label: "Mains" },
-  { key: "side", label: "Sides" },
-  { key: "dessert", label: "Desserts" },
-  { key: "children", label: "Children" },
-];
 
 function MenuPage() {
   return (
     <Container className="py-12">
       <PageHeader
-        eyebrow="Provisional Menu"
-        title="The Sunday Table"
-        description="A working sample menu. Items and prices are provisional and will be finalized before opening."
+        eyebrow="The Sunday Table"
+        title="Our Menu"
+        description="Shared dishes gathered around one table. Items and prices are provisional until finalized."
       />
-      <div className="mt-12 space-y-12">
-        {CATEGORIES.map((cat) => {
-          const items = MOCK_MENU_ITEMS.filter((i) => i.category === cat.key);
-          if (items.length === 0) return null;
-          return (
-            <section key={cat.key}>
-              <h2 className="font-display text-2xl font-bold text-foreground">{cat.label}</h2>
-              <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((item) => (
-                  <MenuItemCard key={item.id} item={item} />
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </div>
+      <PublicMenuView
+        listOptions={publishedMenusQueryOptions()}
+        bySlugOptions={publishedMenuBySlugQueryOptions}
+      />
       <div className="mt-12 flex flex-wrap gap-3">
         <ButtonLink to="/waitlist">Join the Waitlist</ButtonLink>
         <ButtonLink to="/how-it-works" variant="outline">

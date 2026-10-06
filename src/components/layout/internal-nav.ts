@@ -42,7 +42,7 @@ export const STAFF_NAV: NavSection[] = [
   {
     label: "Operations",
     items: [
-      { label: "Dashboard", to: "/staff" },
+      { label: "Overview", to: "/staff" },
       { label: "Reservations", to: "/staff/reservations", permission: "reservations.read_all" },
       { label: "Calendar", to: "/staff/calendar", permission: "availability.manage" },
       { label: "Seating", to: "/staff/seating", permission: "seating.read" },
@@ -68,43 +68,51 @@ export const KITCHEN_NAV: NavSection[] = [
   },
 ];
 
+/**
+ * Administration navigation, grouped into five service areas:
+ *   Overview, Reservations, Menus & Meals, Sundays & Seating, Settings.
+ *
+ * Unfinished modules are intentionally hidden from navigation so staff see a
+ * short, clear menu. Their routes remain reachable directly and still guard
+ * via beforeLoad. Do not create separate top-level navigation for every
+ * configuration table — group related tables under one area.
+ *
+ * Permission filtering is presentation only; server functions enforce real
+ * authorization. Each link keeps its existing permission gate.
+ */
 export const ADMIN_NAV: NavSection[] = [
   {
-    label: "Content",
-    items: [
-      { label: "Dashboard", to: "/admin" },
-      { label: "Content", to: "/admin/content", permission: "content.manage" },
-      { label: "Navigation", to: "/admin/navigation", permission: "content.manage" },
-      { label: "Media", to: "/admin/media", permission: "content.manage" },
-      { label: "Menus", to: "/admin/menus", permission: "menus.manage" },
-      { label: "Menu Items", to: "/admin/menu-items", permission: "menus.manage" },
-    ],
+    label: "Overview",
+    items: [{ label: "Dashboard", to: "/admin" }],
   },
   {
-    label: "Operations",
+    label: "Reservations",
     items: [
-      { label: "Sundays", to: "/admin/sundays", permission: "availability.manage" },
-      { label: "Seating Times", to: "/admin/seating-times", permission: "availability.manage" },
-      { label: "Tables", to: "/admin/tables", permission: "seating.manage" },
-      { label: "Private Room", to: "/admin/private-room", permission: "availability.manage" },
       { label: "Reservations", to: "/admin/reservations", permission: "reservations.read_all" },
       { label: "Payments", to: "/admin/payments", permission: "payments.read" },
     ],
   },
   {
-    label: "Finance",
+    label: "Menus & Meals",
     items: [
-      { label: "Pricing", to: "/admin/pricing", permission: "pricing.manage" },
-      { label: "Discounts", to: "/admin/discounts", permission: "pricing.manage" },
-      { label: "Fees", to: "/admin/fees", permission: "pricing.manage" },
-      { label: "Taxes", to: "/admin/taxes", permission: "pricing.manage" },
+      { label: "Menus", to: "/admin/menus", permission: "menus.manage" },
+      { label: "Feast Offerings", to: "/admin/menu-items", permission: "menus.manage" },
+      { label: "Ordering", to: "/admin/ordering", permission: "menus.manage" },
     ],
   },
   {
-    label: "System",
+    label: "Sundays & Seating",
     items: [
-      { label: "Emails", to: "/admin/emails", permission: "content.manage" },
-      { label: "Reports", to: "/admin/reports", permission: "reports.read" },
+      { label: "Venue Spaces", to: "/admin/spaces", permission: "availability.manage" },
+      { label: "Sundays", to: "/admin/sundays", permission: "availability.manage" },
+      { label: "Seating Times", to: "/admin/seating-times", permission: "availability.manage" },
+      { label: "Tables", to: "/admin/tables", permission: "seating.manage" },
+    ],
+  },
+  {
+    label: "Settings",
+    items: [
+      { label: "Pricing", to: "/admin/pricing", permission: "pricing.manage" },
       { label: "Users", to: "/admin/users", permission: "users.read" },
       { label: "Roles", to: "/admin/roles", permission: "roles.manage" },
       { label: "Settings", to: "/admin/settings", permission: "settings.manage" },

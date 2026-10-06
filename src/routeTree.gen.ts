@@ -45,6 +45,7 @@ import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminMenuItemsRouteImport } from './routes/admin.menu-items'
 import { Route as AdminMenusRouteImport } from './routes/admin.menus'
 import { Route as AdminNavigationRouteImport } from './routes/admin.navigation'
+import { Route as AdminOrderingRouteImport } from './routes/admin.ordering'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPrivateRoomRouteImport } from './routes/admin.private-room'
@@ -53,6 +54,7 @@ import { Route as AdminReservationsRouteImport } from './routes/admin.reservatio
 import { Route as AdminRolesRouteImport } from './routes/admin.roles'
 import { Route as AdminSeatingTimesRouteImport } from './routes/admin.seating-times'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminSpacesRouteImport } from './routes/admin.spaces'
 import { Route as AdminSundaysRouteImport } from './routes/admin.sundays'
 import { Route as AdminTablesRouteImport } from './routes/admin.tables'
 import { Route as AdminTaxesRouteImport } from './routes/admin.taxes'
@@ -256,6 +258,11 @@ const AdminNavigationRoute = AdminNavigationRouteImport.update({
   path: '/navigation',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminOrderingRoute = AdminOrderingRouteImport.update({
+  id: '/ordering',
+  path: '/ordering',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
@@ -294,6 +301,11 @@ const AdminSeatingTimesRoute = AdminSeatingTimesRouteImport.update({
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSpacesRoute = AdminSpacesRouteImport.update({
+  id: '/spaces',
+  path: '/spaces',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSundaysRoute = AdminSundaysRouteImport.update({
@@ -449,6 +461,7 @@ export interface FileRoutesByFullPath {
   '/admin/menu-items': typeof AdminMenuItemsRoute
   '/admin/menus': typeof AdminMenusRoute
   '/admin/navigation': typeof AdminNavigationRoute
+  '/admin/ordering': typeof AdminOrderingRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/private-room': typeof AdminPrivateRoomRoute
@@ -457,6 +470,7 @@ export interface FileRoutesByFullPath {
   '/admin/roles': typeof AdminRolesRoute
   '/admin/seating-times': typeof AdminSeatingTimesRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/spaces': typeof AdminSpacesRoute
   '/admin/sundays': typeof AdminSundaysRoute
   '/admin/tables': typeof AdminTablesRoute
   '/admin/taxes': typeof AdminTaxesRoute
@@ -511,6 +525,7 @@ export interface FileRoutesByTo {
   '/admin/menu-items': typeof AdminMenuItemsRoute
   '/admin/menus': typeof AdminMenusRoute
   '/admin/navigation': typeof AdminNavigationRoute
+  '/admin/ordering': typeof AdminOrderingRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/private-room': typeof AdminPrivateRoomRoute
@@ -519,6 +534,7 @@ export interface FileRoutesByTo {
   '/admin/roles': typeof AdminRolesRoute
   '/admin/seating-times': typeof AdminSeatingTimesRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/spaces': typeof AdminSpacesRoute
   '/admin/sundays': typeof AdminSundaysRoute
   '/admin/tables': typeof AdminTablesRoute
   '/admin/taxes': typeof AdminTaxesRoute
@@ -580,6 +596,7 @@ export interface FileRoutesById {
   '/admin/menu-items': typeof AdminMenuItemsRoute
   '/admin/menus': typeof AdminMenusRoute
   '/admin/navigation': typeof AdminNavigationRoute
+  '/admin/ordering': typeof AdminOrderingRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/private-room': typeof AdminPrivateRoomRoute
@@ -588,6 +605,7 @@ export interface FileRoutesById {
   '/admin/roles': typeof AdminRolesRoute
   '/admin/seating-times': typeof AdminSeatingTimesRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/spaces': typeof AdminSpacesRoute
   '/admin/sundays': typeof AdminSundaysRoute
   '/admin/tables': typeof AdminTablesRoute
   '/admin/taxes': typeof AdminTaxesRoute
@@ -651,6 +669,7 @@ export interface FileRouteTypes {
     | '/admin/menu-items'
     | '/admin/menus'
     | '/admin/navigation'
+    | '/admin/ordering'
     | '/admin/payments'
     | '/admin/pricing'
     | '/admin/private-room'
@@ -659,6 +678,7 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/seating-times'
     | '/admin/settings'
+    | '/admin/spaces'
     | '/admin/sundays'
     | '/admin/tables'
     | '/admin/taxes'
@@ -713,6 +733,7 @@ export interface FileRouteTypes {
     | '/admin/menu-items'
     | '/admin/menus'
     | '/admin/navigation'
+    | '/admin/ordering'
     | '/admin/payments'
     | '/admin/pricing'
     | '/admin/private-room'
@@ -721,6 +742,7 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/seating-times'
     | '/admin/settings'
+    | '/admin/spaces'
     | '/admin/sundays'
     | '/admin/tables'
     | '/admin/taxes'
@@ -781,6 +803,7 @@ export interface FileRouteTypes {
     | '/admin/menu-items'
     | '/admin/menus'
     | '/admin/navigation'
+    | '/admin/ordering'
     | '/admin/payments'
     | '/admin/pricing'
     | '/admin/private-room'
@@ -789,6 +812,7 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/seating-times'
     | '/admin/settings'
+    | '/admin/spaces'
     | '/admin/sundays'
     | '/admin/tables'
     | '/admin/taxes'
@@ -1079,6 +1103,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNavigationRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/ordering': {
+      id: '/admin/ordering'
+      path: '/ordering'
+      fullPath: '/admin/ordering'
+      preLoaderRoute: typeof AdminOrderingRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/payments': {
       id: '/admin/payments'
       path: '/payments'
@@ -1133,6 +1164,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/spaces': {
+      id: '/admin/spaces'
+      path: '/spaces'
+      fullPath: '/admin/spaces'
+      preLoaderRoute: typeof AdminSpacesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/sundays': {
@@ -1383,6 +1421,7 @@ interface AdminRouteChildren {
   AdminMenuItemsRoute: typeof AdminMenuItemsRoute
   AdminMenusRoute: typeof AdminMenusRoute
   AdminNavigationRoute: typeof AdminNavigationRoute
+  AdminOrderingRoute: typeof AdminOrderingRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPricingRoute: typeof AdminPricingRoute
   AdminPrivateRoomRoute: typeof AdminPrivateRoomRoute
@@ -1391,6 +1430,7 @@ interface AdminRouteChildren {
   AdminRolesRoute: typeof AdminRolesRoute
   AdminSeatingTimesRoute: typeof AdminSeatingTimesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSpacesRoute: typeof AdminSpacesRoute
   AdminSundaysRoute: typeof AdminSundaysRoute
   AdminTablesRoute: typeof AdminTablesRoute
   AdminTaxesRoute: typeof AdminTaxesRoute
@@ -1409,6 +1449,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminMenuItemsRoute: AdminMenuItemsRoute,
   AdminMenusRoute: AdminMenusRoute,
   AdminNavigationRoute: AdminNavigationRoute,
+  AdminOrderingRoute: AdminOrderingRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPricingRoute: AdminPricingRoute,
   AdminPrivateRoomRoute: AdminPrivateRoomRoute,
@@ -1417,6 +1458,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRolesRoute: AdminRolesRoute,
   AdminSeatingTimesRoute: AdminSeatingTimesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminSpacesRoute: AdminSpacesRoute,
   AdminSundaysRoute: AdminSundaysRoute,
   AdminTablesRoute: AdminTablesRoute,
   AdminTaxesRoute: AdminTaxesRoute,

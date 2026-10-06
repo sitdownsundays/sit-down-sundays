@@ -1,18 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { InternalPlaceholder } from "@/components/layout/internal-placeholder";
+import { AdminSundaysPage } from "@/components/admin/admin-sundays";
 import { internalHead } from "@/lib/head-meta";
 
 export const Route = createFileRoute("/admin/sundays")({
   head: () =>
     internalHead({
-      title: "Sundays — Admin — Sit Down Sundays",
-      description: "Manage Sunday services.",
+      title: "Sundays & Seating — Admin — Sit Down Sundays",
+      description: "Manage Sunday services, seating times, and capacity.",
     }),
-  component: () => (
-    <InternalPlaceholder
-      eyebrow="Administration"
-      title="Sundays"
-      description="Manage Sunday service availability."
-    />
-  ),
+  component: AdminSundaysPage,
 });

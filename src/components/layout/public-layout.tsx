@@ -5,8 +5,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { Container } from "@/components/layout/container";
 import { ButtonLink } from "@/components/layout/button-link";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/lib/auth/auth-context";
+import { useAuth, useSessionUser } from "@/lib/auth/auth-context";
 import { signOut } from "@/lib/auth.functions";
+import { primaryWorkspaceForRole } from "@/lib/auth/destinations";
 
 export const BRAND_LOGO_SRC =
   "https://vibe.filesafe.space/1790115564962639543/attachments/d7410d81-221b-4e4e-88c0-d5eb14a02b7b.jpg";
@@ -33,7 +34,10 @@ export function PublicLayout() {
   const navigate = useNavigate();
   const signOutFn = useServerFn(signOut);
   const { session, refresh } = useAuth();
+  const sessionUser = useSessionUser();
   const authenticated = session.authenticated;
+  const primaryWorkspace =
+    authenticated && sessionUser ? primaryWorkspaceForRole(sessionUser.roleKey) : null;
 
   async function handleSignOut() {
     try {
@@ -91,6 +95,14 @@ export function PublicLayout() {
           <div className="hidden items-center gap-2 xl:flex">
             {authenticated ? (
               <>
+                {primaryWorkspace && (
+                  <Link
+                    to={primaryWorkspace.to as never}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  >
+                    {primaryWorkspace.label}
+                  </Link>
+                )}
                 <Link
                   to="/account"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground"
@@ -158,6 +170,16 @@ export function PublicLayout() {
               <div className="pt-2">
                 {authenticated ? (
                   <div className="space-y-2">
+                    {primaryWorkspace && (
+                      <ButtonLink
+                        to={primaryWorkspace.to as never}
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setOpen(false)}
+                      >
+                        {primaryWorkspace.label}
+                      </ButtonLink>
+                    )}
                     <ButtonLink to="/account" className="w-full" onClick={() => setOpen(false)}>
                       My Account
                     </ButtonLink>

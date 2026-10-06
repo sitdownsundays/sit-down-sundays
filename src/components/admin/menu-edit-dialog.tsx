@@ -5,8 +5,12 @@
  * expectedUpdatedAt), the user's form values are preserved and a reload
  * action is offered instead of silently overwriting newer data. The reload
  * action closes the dialog AND refreshes the latest record from the server.
+ *
+ * Scheduling uses split date/time ScheduleField controls in an optional
+ * "Publication schedule" section. Existing timestamps round-trip through
+ * isoToScheduleBoundary / scheduleBoundaryToIso.
  */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,9 +27,10 @@ import { normalizeSlug } from "@/lib/menu/constants";
 import type { MenuActionResult, MenuWithContentDTO } from "@/lib/menu/types";
 import { MenuForm } from "./menu-form";
 import {
+  browserTimezoneLabel,
   emptyFormValues,
-  fromDatetimeLocalValue,
   menuToFormValues,
+  scheduleBoundaryToIso,
   validateForm,
   type FormErrors,
   type MenuFormValues,
@@ -89,8 +94,8 @@ export function EditMenuDialog({
             slug: normalizeSlug(v.slug),
             description: v.description.trim(),
             displayOrder: Number(v.displayOrder),
-            publishAt: fromDatetimeLocalValue(v.publishAt),
-            unpublishAt: fromDatetimeLocalValue(v.unpublishAt),
+            publishAt: scheduleBoundaryToIso(v.publishAt),
+            unpublishAt: scheduleBoundaryToIso(v.unpublishAt),
           },
         },
       });
@@ -124,7 +129,13 @@ export function EditMenuDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="max-h-[60vh] overflow-y-auto pr-1">
-            <MenuForm values={values} errors={errors} onChange={update} disabled={submitting} />
+            <MenuForm
+              values={values}
+              errors={errors}
+              onChange={update}
+              disabled={submitting}
+              timezoneLabel={browserTimezoneLabel()}
+            />
           </div>
 
           {conflict ? (

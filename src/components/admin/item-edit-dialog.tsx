@@ -118,6 +118,7 @@ export function EditItemDialog({
             onChange={update}
             sections={sections}
             disabled={submitting}
+            itemId={item ? item.id : "new"}
           />
 
           {conflict ? (

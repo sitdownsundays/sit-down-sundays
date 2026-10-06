@@ -4,10 +4,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Container } from "@/components/layout/container";
 import { SectionHeading } from "@/components/layout/section-heading";
 import { ButtonLink } from "@/components/layout/button-link";
-import { MenuItemCard } from "@/components/layout/menu-item-card";
 import { HomeHero } from "@/components/layout/home-hero";
+import { FeaturedMenuPreview } from "@/components/public/featured-menu-preview";
+import { featuredMenuItemsQueryOptions } from "@/components/public/public-menu-data";
+import { ChooseYourFeastSection } from "@/components/public/choose-your-feast-section";
+import { publishedFeastOfferingsQueryOptions } from "@/components/public/feast-offerings-data";
 import { HERO_IMAGE_SRC } from "@/lib/content/hero-content";
-import { MOCK_MENU_ITEMS } from "@/lib/mock";
 
 export const Route = createFileRoute("/_public/")({
   head: () => ({
@@ -29,6 +31,14 @@ export const Route = createFileRoute("/_public/")({
       { name: "twitter:image", content: HERO_IMAGE_SRC },
     ],
   }),
+  // Prime the featured-items cache for SSR + hydration. staleTime: 0 means
+  // returning to the homepage refreshes featured content after CMS edits.
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(featuredMenuItemsQueryOptions()),
+      context.queryClient.ensureQueryData(publishedFeastOfferingsQueryOptions()),
+    ]);
+  },
   component: HomePage,
 });
 
@@ -104,27 +114,28 @@ function HomePage() {
         </div>
       </Container>
 
-      {/* Featured menu preview */}
-      <section className="bg-gradient-to-b from-cream via-muted/50 to-cream">
+      {/* Choose Your Feast — Curated Feast Offerings */}
+      <section className="bg-gradient-to-b from-cream via-muted/30 to-cream">
+        <Container className="py-24">
+          <SectionHeading
+            centered
+            eyebrow="Curated Sunday Dining"
+            title="Choose Your Feast"
+            description="Our Sunday dining experience is served family-style with fixed per-person offerings. Select the feast that fits your table."
+          />
+          <ChooseYourFeastSection />
+        </Container>
+      </section>
+
+      {/* Featured menu preview — CMS-powered featured items */}
+      <section className="bg-muted/30">
         <Container className="py-24">
           <SectionHeading
             centered
             title="A taste of the table"
             description="A provisional look at what may be served. Final menu and prices to be confirmed before opening."
           />
-          <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-            {MOCK_MENU_ITEMS.slice(0, 6).map((item) => (
-              <MenuItemCard key={item.id} item={item} className="h-full" />
-            ))}
-          </div>
-          <div className="mt-12 flex flex-col items-center gap-3 text-center">
-            <ButtonLink to="/menu" size="lg">
-              Explore the Full Menu <ArrowRight className="size-4" />
-            </ButtonLink>
-            <p className="text-sm text-muted-foreground">
-              Provisional menu — final details coming soon.
-            </p>
-          </div>
+          <FeaturedMenuPreview options={featuredMenuItemsQueryOptions()} />
         </Container>
       </section>
 

@@ -111,6 +111,10 @@ export interface Menu {
   description: string;
   itemIds: string[];
   published: boolean;
+  coverImageUrl?: string;
+  coverImageAlt?: string;
+  pricePerPersonCents?: number;
+  inclusions?: string[];
 }
 
 /* ----------------------------- Availability ----------------------------- */
@@ -152,6 +156,36 @@ export interface PrivateRoom {
   maxGuests: number;
   feeCents: number;
   available: boolean;
+}
+
+/* ----------------------------- Venue Spaces ----------------------------- */
+
+/**
+ * How a physical space participates in online booking.
+ *  - general_dining: open general dining. Bookings stay DISABLED until staff
+ *    configures onlineBookingLimit AND Sunday services + seating times exist.
+ *  - request_only: staff-approval-only for large gatherings. No online
+ *    self-booking, no shared seating, no exclusivity promise, no pooling.
+ *  - not_bookable: not exposed for booking (e.g. suites, coming soon).
+ */
+export type SpaceType = "general_dining" | "request_only" | "not_bookable";
+
+export interface VenueSpace {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  spaceType: SpaceType;
+  /** Physical reported capacity — a fact for display/audit only. Never seats sold. */
+  reportedCapacity: number;
+  /** Staff-controlled sales ceiling. null means NOT FOR SALE. Setting it does not open bookings. */
+  onlineBookingLimit: number | null;
+  isActive: boolean;
+  displayOrder: number;
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
+  createdBy: string | null;
+  updatedBy: string | null;
 }
 
 /* ----------------------------- Reservation ----------------------------- */

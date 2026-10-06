@@ -40,6 +40,7 @@ import type {
   SessionState,
   SessionUser,
 } from "@/lib/auth/types";
+import { resolvePostSigninDestination } from "@/lib/auth/destinations";
 
 /* ------------------------------- Sign up -------------------------------- */
 
@@ -95,7 +96,7 @@ const signinSchema = z
 
 export const signIn = createServerFn({ method: "POST" })
   .validator((raw: unknown) => signinSchema.parse(raw))
-  .handler(async ({ data }): Promise<AuthResult & { redirectTo?: string }> => {
+  .handler(async ({ data }): Promise<AuthResult & { redirectTo?: string; roleKey?: string }> => {
     try {
       const { isProduction } = resolveDataMode();
       const repo = getAuthRepository();
@@ -105,7 +106,13 @@ export const signIn = createServerFn({ method: "POST" })
       );
       if (result.ok) {
         if (result.cookie) setResponseHeader("set-cookie", result.cookie);
-        return { ok: true, redirectTo: sanitizeReturnPath(data.returnTo) };
+        const roleKey = result.user?.roleKey;
+        // Shared permission-aware destination: an explicit return path is used
+        // only when it is both sanitized (open-redirect safe) AND authorized
+        // for this role; otherwise the role's permitted default workspace is
+        // used (admin → /admin, foh → /staff, kitchen → /kitchen, guest → /account).
+        const redirectTo = resolvePostSigninDestination(roleKey, data.returnTo);
+        return { ok: true, redirectTo, roleKey };
       }
       return {
         ok: false,

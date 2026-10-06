@@ -4,6 +4,9 @@
  * Focuses the name input on open. Validation runs client-side before
  * submission; the server re-validates authoritatively. A new item is always
  * active (forced server-side).
+ *
+ * A throwaway itemId is generated for the storage path namespace so an
+ * uploaded photo has a unique path even before the item row exists.
  */
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -47,6 +50,10 @@ export function CreateItemDialog({
   const [errors, setErrors] = useState<ItemFormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string>("");
+  // Throwaway ID namespaces the storage path for an uploaded photo before the
+  // item row exists. Regenerated each time the dialog opens so a fresh upload
+  // gets a fresh path even after a previous attempt was abandoned.
+  const [itemId, setItemId] = useState(() => crypto.randomUUID());
 
   useEffect(() => {
     if (open) {
@@ -54,6 +61,7 @@ export function CreateItemDialog({
       setErrors({});
       setServerError("");
       setSubmitting(false);
+      setItemId(crypto.randomUUID());
       requestAnimationFrame(() => {
         const el = document.getElementById("item-name");
         if (el instanceof HTMLElement) el.focus();
@@ -105,6 +113,7 @@ export function CreateItemDialog({
             onChange={update}
             sections={sections}
             disabled={submitting}
+            itemId={itemId}
           />
 
           {serverError && (

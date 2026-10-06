@@ -38,6 +38,7 @@ import {
   analyticsContextFromInput,
 } from "@/lib/waitlist/analytics";
 import type { WaitlistSubmitResult } from "@/lib/waitlist/types";
+import { postWaitlistWebhook } from "@/lib/server/waitlist-webhook.server";
 
 // Raw payload schema: a permissive object that we then strictly parse.
 const rawPayloadSchema = z.record(z.unknown());
@@ -92,6 +93,11 @@ export const submitWaitlist = createServerFn({ method: "POST" })
         "waitlist_succeeded",
         buildAnalyticsPayload("waitlist_succeeded", analyticsContextFromInput(normalized)),
       );
+
+      // 6. Deliver to the CRM workflow webhook (server-side, fire-and-forget).
+      // Only after a real successful upsert — honeypot/validation paths return
+      // above and never reach here.
+      await postWaitlistWebhook(record);
 
       return { ok: true, duplicate: result.duplicate };
     } catch {

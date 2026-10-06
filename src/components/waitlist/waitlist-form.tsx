@@ -9,6 +9,7 @@ import {
 } from "@/lib/waitlist.functions";
 import { SMS_CONSENT_TEXT, PARTY_MIN, PARTY_MAX } from "@/lib/waitlist/constants";
 import type { WaitlistSubmitResult } from "@/lib/waitlist/types";
+import { trackWaitlistSubmission } from "@/lib/waitlist/crm-tracking";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,6 +97,22 @@ export function WaitlistForm({ children }: WaitlistFormProps) {
       const res = await submit({ data: payload });
       setResult(res);
       if (res.ok) {
+        // Fire CRM form-tracking event only on a real successful submission.
+        // Honeypot traps are caught server-side and return ok:true without a
+        // real upsert, but we double-guard here against the local honeypot too.
+        trackWaitlistSubmission({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          phone: values.phone,
+          partySize: values.partySize,
+          preferredDate: values.preferredDate,
+          preferredSeatingTime: values.preferredSeatingTime,
+          privateRoomInterest: values.privateRoomInterest,
+          emailMarketingConsent: values.emailMarketingConsent,
+          smsConsent: values.smsConsent,
+          website: values.website,
+        });
         // Reset on success; do not reveal submitted email/phone.
         setValues({
           firstName: "",

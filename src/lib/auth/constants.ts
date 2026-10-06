@@ -19,6 +19,27 @@ export const ACCOUNT_BLOCKED_PATH = "/sign-in";
 export const ALLOWED_RETURN_PREFIXES = ["/account", "/staff", "/kitchen", "/admin"] as const;
 
 /**
+ * Whether a caller-supplied return path is a valid internal path.
+ *
+ * Rejects external URLs, protocol-relative URLs, open redirects, backslashes,
+ * control characters, and any path outside the internal allow-list. Shared by
+ * sanitizeReturnPath and the permission-aware destination resolver so both
+ * use one validation rule.
+ */
+export function isAllowedReturnPath(raw: string): boolean {
+  const trimmed = raw.trim();
+  if (!trimmed) return false;
+  // Must start with a single slash (no "//" protocol-relative, no scheme).
+  if (!trimmed.startsWith("/")) return false;
+  if (trimmed.startsWith("//")) return false;
+  // Reject backslashes and control characters.
+  // eslint-disable-next-line no-control-regex
+  if (/[\\]/.test(trimmed) || /[\x00-\x1f]/.test(trimmed)) return false;
+  // Must be within an allowed internal prefix.
+  return ALLOWED_RETURN_PREFIXES.some((p) => trimmed === p || trimmed.startsWith(p + "/"));
+}
+
+/**
  * Sanitize a caller-supplied return path.
  *
  * Rejects external URLs, protocol-relative URLs, open redirects, and any
@@ -26,17 +47,7 @@ export const ALLOWED_RETURN_PREFIXES = ["/account", "/staff", "/kitchen", "/admi
  */
 export function sanitizeReturnPath(raw: string | null | undefined): string {
   if (!raw || typeof raw !== "string") return DEFAULT_POST_SIGNIN_PATH;
-  const trimmed = raw.trim();
-  if (!trimmed) return DEFAULT_POST_SIGNIN_PATH;
-  // Must start with a single slash (no "//" protocol-relative, no scheme).
-  if (!trimmed.startsWith("/")) return DEFAULT_POST_SIGNIN_PATH;
-  if (trimmed.startsWith("//")) return DEFAULT_POST_SIGNIN_PATH;
-  // Reject backslashes and control characters (eslint-disable for the char class).
-  // eslint-disable-next-line no-control-regex
-  if (/[\\]/.test(trimmed) || /[\x00-\x1f]/.test(trimmed)) return DEFAULT_POST_SIGNIN_PATH;
-  // Must be within an allowed internal prefix.
-  const allowed = ALLOWED_RETURN_PREFIXES.some((p) => trimmed === p || trimmed.startsWith(p + "/"));
-  return allowed ? trimmed : DEFAULT_POST_SIGNIN_PATH;
+  return isAllowedReturnPath(raw) ? raw.trim() : DEFAULT_POST_SIGNIN_PATH;
 }
 
 /** Email/password validation boundaries (mirrors Supabase defaults). */

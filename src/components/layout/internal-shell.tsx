@@ -1,6 +1,6 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { Menu, X, Bell, LogOut } from "lucide-react";
+import { Menu, X, Bell, LogOut, ChevronDown, ArrowLeft } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { Container } from "@/components/layout/container";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ import { signOut } from "@/lib/auth.functions";
 import { ROLE_LABELS } from "@/lib/domain/roles";
 import { ROLE_KEYS } from "@/lib/domain";
 import { AREA_NAV, filterNavByRole, type NavSection } from "@/components/layout/internal-nav";
+import { visibleWorkspaces, type WorkspaceArea } from "@/components/layout/workspace-switcher";
 import type { RoleKey } from "@/lib/domain/types";
 import { BRAND_LOGO_SRC } from "@/components/layout/public-layout";
 
@@ -22,6 +23,7 @@ interface InternalShellProps {
 
 export function InternalShell({ area, areaLabel, homeTo }: InternalShellProps) {
   const [open, setOpen] = useState(false);
+  const [switcherOpen, setSwitcherOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const signOutFn = useServerFn(signOut);
@@ -35,6 +37,7 @@ export function InternalShell({ area, areaLabel, homeTo }: InternalShellProps) {
   const isMockMode = dataMode === "mock";
 
   const sections: NavSection[] = filterNavByRole(AREA_NAV[area], activeRole);
+  const workspaces = visibleWorkspaces(activeRole);
 
   async function handleSignOut() {
     try {
@@ -62,8 +65,9 @@ export function InternalShell({ area, areaLabel, homeTo }: InternalShellProps) {
       >
         <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-3 sm:px-4">
           <Link
-            to={homeTo as never}
+            to="/"
             className="group flex items-center gap-2.5 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-md"
+            aria-label="Sit Down Sundays home"
           >
             <span className="flex h-10 shrink-0 items-center justify-center rounded-md border border-sidebar-border/80 bg-white px-2 py-1 shadow-2xs">
               <img
@@ -92,9 +96,54 @@ export function InternalShell({ area, areaLabel, homeTo }: InternalShellProps) {
           </button>
         </div>
 
+        {/* Workspace switcher */}
+        {workspaces.length > 1 && (
+          <div className="border-b border-sidebar-border px-3 py-2">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setSwitcherOpen((v) => !v)}
+                className="flex w-full items-center justify-between rounded-md border border-sidebar-border bg-sidebar-accent/40 px-3 py-2 text-left text-xs font-medium text-sidebar-foreground hover:bg-sidebar-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+                aria-haspopup="menu"
+                aria-expanded={switcherOpen}
+              >
+                <span className="truncate">{areaLabel}</span>
+                <ChevronDown className="size-4 shrink-0 opacity-70" aria-hidden />
+              </button>
+              {switcherOpen && (
+                <div
+                  role="menu"
+                  className="absolute left-0 right-0 top-full z-10 mt-1 overflow-hidden rounded-md border border-sidebar-border bg-sidebar shadow-lg"
+                >
+                  {workspaces.map((w) => (
+                    <Link
+                      key={w.area}
+                      to={w.to as never}
+                      onClick={() => {
+                        setSwitcherOpen(false);
+                        setOpen(false);
+                      }}
+                      role="menuitem"
+                      className={cn(
+                        "block px-3 py-2 text-xs font-medium transition-colors",
+                        w.area === area
+                          ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent",
+                      )}
+                    >
+                      {w.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         <nav
-          className="flex h-[calc(100vh-4rem)] flex-col overflow-y-auto px-3 py-4"
+          className="flex flex-col overflow-y-auto px-3 py-4"
           aria-label={areaLabel}
+          style={{ maxHeight: "calc(100vh - 4rem)" }}
         >
           <div className="flex-1 space-y-6">
             {sections.map((section) => (
@@ -125,6 +174,18 @@ export function InternalShell({ area, areaLabel, homeTo }: InternalShellProps) {
                 </ul>
               </div>
             ))}
+          </div>
+
+          {/* Back to website */}
+          <div className="mt-4 border-t border-sidebar-border pt-3">
+            <Link
+              to="/"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent"
+            >
+              <ArrowLeft className="size-4" aria-hidden />
+              Back to website
+            </Link>
           </div>
 
           {/* Mock role preview — development only, never in Supabase mode */}
@@ -175,16 +236,64 @@ export function InternalShell({ area, areaLabel, homeTo }: InternalShellProps) {
       {/* Main */}
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur sm:px-6">
-          <button
-            type="button"
-            className="inline-flex size-10 items-center justify-center rounded-md text-foreground hover:bg-accent lg:hidden"
-            aria-label="Open menu"
-            onClick={() => setOpen(true)}
-          >
-            <Menu className="size-6" />
-          </button>
-          <div className="hidden lg:block" />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="inline-flex size-10 items-center justify-center rounded-md text-foreground hover:bg-accent lg:hidden"
+              aria-label="Open menu"
+              onClick={() => setOpen(true)}
+            >
+              <Menu className="size-6" />
+            </button>
+
+            {/* Mobile workspace switcher */}
+            {workspaces.length > 1 && (
+              <div className="relative lg:hidden">
+                <button
+                  type="button"
+                  onClick={() => setSwitcherOpen((v) => !v)}
+                  className="flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-haspopup="menu"
+                  aria-expanded={switcherOpen}
+                >
+                  {areaLabel}
+                  <ChevronDown className="size-4 opacity-70" aria-hidden />
+                </button>
+                {switcherOpen && (
+                  <div
+                    role="menu"
+                    className="absolute left-0 top-full z-10 mt-1 w-56 overflow-hidden rounded-md border border-border bg-card shadow-lg"
+                  >
+                    {workspaces.map((w) => (
+                      <Link
+                        key={w.area}
+                        to={w.to as never}
+                        onClick={() => setSwitcherOpen(false)}
+                        role="menuitem"
+                        className={cn(
+                          "block px-3 py-2 text-sm font-medium transition-colors",
+                          w.area === area
+                            ? "bg-primary text-primary-foreground"
+                            : "text-foreground hover:bg-accent",
+                        )}
+                      >
+                        {w.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="hidden items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground lg:inline-flex"
+            >
+              <ArrowLeft className="size-4" aria-hidden />
+              Back to website
+            </Link>
             <button
               type="button"
               className="relative inline-flex size-10 items-center justify-center rounded-md text-foreground hover:bg-accent"

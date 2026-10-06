@@ -215,8 +215,8 @@ describe("admin menus — form validation", () => {
       ...emptyFormValues(),
       name: "Menu",
       slug: "m",
-      publishAt: "2025-10-01T10:00",
-      unpublishAt: "2025-09-01T10:00",
+      publishAt: { date: "2025-10-01", time: "10:00" },
+      unpublishAt: { date: "2025-09-01", time: "10:00" },
     });
     expect(errors.unpublishAt).toBeTruthy();
   });
@@ -226,8 +226,8 @@ describe("admin menus — form validation", () => {
       ...emptyFormValues(),
       name: "Menu",
       slug: "m",
-      publishAt: "2025-09-01T10:00",
-      unpublishAt: "2025-10-01T10:00",
+      publishAt: { date: "2025-09-01", time: "10:00" },
+      unpublishAt: { date: "2025-10-01", time: "10:00" },
     });
     expect(errors.unpublishAt).toBeUndefined();
   });
@@ -646,15 +646,29 @@ describe("admin menus — create-dialog focus", () => {
 /* ----------------------- Date error aria-describedby ----------------------- */
 
 describe("admin menus — date error accessibility", () => {
-  it("connects publish-date errors to the input with a stable id", () => {
+  it("connects publish-date errors to the field with a stable id", () => {
     const src = formSource();
-    expect(src).toMatch(/id="menu-publish-error"/);
-    expect(src).toMatch(/aria-describedby=\{errors\.publishAt \? "menu-publish-error"/);
+    // ScheduleField uses id="menu-publish-at" with error id "menu-publish-at-error".
+    expect(src).toMatch(/id="menu-publish-at"/);
+    expect(src).toMatch(/error=\{errors\.publishAt\}/);
   });
 
-  it("connects unpublish-date errors to the input with a stable id", () => {
+  it("connects unpublish-date errors to the field with a stable id", () => {
     const src = formSource();
-    expect(src).toMatch(/id="menu-unpublish-error"/);
-    expect(src).toMatch(/aria-describedby=\{errors\.unpublishAt \? "menu-unpublish-error"/);
+    expect(src).toMatch(/id="menu-unpublish-at"/);
+    expect(src).toMatch(/error=\{errors\.unpublishAt\}/);
+  });
+
+  it("renders the publication schedule section with both boundaries", () => {
+    const src = formSource();
+    expect(src).toMatch(/Publication schedule/i);
+    expect(src).toMatch(/Show on website from/i);
+    expect(src).toMatch(/Hide from website after/i);
+  });
+
+  it("explains scheduling controls menu visibility, not reservations", () => {
+    const src = formSource();
+    expect(src).toMatch(/not reservation dates/i);
+    expect(src).toMatch(/seating times/i);
   });
 });

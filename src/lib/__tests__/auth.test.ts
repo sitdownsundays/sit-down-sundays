@@ -257,6 +257,159 @@ describe("mock auth repository", () => {
     const res = await repo.requestPasswordReset("nonexistent@example.com");
     expect(res.ok).toBe(true);
   });
+
+  it("signin returns the user role so the redirect can be role-aware", async () => {
+    const repo = __getMockAuthRepository();
+    await repo.signup(
+      { email: "role@example.com", password: "password123", firstName: "R", lastName: "S" },
+      false,
+    );
+    repo.__verifyEmail("role@example.com");
+    const res = await repo.signin({ email: "role@example.com", password: "password123" }, false);
+    expect(res.ok).toBe(true);
+    expect(res.user?.roleKey).toBe("guest");
+  });
+});
+
+/* ----------------------- Role-based destinations (shared helper) ----------------------- */
+
+import {
+  resolvePostSigninDestination,
+  defaultWorkspaceForRole,
+  primaryWorkspaceForRole,
+  isPathAuthorizedForRole,
+} from "@/lib/auth/destinations";
+
+describe("defaultWorkspaceForRole", () => {
+  it("administrator → /admin", () => {
+    expect(defaultWorkspaceForRole("administrator")).toBe("/admin");
+  });
+  it("content_manager → /admin (permitted)", () => {
+    expect(defaultWorkspaceForRole("content_manager")).toBe("/admin");
+  });
+  it("operations_manager → its permitted primary workspace (/staff)", () => {
+    expect(defaultWorkspaceForRole("ops_manager")).toBe("/staff");
+  });
+  it("front-of-house staff → /staff", () => {
+    expect(defaultWorkspaceForRole("foh_staff")).toBe("/staff");
+  });
+  it("kitchen staff → /kitchen", () => {
+    expect(defaultWorkspaceForRole("kitchen_staff")).toBe("/kitchen");
+  });
+  it("guest → /account", () => {
+    expect(defaultWorkspaceForRole("guest")).toBe("/account");
+  });
+  it("undefined role → /account", () => {
+    expect(defaultWorkspaceForRole(undefined)).toBe("/account");
+  });
+});
+
+describe("resolvePostSigninDestination", () => {
+  it("uses the role default when no return path is supplied", () => {
+    expect(resolvePostSigninDestination("administrator", undefined)).toBe("/admin");
+    expect(resolvePostSigninDestination("foh_staff", undefined)).toBe("/staff");
+    expect(resolvePostSigninDestination("kitchen_staff", undefined)).toBe("/kitchen");
+    expect(resolvePostSigninDestination("ops_manager", undefined)).toBe("/staff");
+    expect(resolvePostSigninDestination("content_manager", undefined)).toBe("/admin");
+    expect(resolvePostSigninDestination("guest", undefined)).toBe("/account");
+  });
+
+  it("honors an explicit return path that is sanitized and authorized", () => {
+    expect(resolvePostSigninDestination("administrator", "/admin/menus")).toBe("/admin/menus");
+    expect(resolvePostSigninDestination("foh_staff", "/staff/calendar")).toBe("/staff/calendar");
+    expect(resolvePostSigninDestination("kitchen_staff", "/kitchen/preparation")).toBe(
+      "/kitchen/preparation",
+    );
+    expect(resolvePostSigninDestination("guest", "/account/reservations")).toBe(
+      "/account/reservations",
+    );
+  });
+
+  it("rejects external/open-redirect return paths and falls back to the role default", () => {
+    expect(resolvePostSigninDestination("administrator", "//evil.com")).toBe("/admin");
+    expect(resolvePostSigninDestination("administrator", "https://evil.com")).toBe("/admin");
+    expect(resolvePostSigninDestination("foh_staff", "//evil.com")).toBe("/staff");
+  });
+
+  it("rejects a return path the role is not authorized for and uses the role default", () => {
+    // guest is not authorized for any internal workspace
+    expect(resolvePostSigninDestination("guest", "/admin")).toBe("/account");
+    expect(resolvePostSigninDestination("guest", "/staff")).toBe("/account");
+    expect(resolvePostSigninDestination("guest", "/kitchen")).toBe("/account");
+    // kitchen staff is not authorized for /admin or /staff
+    expect(resolvePostSigninDestination("kitchen_staff", "/admin")).toBe("/kitchen");
+    expect(resolvePostSigninDestination("kitchen_staff", "/staff")).toBe("/kitchen");
+    // front-of-house is not authorized for /admin or /kitchen
+    expect(resolvePostSigninDestination("foh_staff", "/admin")).toBe("/staff");
+    expect(resolvePostSigninDestination("foh_staff", "/kitchen")).toBe("/staff");
+  });
+
+  it("rejects disallowed internal prefixes (e.g. /waitlist, /)", () => {
+    expect(resolvePostSigninDestination("administrator", "/waitlist")).toBe("/admin");
+    expect(resolvePostSigninDestination("guest", "/waitlist")).toBe("/account");
+    expect(resolvePostSigninDestination("administrator", "/")).toBe("/admin");
+  });
+});
+
+describe("primaryWorkspaceForRole (public-header workspace link)", () => {
+  it("administrator sees Administration", () => {
+    const w = primaryWorkspaceForRole("administrator");
+    expect(w?.area).toBe("admin");
+    expect(w?.label).toBe("Administration");
+    expect(w?.to).toBe("/admin");
+  });
+  it("content_manager sees Administration", () => {
+    expect(primaryWorkspaceForRole("content_manager")?.area).toBe("admin");
+  });
+  it("front-of-house staff sees Staff Operations, not Administration", () => {
+    const w = primaryWorkspaceForRole("foh_staff");
+    expect(w?.area).toBe("staff");
+    expect(w?.label).toBe("Staff Operations");
+    expect(w?.to).toBe("/staff");
+  });
+  it("kitchen staff sees Kitchen, not Administration", () => {
+    expect(primaryWorkspaceForRole("kitchen_staff")?.area).toBe("kitchen");
+  });
+  it("operations manager sees Staff Operations", () => {
+    expect(primaryWorkspaceForRole("ops_manager")?.area).toBe("staff");
+  });
+  it("guest sees no internal workspace link", () => {
+    expect(primaryWorkspaceForRole("guest")).toBeNull();
+  });
+  it("undefined role sees no internal workspace link", () => {
+    expect(primaryWorkspaceForRole(undefined)).toBeNull();
+  });
+});
+
+describe("isPathAuthorizedForRole (unauthorized internal return paths)", () => {
+  it("guest is not authorized for any internal workspace", () => {
+    expect(isPathAuthorizedForRole("guest", "/admin")).toBe(false);
+    expect(isPathAuthorizedForRole("guest", "/staff")).toBe(false);
+    expect(isPathAuthorizedForRole("guest", "/kitchen")).toBe(false);
+    expect(isPathAuthorizedForRole("guest", "/admin/menus")).toBe(false);
+  });
+  it("guest is always authorized for /account", () => {
+    expect(isPathAuthorizedForRole("guest", "/account")).toBe(true);
+    expect(isPathAuthorizedForRole("guest", "/account/reservations")).toBe(true);
+  });
+  it("kitchen staff is authorized only for /kitchen and /account", () => {
+    expect(isPathAuthorizedForRole("kitchen_staff", "/kitchen")).toBe(true);
+    expect(isPathAuthorizedForRole("kitchen_staff", "/admin")).toBe(false);
+    expect(isPathAuthorizedForRole("kitchen_staff", "/staff")).toBe(false);
+  });
+  it("front-of-house staff is authorized only for /staff and /account", () => {
+    expect(isPathAuthorizedForRole("foh_staff", "/staff")).toBe(true);
+    expect(isPathAuthorizedForRole("foh_staff", "/admin")).toBe(false);
+    expect(isPathAuthorizedForRole("foh_staff", "/kitchen")).toBe(false);
+  });
+  it("administrator is authorized for every internal workspace", () => {
+    expect(isPathAuthorizedForRole("administrator", "/admin")).toBe(true);
+    expect(isPathAuthorizedForRole("administrator", "/staff")).toBe(true);
+    expect(isPathAuthorizedForRole("administrator", "/kitchen")).toBe(true);
+  });
+  it("undefined role is not authorized for internal paths", () => {
+    expect(isPathAuthorizedForRole(undefined, "/admin")).toBe(false);
+  });
 });
 
 /* ----------------------- Mock cookie encoding round-trip ----------------------- */
