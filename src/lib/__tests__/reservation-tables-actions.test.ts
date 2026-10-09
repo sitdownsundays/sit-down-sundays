@@ -1,0 +1,312 @@
+/**
+ * assignReservationTables action — behavioral tests.
+ *
+ * Exercises the REAL production action handler serverAssignReservationTables
+ * in reservation-tables-actions.server.ts. The authorization helper
+ * (resolveSundaysActorWithPermission) and the admin Supabase client
+ * (getAdminClient) are mocked at their real module boundaries via vi.mock, so
+ * the action wiring — permission requested, actor passed to the RPC, input
+ * validation, code/message mapping, error handling — is what is under test.
+ *
+ * These are MOCKED-BOUNDARY tests, not live PostgreSQL. They do not prove the
+ * RPC's atomic/locking behavior; they verify the application wrapper.
+ */
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
+// ---------------------------------------------------------------------------
+// Mock the admin Supabase client so we can assert RPC call args and control
+// results. getAdminClient returns an object with an .rpc() mock.
+// ---------------------------------------------------------------------------
+const mockRpc = vi.fn();
+vi.mock("@/lib/server/supabase-admin.server", () => ({
+  getAdminClient: () => ({ rpc: mockRpc }),
+}));
+
+// ---------------------------------------------------------------------------
+// Mock the authorization helper so we can control auth outcomes per test.
+// ---------------------------------------------------------------------------
+const mockResolve = vi.fn();
+vi.mock("@/lib/server/sundays-auth.server", () => ({
+  resolveSundaysActorWithPermission: (permission: string) => mockResolve(permission),
+  SundaysAuthorizationError: class SundaysAuthorizationError extends Error {
+    constructor(message = "You are not authorized.") {
+      super(message);
+      this.name = "SundaysAuthorizationError";
+    }
+  },
+}));
+
+// Import AFTER mocks are registered.
+const { serverAssignReservationTables } =
+  await import("@/lib/server/reservation-tables-actions.server");
+
+const ACTOR_ID = "verified-session-user-id";
+const RES_ID = "11111111-1111-1111-1111-111111111111";
+const TABLE_A = "22222222-2222-2222-2222-222222222222";
+const TABLE_B = "33333333-3333-3333-3333-333333333333";
+const EXPECTED_AT = "2026-01-01T00:00:00.000Z";
+const NEW_AT = "2026-01-02T00:00:00.000Z";
+
+function authActor(): { role: string; userId: string } {
+  return { role: "ops_manager", userId: ACTOR_ID };
+}
+
+function authReject(): never {
+  throw new (class extends Error {
+    constructor() {
+      super("Unauthorized");
+      this.name = "SundaysAuthorizationError";
+    }
+  })();
+}
+
+function rpcSuccess(overrides: Partial<{ ids: string[]; updatedAt: string }> = {}) {
+  return {
+    data: {
+      ok: true,
+      reservation_id: RES_ID,
+      assigned_table_ids: overrides.ids ?? [TABLE_A, TABLE_B],
+      reservation_updated_at: overrides.updatedAt ?? NEW_AT,
+    },
+    error: null,
+  };
+}
+
+function rpcFailure(code: string) {
+  return { data: { ok: false, code }, error: null };
+}
+
+describe("serverAssignReservationTables", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockResolve.mockReset();
+    mockRpc.mockReset();
+  });
+
+  it("requires seating.manage before reaching the RPC", async () => {
+    mockResolve.mockImplementation(authReject);
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeTruthy();
+    expect(mockRpc).not.toHaveBeenCalled();
+    expect(mockResolve).toHaveBeenCalledWith("seating.manage");
+  });
+
+  it("rejects malformed reservation ID without calling the RPC", async () => {
+    mockResolve.mockImplementation(authActor);
+    const result = await serverAssignReservationTables({
+      reservationId: "not-a-uuid",
+      tableIds: [TABLE_A],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("invalid_data");
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it("rejects a non-UUID table ID without calling the RPC", async () => {
+    mockResolve.mockImplementation(authActor);
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: ["bad-id"],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(result.ok).toBe(false);
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it("rejects duplicate table IDs without calling the RPC", async () => {
+    mockResolve.mockImplementation(authActor);
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A, TABLE_A],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(result.ok).toBe(false);
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it("rejects an invalid timestamp without calling the RPC", async () => {
+    mockResolve.mockImplementation(authActor);
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A],
+      expectedUpdatedAt: "",
+    });
+    expect(result.ok).toBe(false);
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it("rejects injected actor/status/room fields before reaching the RPC", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue(rpcSuccess());
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A],
+      expectedUpdatedAt: EXPECTED_AT,
+      actorUserId: "hacker",
+      status: "confirmed",
+      room: "ballroom",
+    });
+    // The strict schema rejects unknown keys, so the RPC is never called and
+    // no injected actor/status/room can reach the database.
+    expect(result.ok).toBe(false);
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it("uses the verified session actor, never a browser-supplied one", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue(rpcSuccess());
+    await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    const call = mockRpc.mock.calls[0];
+    expect(call[0]).toBe("assign_reservation_tables_atomic");
+    const args = call[1];
+    expect(args.p_actor_user_id).toBe(ACTOR_ID);
+    expect(args).not.toHaveProperty("status");
+    expect(args).not.toHaveProperty("room");
+  });
+
+  it("passes the verified actor and exact expected timestamp to the RPC", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue(rpcSuccess());
+    await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A, TABLE_B],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(mockRpc).toHaveBeenCalledWith("assign_reservation_tables_atomic", {
+      p_reservation_id: RES_ID,
+      p_table_ids: [TABLE_A, TABLE_B],
+      p_expected_updated_at: EXPECTED_AT,
+      p_actor_user_id: ACTOR_ID,
+    });
+  });
+
+  it("passes an empty array through as an explicit release-all", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue(rpcSuccess({ ids: [], updatedAt: NEW_AT }));
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(mockRpc).toHaveBeenCalledWith("assign_reservation_tables_atomic", {
+      p_reservation_id: RES_ID,
+      p_table_ids: [],
+      p_expected_updated_at: EXPECTED_AT,
+      p_actor_user_id: ACTOR_ID,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.assignedTableIds).toEqual([]);
+  });
+
+  it("maps success to typed camelCase fields", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue(rpcSuccess());
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A, TABLE_B],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.reservationId).toBe(RES_ID);
+      expect(result.assignedTableIds).toEqual([TABLE_A, TABLE_B]);
+      expect(result.reservationUpdatedAt).toBe(NEW_AT);
+    }
+  });
+
+  it("maps conflict code to a reload message", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue(rpcFailure("conflict"));
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.code).toBe("conflict");
+      expect(result.error).toContain("Reload");
+    }
+  });
+
+  it("maps table_conflict code to an unavailable-table message", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue(rpcFailure("table_conflict"));
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.code).toBe("table_conflict");
+      expect(result.error).toContain("already reserved");
+    }
+  });
+
+  it("maps insufficient_seats code to a capacity message", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue(rpcFailure("insufficient_seats"));
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.code).toBe("insufficient_seats");
+      expect(result.error).toContain("party size");
+    }
+  });
+
+  it("maps invalid_table, invalid_configuration, invalid_status codes distinctly", async () => {
+    mockResolve.mockImplementation(authActor);
+    for (const code of ["invalid_table", "invalid_configuration", "invalid_status"] as const) {
+      mockRpc.mockResolvedValue(rpcFailure(code));
+      const result = await serverAssignReservationTables({
+        reservationId: RES_ID,
+        tableIds: [TABLE_A],
+        expectedUpdatedAt: EXPECTED_AT,
+      });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.code).toBe(code);
+    }
+  });
+
+  it("database/transport error produces a safe failure, not success", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue({ data: null, error: { message: "connection reset" } });
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.code).toBe("unexpected");
+      expect(result.error).not.toContain("connection reset");
+    }
+  });
+
+  it("a thrown client error produces a safe failure, not a raw message", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockRejectedValue(new Error("db down"));
+    const result = await serverAssignReservationTables({
+      reservationId: RES_ID,
+      tableIds: [TABLE_A],
+      expectedUpdatedAt: EXPECTED_AT,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).not.toContain("db down");
+  });
+});

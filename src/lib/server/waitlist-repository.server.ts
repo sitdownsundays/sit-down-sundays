@@ -50,15 +50,21 @@ export interface WaitlistRepository {
 }
 
 /** Extract the consent state from a stored row for merging. */
-interface StoredConsent {
-  emailMarketingConsent: boolean;
-  emailConsentText: string | null;
-  emailConsentTextVersion: string | null;
-  emailConsentTimestamp: string | null;
-  smsConsent: boolean;
-  smsConsentText: string | null;
-  smsConsentTextVersion: string | null;
-  smsConsentTimestamp: string | null;
+// Accurate shape of the database columns selected from waitlist_entries.
+// The DB uses snake_case column names; this type must NOT be confused with
+// the camelCase ConsentState used by the application consent model.
+interface StoredWaitlistRow {
+  id: string;
+  normalized_email: string;
+  private_room_interest: boolean;
+  email_marketing_consent: boolean;
+  email_consent_text: string | null;
+  email_consent_text_version: string | null;
+  email_consent_timestamp: string | null;
+  sms_consent: boolean;
+  sms_consent_text: string | null;
+  sms_consent_text_version: string | null;
+  sms_consent_timestamp: string | null;
 }
 
 function incomingConsent(input: WaitlistRecord): ConsentState {
@@ -174,9 +180,7 @@ class SupabaseWaitlistRepository implements WaitlistRepository {
       throw new Error("Waitlist submission could not be processed.");
     }
 
-    const existing = (existingRows?.[0] ?? undefined) as
-      | (StoredConsent & { id: string; normalized_email: string; private_room_interest: boolean })
-      | undefined;
+    const existing = (existingRows?.[0] ?? undefined) as StoredWaitlistRow | undefined;
 
     if (existing) {
       // Merge consent without downgrading.

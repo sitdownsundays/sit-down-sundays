@@ -137,7 +137,11 @@ export function AdminSettingsPage() {
     return (
       <ErrorState
         message={loadError || "We couldn't load payment settings."}
-        onRetry={loadPolicy}
+        action={
+          <Button variant="outline" onClick={loadPolicy}>
+            Try again
+          </Button>
+        }
       />
     );
 

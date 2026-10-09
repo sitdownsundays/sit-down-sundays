@@ -33,6 +33,7 @@ describe("representative route availability", () => {
       "_public.policies.tsx",
       "_public.waitlist.tsx",
       "_public.book.tsx",
+      "_public.reserve.tsx",
       "_public.contact.tsx",
       "_public.sign-in.tsx",
       "_public.create-account.tsx",
@@ -134,6 +135,7 @@ describe("public navigation", () => {
       "utf-8",
     );
     const routes = [
+      "/reserve",
       "/the-experience",
       "/menu",
       "/how-it-works",

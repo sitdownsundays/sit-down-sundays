@@ -1,0 +1,164 @@
+SIT DOWN SUNDAYS — 2026-10-09 CHECKPOINT AND BOUNDED AUDIT
+
+STATUS: SOURCE BACKUP, NOT LAUNCH APPROVAL
+
+Source: owner-provided AI Studio export, sunday-supper-2 (1).zip.
+ZIP SHA-256: 9fa617bdc4ab80e8cf96b163cc7018195ba512fa501ca30f5c7279ffdb203fd5
+451 export files matched the checkout byte-for-byte after validation.
+Base: 6eb2bdd (October 6 checkpoint).
+Branch: checkpoint/2026-10-09-reservations-seating.
+No application or migration fixes were made during this audit. The export is
+preserved; only this audit and validation evidence are added. Main is untouched.
+GitHub is a checkpoint, not a claim of synchronization into AI Studio or deployment.
+
+OBSERVED LOCAL VALIDATION
+
+- bun install --frozen-lockfile --ignore-scripts: exit 0, no dependency changes.
+- vitest run: exit 0; 1,401 tests passed across 75 files.
+- eslint .: exit 0; 0 errors, 23 react-refresh warnings.
+- tsc --noEmit: exit 2; 724 diagnostics across 105 files.
+  353 diagnostics are in test files; 371 are outside tests (including mocks).
+  This is the current measured result, not the older 486-diagnostic baseline.
+  No strict compiler flags were weakened and no errors were suppressed.
+- bun run build: exit 0; client and SSR production bundles generated.
+  Entry observed: dist/server/server.js. A successful Vite build is NOT a
+  successful standalone TypeScript check.
+- Local development HTTP smoke check, APP_DATA_MODE=mock:
+  GET /reserve -> 200.
+  GET /book?checkpoint=20261009 -> 307,
+  Location: /reserve?checkpoint=20261009.
+  This is not a browser interaction test or a published/live Supabase probe.
+- git diff --check: clean.
+- All 451 export files scanned for private-key markers, common Stripe/Supabase/
+  GitHub credential tokens, JWT-shaped tokens, password-bearing PostgreSQL URLs,
+  and sensitive environment/key filenames: no matches. This is a bounded
+  pattern scan, not a comprehensive security certification or history scan.
+
+CURRENT IMPLEMENTATION FOUND
+
+- /reserve renders the existing four-step request wizard; /book redirects.
+- Shared family-style party feast and shared platters; category pricing;
+  guest-specific dietary/allergy/meal notes; authoritative quote/submission.
+- Requests start pending_review/unpaid, not paid or confirmed inventory.
+- Admin reservation details, feast summary, and guest dietary notes.
+- Physical-table list/create/edit/disable/reactivate.
+- Party assignment context/action/dialog, cancellation action/dialog, and
+  confirmation action/dialog; authorized server wrappers and atomic SQL drafts.
+- Custom Supabase clients under src/lib/server are the actual integration.
+  A missing generated Cloud integration directory does not establish failure.
+
+PRIORITIZED FINDINGS — NO PRODUCTION FIXES APPLIED
+
+1. HIGH: The configured standalone TypeScript check fails.
+   Evidence: typecheck.txt (724 diagnostics, including production modules).
+   Largest code categories: TS4111=195, TS2532=182, TS18048=136,
+   TS2375=62, TS2322=45, TS2379=26. Some diagnostics are strictness/fixture
+   issues; the count does not mean 724 independent runtime defects.
+   Fix in small scoped AI Studio batches. Retain strictness; start with actual
+   contract errors in booking/admin/server functions, then mechanical cleanup.
+
+2. HIGH BEFORE PUBLIC CUSTOMER PORTAL USE: Customer and staff reservation pages
+   still render demo reservations, independently of the real admin repository.
+   src/routes/account.reservations.index.tsx:6,19 imports/uses MOCK_RESERVATIONS.
+   src/routes/account.reservations.$reservationId.tsx does the same.
+   src/routes/staff.reservations.index.tsx and detail route also use mocks.
+   These are not customer-specific live history/tracking. Do not present them
+   as such. Replace with authorized real reads or clearly disable those pages
+   pending implementation. No actual customer data exposure was demonstrated.
+
+3. MEDIUM: RPC result shape is asserted, not validated; malformed success data
+   becomes application success with an empty timestamp.
+   reservation-confirm-actions.server.ts:96-114 and
+   reservation-cancel-actions.server.ts:94-111 accept {ok:true} and synthesize
+   reservationId, empty reservationUpdatedAt, and false already* flags.
+   A mocked-boundary audit reproduction against both real actions returned
+   ok:true, reservationUpdatedAt:"" for exactly that malformed response.
+   reservation-tables-actions.server.ts:102-122 repeats this pattern.
+   The confirmation test explicitly EXPECTS malformed success to succeed.
+   Fix with runtime response validation, matching reservation identity, valid
+   timestamp/booleans/arrays, and an allowlist of failure codes. Malformed data
+   must become an uncertain safe failure, never fabricated success.
+
+4. MEDIUM: Confirmation/cancellation dialog reports overstate lifecycle safety.
+   confirm-reservation-dialog.tsx:58-65 and cancel-reservation-dialog.tsx reset
+   local needsReload/reason state on opening; reload closes the dialog rather
+   than preserving the cancellation reason across a pending-review reload.
+   Neither component has an unmount/reservation-generation response guard.
+   After await, callbacks and state updates are unconditional. Navigating away
+   during a pending action can allow an obsolete callback to affect later UI.
+   Their requiresReloadBeforeRetry helpers only include conflict/unexpected;
+   invalid_status does not require the requested refresh.
+   Closing/reopening also loses the local uncertain/reload gate. SQL protects
+   duplicate state transitions, but the requested UI recovery guarantee is not
+   implemented. Keep recovery state with the reservation, preserve the reason,
+   and add rendered lifecycle tests. Current helper tests do not cover this.
+   No success/already-confirmed-specific notification is emitted by the dialog;
+   admin-reservations.tsx:436-468 launches generic detail/list refresh callbacks.
+
+5. HIGH OPERATIONAL RISK: Later configuration edits can invalidate assignments.
+   sundays-supabase.server.ts:updateDiningTable directly updates seats/is_active;
+   updateSundayService/updateSeatingTime similarly change scheduling fields.
+   No assignment-aware protection was found in these paths or saved migrations.
+   0015 locks protect assignment while the RPC runs, not after it commits.
+   Before operational seating use, block or atomically reconcile edits that
+   invalidate current assignments. Until fixed, do not change assigned-table
+   capacity/activation or an assigned service's schedule/room/timezone casually.
+   This is source evidence, not a live concurrency reproduction.
+
+6. KNOWN REQUEST RECOVERY LIMITATION: SubmissionController survives step changes
+   but not a full page reload (submission-controller.ts:28-30 and parent ref).
+   An uncertain request followed by reload loses its original key/payload and
+   can be resubmitted under a new key. Recovery must be designed before claiming
+   full reload-safe deduplication; do not put dietary/contact data into URLs.
+
+MIGRATION RECONCILIATION
+
+- Export has 0001-0012 in supabase/migrations, 0013-0017 in pending-migrations.
+- Owner supplied live metadata confirming 0013 table privileges, 0014 exclusion
+  constraint, and 0015/0016/0017 RPC signatures and service-role-only execution.
+  This audit did not query the live database or test rollback/concurrency.
+- 0014 and 0015 match the locally reviewed SQL byte-for-byte.
+- 0013 and 0016 differ from reviewed copies only by final newline.
+- 0017 contains the reviewed confirmation behavior. Installation was verified by
+  the owner; the pasted execution script had formatting/comment differences.
+  No live pg_get_functiondef comparison was performed.
+- UNAPPLIED comments / pending directory are stale relative to the owner's
+  manual application. Do not reapply merely because of directory or comments.
+- Do not move these into an automated migration deployment without reconciling
+  the remote migration ledger and actual schema. No migration was run here.
+- Per-guest note fields in 0012 are present in source; a fresh live column and
+  note round-trip check remains outstanding.
+
+REMAINING MVP WORK / BUSINESS DECISIONS
+
+- Check-in: staff.check-in is a placeholder; no 0018 migration in this export.
+- Per-party manager-authorized deadline/payment arrangements: not implemented.
+- Stripe deposit/balance collection and verified webhooks: not implemented.
+- Requested 10% tax and 18% gratuity: not in reservation pricing; current
+  grandTotalCents equals subtotalCents (reservation/pricing.ts:95).
+  Confirm charge bases and implement before presenting a final payable total.
+- Secure customer reservation/balance access and customer notifications remain
+  incomplete; customer account demo screens must not masquerade as real data.
+- Senior 62+/5% and child <=10/$19.99 configuration was owner-reported in the
+  database; not freshly verified by this source-only checkpoint.
+- Live full customer journey, rendered admin interactions, role checks,
+  PostgreSQL conflict/rollback/concurrency, and applied guest-note round trip.
+- Full floor map/drag-and-drop and GHL calendar sync remain deferred; party
+  assignment can use multiple physical tables without individual-seat mapping.
+
+NEXT REPAIR ORDER
+
+1. Preserve this checkpoint, then repair small action-response and dialog
+   lifecycle batches in AI Studio; remove/disable misleading demo portal data.
+2. Resolve production TypeScript contract issues without weakening configuration.
+3. Protect assignments from later configuration edits.
+4. Implement chosen check-in/payment-arrangement policy, tax/gratuity, secure
+   customer access; Stripe remains the final payment integration phase.
+5. Run real end-to-end and database behavioral verification before launch.
+
+AUDIT LIMITS
+
+No live credentials used, no live reservation mutation, no SQL execution,
+no published-site deployment, no rendered browser test, no full penetration
+test, and no claim that this backup is production-ready. Passing unit tests
+and builds do not erase the findings above.

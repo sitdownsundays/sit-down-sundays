@@ -137,7 +137,11 @@ export function AdminSpacesPage() {
       {loadState === "error" && (
         <ErrorState
           message={loadError || "We couldn't load the venue spaces."}
-          onRetry={loadSpaces}
+          action={
+            <Button variant="outline" onClick={loadSpaces}>
+              Try again
+            </Button>
+          }
         />
       )}
 

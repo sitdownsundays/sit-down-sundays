@@ -18,6 +18,10 @@ import type {
   SundayServiceOperationResult,
   SeatingTimeOperationResult,
   PaymentPolicyOperationResult,
+  DiningTableDTO,
+  CreateDiningTableInput,
+  UpdateDiningTableInput,
+  DiningTableOperationResult,
 } from "@/lib/sundays/types";
 
 export interface ISundaysRepository {
@@ -50,4 +54,15 @@ export interface ISundaysRepository {
     actorUserId: string,
     input: UpdatePaymentPolicyInput,
   ): Promise<PaymentPolicyOperationResult>;
+
+  // Physical dining tables
+  listDiningTables(spaceId?: string): Promise<DiningTableDTO[]>;
+  createDiningTable(
+    actorUserId: string,
+    input: CreateDiningTableInput,
+  ): Promise<DiningTableOperationResult>;
+  updateDiningTable(
+    actorUserId: string,
+    input: UpdateDiningTableInput,
+  ): Promise<DiningTableOperationResult>;
 }

@@ -25,6 +25,7 @@ import { Route as PublicMenuRouteImport } from './routes/_public.menu'
 import { Route as PublicOurStoryRouteImport } from './routes/_public.our-story'
 import { Route as PublicPoliciesRouteImport } from './routes/_public.policies'
 import { Route as PublicPrivateRoomRouteImport } from './routes/_public.private-room'
+import { Route as PublicReserveRouteImport } from './routes/_public.reserve'
 import { Route as PublicResetPasswordRouteImport } from './routes/_public.reset-password'
 import { Route as PublicSignInRouteImport } from './routes/_public.sign-in'
 import { Route as PublicTheExperienceRouteImport } from './routes/_public.the-experience'
@@ -156,6 +157,11 @@ const PublicPoliciesRoute = PublicPoliciesRouteImport.update({
 const PublicPrivateRoomRoute = PublicPrivateRoomRouteImport.update({
   id: '/private-room',
   path: '/private-room',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicReserveRoute = PublicReserveRouteImport.update({
+  id: '/reserve',
+  path: '/reserve',
   getParentRoute: () => PublicRoute,
 } as any)
 const PublicResetPasswordRoute = PublicResetPasswordRouteImport.update({
@@ -443,6 +449,7 @@ export interface FileRoutesByFullPath {
   '/our-story': typeof PublicOurStoryRoute
   '/policies': typeof PublicPoliciesRoute
   '/private-room': typeof PublicPrivateRoomRoute
+  '/reserve': typeof PublicReserveRoute
   '/reset-password': typeof PublicResetPasswordRoute
   '/sign-in': typeof PublicSignInRoute
   '/the-experience': typeof PublicTheExperienceRoute
@@ -508,6 +515,7 @@ export interface FileRoutesByTo {
   '/our-story': typeof PublicOurStoryRoute
   '/policies': typeof PublicPoliciesRoute
   '/private-room': typeof PublicPrivateRoomRoute
+  '/reserve': typeof PublicReserveRoute
   '/reset-password': typeof PublicResetPasswordRoute
   '/sign-in': typeof PublicSignInRoute
   '/the-experience': typeof PublicTheExperienceRoute
@@ -578,6 +586,7 @@ export interface FileRoutesById {
   '/_public/our-story': typeof PublicOurStoryRoute
   '/_public/policies': typeof PublicPoliciesRoute
   '/_public/private-room': typeof PublicPrivateRoomRoute
+  '/_public/reserve': typeof PublicReserveRoute
   '/_public/reset-password': typeof PublicResetPasswordRoute
   '/_public/sign-in': typeof PublicSignInRoute
   '/_public/the-experience': typeof PublicTheExperienceRoute
@@ -651,6 +660,7 @@ export interface FileRouteTypes {
     | '/our-story'
     | '/policies'
     | '/private-room'
+    | '/reserve'
     | '/reset-password'
     | '/sign-in'
     | '/the-experience'
@@ -716,6 +726,7 @@ export interface FileRouteTypes {
     | '/our-story'
     | '/policies'
     | '/private-room'
+    | '/reserve'
     | '/reset-password'
     | '/sign-in'
     | '/the-experience'
@@ -785,6 +796,7 @@ export interface FileRouteTypes {
     | '/_public/our-story'
     | '/_public/policies'
     | '/_public/private-room'
+    | '/_public/reserve'
     | '/_public/reset-password'
     | '/_public/sign-in'
     | '/_public/the-experience'
@@ -961,6 +973,13 @@ declare module '@tanstack/react-router' {
       path: '/private-room'
       fullPath: '/private-room'
       preLoaderRoute: typeof PublicPrivateRoomRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/reserve': {
+      id: '/_public/reserve'
+      path: '/reserve'
+      fullPath: '/reserve'
+      preLoaderRoute: typeof PublicReserveRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_public/reset-password': {
@@ -1348,6 +1367,7 @@ interface PublicRouteChildren {
   PublicOurStoryRoute: typeof PublicOurStoryRoute
   PublicPoliciesRoute: typeof PublicPoliciesRoute
   PublicPrivateRoomRoute: typeof PublicPrivateRoomRoute
+  PublicReserveRoute: typeof PublicReserveRoute
   PublicResetPasswordRoute: typeof PublicResetPasswordRoute
   PublicSignInRoute: typeof PublicSignInRoute
   PublicTheExperienceRoute: typeof PublicTheExperienceRoute
@@ -1367,6 +1387,7 @@ const PublicRouteChildren: PublicRouteChildren = {
   PublicOurStoryRoute: PublicOurStoryRoute,
   PublicPoliciesRoute: PublicPoliciesRoute,
   PublicPrivateRoomRoute: PublicPrivateRoomRoute,
+  PublicReserveRoute: PublicReserveRoute,
   PublicResetPasswordRoute: PublicResetPasswordRoute,
   PublicSignInRoute: PublicSignInRoute,
   PublicTheExperienceRoute: PublicTheExperienceRoute,

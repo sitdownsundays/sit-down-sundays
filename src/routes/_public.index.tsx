@@ -231,17 +231,18 @@ function HomePage() {
         </Container>
       </section>
 
-      {/* Waitlist CTA */}
+      {/* Reservation CTA */}
       <section className="bg-clay text-cream">
         <Container className="flex flex-col items-center gap-6 py-20 text-center">
           <h2 className="font-display text-3xl font-bold sm:text-4xl">
             Save your seat at the table
           </h2>
           <p className="max-w-xl text-cream/90">
-            The waitlist is the first step. When reservations open, you'll hear from us first.
+            Submit a reservation request for an upcoming Sunday. Your request is pending staff
+            review — it is not yet a confirmed reservation.
           </p>
-          <ButtonLink to="/waitlist" variant="gold" size="lg">
-            Join the Waitlist
+          <ButtonLink to="/reserve" variant="gold" size="lg">
+            Reserve
           </ButtonLink>
           <Link
             to="/contact"

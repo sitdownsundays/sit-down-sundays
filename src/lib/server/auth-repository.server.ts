@@ -401,14 +401,13 @@ class SupabaseAuthRepository implements AuthRepository {
     _isProduction: boolean,
   ): Promise<SessionEstablishResult & { redirectTo?: string }> {
     const client = getSupabaseSSRClient();
+    // The installed @supabase/auth-js SDK takes the authorization code as the
+    // first string argument: exchangeCodeForSession(authCode, options?).
     // The PKCE code_verifier is stored in a cookie by @supabase/ssr during
-    // signup/recovery. exchangeCodeForSession reads it automatically when the
-    // SSR client's cookie store is populated. We pass an explicit verifier
-    // only as a fallback.
-    const { data, error } = await client.auth.exchangeCodeForSession({
-      authCode: input.authCode,
-      codeVerifier: input.codeVerifier,
-    });
+    // signup/recovery; the SSR client reads it automatically from its cookie
+    // store. We therefore pass the code directly and do NOT fabricate or
+    // inject a verifier (doing so would bypass PKCE).
+    const { data, error } = await client.auth.exchangeCodeForSession(input.authCode);
 
     if (error || !data.session) {
       return { ok: false, kind: "unexpected", message: "Verification could not be completed." };
@@ -437,9 +436,7 @@ class SupabaseAuthRepository implements AuthRepository {
     // PKCE recovery flow: exchange the code to establish a session first.
     // The SSR client reads the PKCE verifier from its cookie automatically.
     if (input.code) {
-      const { error: codeErr } = await client.auth.exchangeCodeForSession({
-        authCode: input.code,
-      });
+      const { error: codeErr } = await client.auth.exchangeCodeForSession(input.code);
       if (codeErr) {
         return { ok: false, kind: "validation", message: "Reset link is invalid or expired." };
       }

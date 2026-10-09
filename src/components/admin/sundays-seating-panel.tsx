@@ -145,7 +145,14 @@ export function SeatingTimesPanel({ service }: SeatingTimesPanelProps) {
 
       {loadState === "loading" && <LoadingState label="Loading seating times…" />}
       {loadState === "error" && (
-        <ErrorState message="We couldn't load seating times." onRetry={loadSeatings} />
+        <ErrorState
+          message="We couldn't load seating times."
+          action={
+            <Button variant="outline" onClick={loadSeatings}>
+              Try again
+            </Button>
+          }
+        />
       )}
       {loadState === "loaded" && seatings.length === 0 && (
         <EmptyState title="No seating times" description="Add a seating time for this service." />

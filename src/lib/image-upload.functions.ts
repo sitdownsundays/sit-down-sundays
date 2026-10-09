@@ -114,7 +114,14 @@ export const uploadMenuItemImage = createServerFn({ method: "POST" })
       const guard = await requireUploadActor();
       if (!guard.ok) return guard;
       const repo = getMenuUploadRepository();
-      const file = new File([bytes], data.fileName, { type: data.mediaType });
+      // Construct an ArrayBuffer-backed copy so the byte view is accepted as a
+      // BlobPart under strict lib types. Preserves the exact validated byte
+      // range without including unrelated backing-buffer bytes.
+      const buffer = bytes.buffer.slice(
+        bytes.byteOffset,
+        bytes.byteOffset + bytes.byteLength,
+      ) as ArrayBuffer;
+      const file = new File([buffer], data.fileName, { type: data.mediaType });
       return await repo.upload({ file, itemId: data.itemId }, guard.actor.userId);
     } catch {
       return {

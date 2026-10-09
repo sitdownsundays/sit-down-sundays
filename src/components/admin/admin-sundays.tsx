@@ -169,7 +169,11 @@ export function AdminSundaysPage() {
       {loadState === "error" && (
         <ErrorState
           message={loadError || "We couldn't load Sunday services."}
-          onRetry={loadServices}
+          action={
+            <Button variant="outline" onClick={loadServices}>
+              Try again
+            </Button>
+          }
         />
       )}
 

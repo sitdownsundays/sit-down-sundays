@@ -69,14 +69,12 @@ export function InternalShell({ area, areaLabel, homeTo }: InternalShellProps) {
             className="group flex items-center gap-2.5 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-md"
             aria-label="Sit Down Sundays home"
           >
-            <span className="flex h-10 shrink-0 items-center justify-center rounded-md border border-sidebar-border/80 bg-white px-2 py-1 shadow-2xs">
-              <img
-                src={BRAND_LOGO_SRC}
-                alt="D.A.'s Banquets & Events"
-                className="h-7 w-auto max-w-[90px] object-contain"
-                loading="eager"
-              />
-            </span>
+            <img
+              src={BRAND_LOGO_SRC}
+              alt="D.A.'s Banquets & Events"
+              className="h-9 w-auto max-w-[110px] object-contain"
+              loading="eager"
+            />
             <div className="flex flex-col min-w-0">
               <span className="font-display text-xs font-bold leading-tight text-sidebar-foreground truncate">
                 {areaLabel}

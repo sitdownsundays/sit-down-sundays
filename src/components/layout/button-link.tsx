@@ -13,6 +13,7 @@ const buttonLinkVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         gold: "bg-gold text-gold-foreground shadow hover:bg-gold/90",
+        link: "text-primary underline-offset-4 hover:underline h-auto px-0",
       },
       size: {
         default: "h-9 px-4 py-2",
@@ -29,11 +30,16 @@ interface ButtonLinkProps extends VariantProps<typeof buttonLinkVariants> {
   to: string;
   children: React.ReactNode;
   className?: string;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }
 
-export function ButtonLink({ to, children, variant, size, className }: ButtonLinkProps) {
+export function ButtonLink({ to, children, variant, size, className, onClick }: ButtonLinkProps) {
   return (
-    <Link to={to as never} className={cn(buttonLinkVariants({ variant, size }), className)}>
+    <Link
+      to={to as never}
+      onClick={onClick}
+      className={cn(buttonLinkVariants({ variant, size }), className)}
+    >
       {children}
     </Link>
   );

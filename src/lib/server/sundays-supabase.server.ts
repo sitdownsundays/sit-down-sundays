@@ -24,9 +24,13 @@ import type {
   SundayServiceOperationResult,
   SeatingTimeOperationResult,
   PaymentPolicyOperationResult,
+  DiningTableDTO,
+  CreateDiningTableInput,
+  UpdateDiningTableInput,
+  DiningTableOperationResult,
 } from "@/lib/sundays/types";
 import type { ISundaysRepository } from "./sundays-repository-interface.server";
-import type { SundayStatus } from "@/lib/sundays/constants";
+import type { SundayStatus, TableSize } from "@/lib/sundays/constants";
 import {
   SERVICE_WINDOW_START,
   SERVICE_WINDOW_END,
@@ -96,6 +100,34 @@ interface PaymentPolicyRow {
   updated_at: string;
   created_by: string | null;
   updated_by: string | null;
+}
+
+interface DiningTableRow {
+  id: string;
+  space_id: string;
+  label: string;
+  seats: number;
+  zone: string;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
+}
+
+function diningRowToDTO(row: DiningTableRow): DiningTableDTO {
+  return {
+    id: row.id,
+    spaceId: row.space_id,
+    label: row.label,
+    seats: row.seats as TableSize,
+    zone: row.zone,
+    isActive: row.is_active,
+    displayOrder: row.display_order,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
 }
 
 function serviceRowToDTO(row: SundayServiceRow): SundayServiceDTO {
@@ -453,5 +485,109 @@ export class SupabaseSundaysRepository implements ISundaysRepository {
         updatedBy: row.updated_by,
       },
     };
+  }
+
+  // ------------------------------------------------------------------------
+  // Physical dining tables
+  // ------------------------------------------------------------------------
+  private static normalizeLabel(label: string): string {
+    return label.trim().toLowerCase();
+  }
+
+  async listDiningTables(spaceId?: string): Promise<DiningTableDTO[]> {
+    let query = this.getAdmin().from("dining_tables").select("*");
+    if (spaceId) query = query.eq("space_id", spaceId);
+    const { data, error } = await query
+      .order("display_order", { ascending: true })
+      .order("label", { ascending: true })
+      .order("id", { ascending: true });
+    if (error) {
+      console.error("Failed to list dining tables:", error.message);
+      throw new Error("Could not list dining tables.");
+    }
+    return (data as DiningTableRow[]).map(diningRowToDTO);
+  }
+
+  async createDiningTable(
+    actorUserId: string,
+    input: CreateDiningTableInput,
+  ): Promise<DiningTableOperationResult> {
+    const label = input.label.trim();
+    if (!label) {
+      return { success: false, error: "Label is required." };
+    }
+    const payload = {
+      space_id: input.spaceId,
+      label,
+      seats: input.seats,
+      zone: input.zone ?? "",
+      is_active: input.isActive ?? true,
+      display_order: input.displayOrder ?? 0,
+      created_by: actorUserId,
+      updated_by: actorUserId,
+    };
+    const { data, error } = await this.getAdmin()
+      .from("dining_tables")
+      .insert(payload)
+      .select("*")
+      .single();
+    if (error) {
+      // Unique constraint violation on (space_id, normalized label) → duplicate.
+      if (error.code === "23505") {
+        return {
+          success: false,
+          error: "A table with this label already exists in this room.",
+        };
+      }
+      console.error("Failed to create dining table:", error.message);
+      return { success: false, error: "Could not create dining table." };
+    }
+    return { success: true, data: diningRowToDTO(data as DiningTableRow) };
+  }
+
+  async updateDiningTable(
+    actorUserId: string,
+    input: UpdateDiningTableInput,
+  ): Promise<DiningTableOperationResult> {
+    const patch: Record<string, unknown> = { updated_by: actorUserId };
+    if (input.label !== undefined) patch.label = input.label.trim();
+    if (input.seats !== undefined) patch.seats = input.seats;
+    if (input.zone !== undefined) patch.zone = input.zone.trim();
+    if (input.isActive !== undefined) patch.is_active = input.isActive;
+    if (input.displayOrder !== undefined) patch.display_order = input.displayOrder;
+
+    const { data, error } = await this.getAdmin()
+      .from("dining_tables")
+      .update(patch)
+      .eq("id", input.id)
+      .eq("updated_at", input.expectedUpdatedAt)
+      .select("*")
+      .maybeSingle();
+    if (error) {
+      if (error.code === "23505") {
+        return {
+          success: false,
+          error: "A table with this label already exists in this room.",
+        };
+      }
+      console.error("Failed to update dining table:", error.message);
+      return { success: false, error: "Could not update dining table." };
+    }
+    if (!data) {
+      // Zero rows updated: either the record was deleted or updated_at changed
+      // (stale edit). Distinguish by checking existence.
+      const { data: exists } = await this.getAdmin()
+        .from("dining_tables")
+        .select("id")
+        .eq("id", input.id)
+        .maybeSingle();
+      if (!exists) return { success: false, error: "Table not found." };
+      return {
+        success: false,
+        conflict: true,
+        error: "This table was modified by another user. Please reload the latest data.",
+      };
+    }
+    return { success: true, data: diningRowToDTO(data as DiningTableRow) };
   }
 }

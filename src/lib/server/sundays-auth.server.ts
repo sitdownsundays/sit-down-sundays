@@ -16,7 +16,7 @@
  */
 import { getAuthRepository } from "./auth-repository.server";
 import { roleHasPermission } from "@/lib/domain/roles";
-import type { RoleKey } from "@/lib/domain/types";
+import type { RoleKey, PermissionKey } from "@/lib/domain/types";
 
 export interface SundaysActor {
   role: RoleKey;
@@ -43,6 +43,27 @@ export async function resolveSundaysActor(): Promise<SundaysActor> {
   }
   const role = session.user.roleKey;
   if (!roleHasPermission(role, "availability.manage")) {
+    throw new SundaysAuthorizationError();
+  }
+  return { role, userId: session.user.id };
+}
+
+/**
+ * Resolve the current authenticated actor and require the given permission.
+ * Used for dining-table management which is gated by seating.read /
+ * seating.manage (distinct from the availability.manage used for Sunday
+ * services and seating times).
+ */
+export async function resolveSundaysActorWithPermission(
+  permission: PermissionKey,
+): Promise<SundaysActor> {
+  const auth = getAuthRepository();
+  const session = await auth.resolveSession();
+  if (!session.authenticated) {
+    throw new SundaysAuthorizationError();
+  }
+  const role = session.user.roleKey;
+  if (!roleHasPermission(role, permission)) {
     throw new SundaysAuthorizationError();
   }
   return { role, userId: session.user.id };

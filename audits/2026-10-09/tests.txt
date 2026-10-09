@@ -1,0 +1,12 @@
+
+ RUN  v5.0.1 /Users/usuario/Documents/Codex/2026-09-21/ple/github-bootstrap-20260924/sunday-supper-2
+
+
+ Test Files  75 passed (75)
+      Tests  1401 passed (1401)
+   Start at  17:42:48
+   Duration  5.01s (import 44%, transform 42%, tests 11%, worker 3%)
+
+  Transform  transforming modules took 7.75s · 42% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns

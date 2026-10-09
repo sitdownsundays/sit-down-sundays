@@ -42,7 +42,7 @@ export const HOME_HERO_CONTENT: HeroContent = {
   headline: "Come Sit Down With Us",
   supportingText:
     "Good food tastes even better when it is shared. Sit Down Sundays brings family, friends, and community together around one thoughtfully prepared table.",
-  primaryAction: { label: "Join the Waitlist", to: "/waitlist" },
+  primaryAction: { label: "Reserve", to: "/reserve" },
   secondaryAction: { label: "Explore the Experience", to: "/the-experience" },
   imageAlt:
     "A joyful multigenerational African American family sharing an abundant Sunday meal together with warm conversation around a homestyle dining table in late-afternoon natural light.",

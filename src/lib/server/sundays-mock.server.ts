@@ -22,6 +22,10 @@ import type {
   SundayServiceOperationResult,
   SeatingTimeOperationResult,
   PaymentPolicyOperationResult,
+  DiningTableDTO,
+  CreateDiningTableInput,
+  UpdateDiningTableInput,
+  DiningTableOperationResult,
 } from "@/lib/sundays/types";
 import type { ISundaysRepository } from "./sundays-repository-interface.server";
 import type { SundayStatus, TableSize } from "@/lib/sundays/constants";
@@ -238,7 +242,112 @@ export class MockSundaysRepository implements ISundaysRepository {
     this.paymentPolicy = updated;
     return { success: true, data: { ...updated } };
   }
-}
 
-// Re-export for table-size usage in future phases (keeps the import graph clean).
-export type { TableSize };
+  // ------------------------------------------------------------------------
+  // Physical dining tables
+  // ------------------------------------------------------------------------
+  private diningTables: (DiningTableDTO & { createdBy: string; updatedBy: string })[] = [];
+
+  private static normalizeLabel(label: string): string {
+    return label.trim().toLowerCase();
+  }
+
+  async listDiningTables(spaceId?: string): Promise<DiningTableDTO[]> {
+    const filtered = spaceId
+      ? this.diningTables.filter((t) => t.spaceId === spaceId)
+      : [...this.diningTables];
+    // Include inactive tables for management. Deterministic ordering.
+    return filtered.sort(
+      (a, b) =>
+        a.displayOrder - b.displayOrder ||
+        a.label.localeCompare(b.label) ||
+        a.id.localeCompare(b.id),
+    );
+  }
+
+  async createDiningTable(
+    actorUserId: string,
+    input: CreateDiningTableInput,
+  ): Promise<DiningTableOperationResult> {
+    const label = input.label.trim();
+    if (!label) {
+      return { success: false, error: "Label is required." };
+    }
+    const norm = MockSundaysRepository.normalizeLabel(label);
+    const duplicate = this.diningTables.some(
+      (t) => t.spaceId === input.spaceId && MockSundaysRepository.normalizeLabel(t.label) === norm,
+    );
+    if (duplicate) {
+      return {
+        success: false,
+        error: "A table with this label already exists in this room.",
+      };
+    }
+    const now = new Date().toISOString();
+    const newTable: DiningTableDTO & { createdBy: string; updatedBy: string } = {
+      id: crypto.randomUUID(),
+      spaceId: input.spaceId,
+      label,
+      seats: input.seats,
+      zone: input.zone ?? "",
+      isActive: input.isActive ?? true,
+      displayOrder: input.displayOrder ?? 0,
+      createdAt: now,
+      updatedAt: now,
+      createdBy: actorUserId,
+      updatedBy: actorUserId,
+    };
+    this.diningTables.push(newTable);
+    return { success: true, data: { ...newTable } };
+  }
+
+  async updateDiningTable(
+    actorUserId: string,
+    input: UpdateDiningTableInput,
+  ): Promise<DiningTableOperationResult> {
+    const idx = this.diningTables.findIndex((t) => t.id === input.id);
+    if (idx === -1) {
+      return { success: false, error: "Table not found." };
+    }
+    const existing = this.diningTables[idx];
+    if (existing.updatedAt !== input.expectedUpdatedAt) {
+      return {
+        success: false,
+        conflict: true,
+        error: "This table was modified by another user. Please reload the latest data.",
+      };
+    }
+    if (input.label !== undefined) {
+      const label = input.label.trim();
+      if (!label) {
+        return { success: false, error: "Label is required." };
+      }
+      const norm = MockSundaysRepository.normalizeLabel(label);
+      const duplicate = this.diningTables.some(
+        (t) =>
+          t.id !== input.id &&
+          t.spaceId === existing.spaceId &&
+          MockSundaysRepository.normalizeLabel(t.label) === norm,
+      );
+      if (duplicate) {
+        return {
+          success: false,
+          error: "A table with this label already exists in this room.",
+        };
+      }
+    }
+    const updated: DiningTableDTO & { createdBy: string; updatedBy: string } = {
+      ...existing,
+      label: input.label !== undefined ? input.label.trim() : existing.label,
+      seats: input.seats ?? existing.seats,
+      zone: input.zone !== undefined ? input.zone.trim() : existing.zone,
+      isActive: input.isActive !== undefined ? input.isActive : existing.isActive,
+      displayOrder: input.displayOrder !== undefined ? input.displayOrder : existing.displayOrder,
+      updatedAt: new Date(Math.max(Date.now(), Date.parse(existing.updatedAt) + 1)).toISOString(),
+      createdBy: existing.createdBy,
+      updatedBy: actorUserId,
+    };
+    this.diningTables[idx] = updated;
+    return { success: true, data: { ...updated } };
+  }
+}

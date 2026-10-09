@@ -1,5 +1,5 @@
-import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { useState, type ReactNode } from "react";
 import { Menu, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { Container } from "@/components/layout/container";
@@ -10,10 +10,11 @@ import { signOut } from "@/lib/auth.functions";
 import { primaryWorkspaceForRole } from "@/lib/auth/destinations";
 
 export const BRAND_LOGO_SRC =
-  "https://vibe.filesafe.space/1790115564962639543/attachments/d7410d81-221b-4e4e-88c0-d5eb14a02b7b.jpg";
+  "https://vibe.filesafe.space/1790115564962639543/attachments/92a30cb8-425c-4bd9-9ed4-8671866de6d2.png";
 
 const NAV = [
   { label: "Home", to: "/" },
+  { label: "Reserve", to: "/reserve" },
   { label: "The Experience", to: "/the-experience" },
   { label: "Menu", to: "/menu" },
   { label: "How It Works", to: "/how-it-works" },
@@ -24,11 +25,12 @@ const NAV = [
 const SECONDARY = [
   { label: "Our Story", to: "/our-story" },
   { label: "Policies", to: "/policies" },
+  { label: "Waitlist", to: "/waitlist" },
   { label: "Contact", to: "/contact" },
   { label: "Sign In", to: "/sign-in" },
 ];
 
-export function PublicLayout() {
+export function PublicLayout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
@@ -50,12 +52,12 @@ export function PublicLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* Announcement / waitlist CTA */}
+      {/* Announcement / reserve CTA */}
       <div className="bg-charcoal text-cream">
         <Container className="flex items-center justify-center gap-2 py-2 text-center text-sm">
-          <span className="font-medium">Reservations opening soon.</span>
-          <Link to="/waitlist" className="underline underline-offset-2 hover:text-gold">
-            Join the waitlist →
+          <span className="font-medium">Now accepting reservation requests.</span>
+          <Link to="/reserve" className="underline underline-offset-2 hover:text-gold">
+            Reserve →
           </Link>
         </Container>
       </div>
@@ -67,14 +69,12 @@ export function PublicLayout() {
             className="group flex items-center focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring rounded-md"
             aria-label="Sit Down Sundays home"
           >
-            <span className="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-white">
-              <img
-                src={BRAND_LOGO_SRC}
-                alt="D.A.'s Banquets & Events"
-                className="block w-[140px] -mx-3 -my-1 object-contain lg:w-[195px] lg:-mx-4 lg:-my-2"
-                loading="eager"
-              />
-            </span>
+            <img
+              src={BRAND_LOGO_SRC}
+              alt="D.A.'s Banquets & Events"
+              className="block h-12 w-auto max-w-[170px] object-contain sm:h-14 sm:max-w-[200px] lg:h-20 lg:max-w-[280px]"
+              loading="eager"
+            />
           </Link>
 
           <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary">
@@ -125,8 +125,8 @@ export function PublicLayout() {
                 >
                   Sign In
                 </Link>
-                <ButtonLink to="/waitlist" size="default">
-                  Join the Waitlist
+                <ButtonLink to="/reserve" size="default">
+                  Reserve
                 </ButtonLink>
               </>
             )}
@@ -195,8 +195,8 @@ export function PublicLayout() {
                     </button>
                   </div>
                 ) : (
-                  <ButtonLink to="/waitlist" className="w-full" onClick={() => setOpen(false)}>
-                    Join the Waitlist
+                  <ButtonLink to="/reserve" className="w-full" onClick={() => setOpen(false)}>
+                    Reserve
                   </ButtonLink>
                 )}
               </div>
@@ -205,9 +205,7 @@ export function PublicLayout() {
         )}
       </header>
 
-      <main className="flex-1">
-        <Outlet />
-      </main>
+      <main className="flex-1">{children}</main>
 
       <PublicFooter />
     </div>
@@ -220,14 +218,12 @@ function PublicFooter() {
       <Container className="grid gap-8 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-3">
           <Link to="/" className="group flex items-center gap-2.5">
-            <span className="flex h-10 shrink-0 items-center justify-center rounded-md border border-border/80 bg-white px-2 py-1 shadow-xs">
-              <img
-                src={BRAND_LOGO_SRC}
-                alt="D.A.'s Banquets & Events"
-                className="h-7 w-auto max-w-[110px] object-contain"
-                loading="lazy"
-              />
-            </span>
+            <img
+              src={BRAND_LOGO_SRC}
+              alt="D.A.'s Banquets & Events"
+              className="h-10 w-auto max-w-[140px] object-contain"
+              loading="lazy"
+            />
             <div className="flex flex-col">
               <span className="font-display text-base font-bold text-foreground">
                 Sit Down Sundays

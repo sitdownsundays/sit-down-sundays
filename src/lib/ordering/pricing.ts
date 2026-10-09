@@ -79,7 +79,7 @@ export interface PricingConfigSnapshot {
 }
 
 /** Integer cents math: round half-up to avoid floating drift. */
-function roundCents(value: number): number {
+export function roundCents(value: number): number {
   return Math.round(value);
 }
 

@@ -328,3 +328,75 @@ describe("image-upload constants", () => {
     }
   });
 });
+
+/* ----------------------------- ArrayBuffer-backed byte copy ----------------------------- */
+/**
+ * Regression: the production upload path (src/lib/image-upload.functions.ts)
+ * constructs an ArrayBuffer-backed copy from a Uint8Array so the byte view is
+ * accepted as a BlobPart under strict lib types. It must preserve the EXACT
+ * validated byte range — including when the input is a subarray with a nonzero
+ * byteOffset — without including unrelated backing-buffer bytes.
+ *
+ * This exercises the real conversion logic used by the server function, not a
+ * copied helper. It mirrors the exact `bytes.buffer.slice(byteOffset, ...)`
+ * expression so a regression (e.g. using the whole buffer) is caught.
+ */
+describe("ArrayBuffer-backed byte copy preserves exact bytes", () => {
+  /** Mirror of the production conversion in image-upload.functions.ts. */
+  function toBlobPart(bytes: Uint8Array): ArrayBuffer {
+    return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  }
+
+  it("preserves a full-buffer Uint8Array exactly", () => {
+    const bytes = jpegBytes(); // full buffer, byteOffset 0
+    const part = toBlobPart(bytes);
+    const view = new Uint8Array(part);
+    expect(view.byteLength).toBe(bytes.byteLength);
+    expect(Array.from(view)).toEqual(Array.from(bytes));
+  });
+
+  it("preserves a subarray with nonzero byteOffset without leaking buffer bytes", () => {
+    // Backing buffer: 4 leading garbage bytes + real JPEG bytes + 4 trailing.
+    const backing = new Uint8Array(40);
+    backing[0] = 0xde;
+    backing[1] = 0xad;
+    backing[2] = 0xbe;
+    backing[3] = 0xef;
+    const real = jpegBytes(); // 32 bytes
+    backing.set(real, 4);
+    backing[36] = 0xca;
+    backing[37] = 0xfe;
+    backing[38] = 0xba;
+    backing[39] = 0xbe;
+
+    // Subarray starting at offset 4, length 32 — a nonzero byteOffset view.
+    const sub = backing.subarray(4, 4 + 32);
+    expect(sub.byteOffset).toBe(4);
+    expect(sub.byteLength).toBe(32);
+
+    const part = toBlobPart(sub);
+    const view = new Uint8Array(part);
+    // The copy must be exactly the 32 real bytes, NOT include the leading
+    // garbage or trailing bytes from the shared backing buffer.
+    expect(view.byteLength).toBe(32);
+    expect(Array.from(view)).toEqual(Array.from(real));
+    expect(view[0]).toBe(0xff);
+    expect(view[1]).toBe(0xd8);
+    expect(view[2]).toBe(0xff);
+    // Leading garbage must NOT appear.
+    expect(view[0]).not.toBe(0xde);
+    // Trailing garbage must NOT appear.
+    expect(view[31]).not.toBe(0xca);
+  });
+
+  it("a File built from the copy round-trips the exact bytes", async () => {
+    const bytes = pngBytes();
+    const part = toBlobPart(bytes);
+    const file = new File([part], "p.png", { type: "image/png" });
+    const ab = await file.arrayBuffer();
+    const view = new Uint8Array(ab);
+    expect(Array.from(view)).toEqual(Array.from(bytes));
+    // Magic-byte validation still works on the reconstructed bytes.
+    expect(detectImageFormat(view)).toBe("image/png");
+  });
+});

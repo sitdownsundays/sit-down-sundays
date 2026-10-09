@@ -3,7 +3,7 @@ import type {
   CreateFeastOfferingInput,
   UpdateFeastOfferingInput,
   FeastOfferingOperationResult,
-} from "./types";
+} from "@/lib/feast/types";
 
 export interface IFeastRepository {
   listPublishedOfferings(): Promise<FeastOfferingDTO[]>;

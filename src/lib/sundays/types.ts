@@ -6,6 +6,7 @@
  * availability promise is made until capacity enforcement is implemented.
  */
 import type { SundayStatus, TableSize, BalanceDeadlineType } from "./constants";
+import type { SpaceType } from "@/lib/spaces/constants";
 
 export interface SundayServiceDTO {
   id: string;
@@ -138,6 +139,35 @@ export interface DiningTableOperationResult {
   conflict?: boolean;
 }
 
+/**
+ * Result of listing dining tables. A discriminated union so that authorization
+ * failure, invalid input, and repository failure are never indistinguishable
+ * from a successful empty inventory.
+ */
+export type DiningTableListResult =
+  { ok: true; tables: DiningTableDTO[] } | { ok: false; error: string };
+
+/**
+ * Minimal room projection for the Tables screen. Only the fields needed to
+ * label and filter physical tables — no booking limits, audit actors, or
+ * other venue configuration. Inactive rooms are included so existing tables
+ * can still display their room names.
+ */
+export interface DiningTableRoomOption {
+  id: string;
+  name: string;
+  spaceType: SpaceType;
+  isActive: boolean;
+}
+
+/**
+ * Result of listing room options for the Tables screen. A discriminated union
+ * so authorization failure and repository failure are never indistinguishable
+ * from a successful empty list.
+ */
+export type DiningTableRoomOptionsResult =
+  { ok: true; rooms: DiningTableRoomOption[] } | { ok: false; error: string };
+
 /** Payment policy configuration (singleton). */
 export interface PaymentPolicyDTO {
   /** Deposit percentage at reservation (confirmed 50). */
@@ -177,3 +207,159 @@ export interface ReservationBalanceOverride {
   reason: string;
   changedAt: string;
 }
+
+/* ----------------------------- Table assignments ----------------------------- */
+
+/**
+ * Safe machine-readable codes returned by the assign_reservation_tables_atomic
+ * RPC. The application wrapper maps these to user-facing messages.
+ */
+export type AssignTablesCode =
+  | "conflict"
+  | "table_conflict"
+  | "insufficient_seats"
+  | "invalid_table"
+  | "invalid_configuration"
+  | "invalid_status"
+  | "not_found"
+  | "invalid_data"
+  | "invalid_actor"
+  | "unexpected";
+
+/**
+ * Result of assigning (or releasing) a reservation's physical tables.
+ *
+ * Success carries the reservation ID, the assigned table IDs (empty when all
+ * tables were released), and the new reservation updatedAt for the next edit.
+ * Failure carries a safe code + message. Raw database errors are never exposed.
+ */
+export type AssignTablesResult =
+  | {
+      ok: true;
+      reservationId: string;
+      assignedTableIds: string[];
+      reservationUpdatedAt: string;
+    }
+  | {
+      ok: false;
+      code: AssignTablesCode;
+      error: string;
+    };
+
+/* --------------------- Reservation table-assignment context --------------------- */
+
+/**
+ * A current (released_at IS NULL) table assignment for a reservation.
+ * Inactive currently-assigned tables remain visible so they can be released.
+ */
+export interface ReservationTableAssignmentDTO {
+  id: string;
+  diningTableId: string;
+  seatingStart: string;
+  seatingEnd: string;
+  tableLabel: string;
+  tableSeats: number;
+  tableIsActive: boolean;
+}
+
+/**
+ * A physical table in the reservation's room. Named roomTables (not
+ * availableTables): this endpoint does NOT guarantee a table is free — the
+ * assignment RPC checks conflicts authoritatively when saving.
+ */
+export interface ReservationRoomTableDTO {
+  id: string;
+  label: string;
+  seats: number;
+  zone: string;
+  isActive: boolean;
+}
+
+/**
+ * Context for the party-to-table assignment dialog. Only the fields needed
+ * to present the reservation, its current assignments, and the room's
+ * physical tables. No other parties' contact info, dietary notes, payments,
+ * or order contents.
+ */
+export interface ReservationTableContextDTO {
+  reservationId: string;
+  reservationNumber: string;
+  partySize: number;
+  status: string;
+  updatedAt: string;
+  roomId: string;
+  roomName: string;
+  serviceDate: string;
+  seatingStart: string;
+  seatingEnd: string;
+  currentAssignments: ReservationTableAssignmentDTO[];
+  roomTables: ReservationRoomTableDTO[];
+}
+
+export type ReservationTableContextResult =
+  { ok: true; context: ReservationTableContextDTO } | { ok: false; error: string };
+
+/* ----------------------------- Reservation confirmation ----------------------------- */
+
+/**
+ * Safe machine-readable codes returned by the confirm_reservation_atomic RPC.
+ * The application wrapper maps these to user-facing messages.
+ */
+export type ConfirmReservationCode =
+  "conflict" | "invalid_status" | "not_found" | "invalid_data" | "invalid_actor" | "unexpected";
+
+/**
+ * Result of confirming a reservation (pending_review → confirmed).
+ *
+ * Success carries the reservation ID, the new reservation updatedAt, and
+ * whether the reservation was already confirmed (idempotent recovery).
+ * Failure carries a safe code + message. Raw database errors are never exposed.
+ *
+ * Confirmation accepts the reservation request; it does NOT collect money,
+ * satisfy the deposit, or change payment status. The wrapper must not claim
+ * otherwise.
+ */
+export type ConfirmReservationResult =
+  | {
+      ok: true;
+      reservationId: string;
+      reservationUpdatedAt: string;
+      alreadyConfirmed: boolean;
+    }
+  | {
+      ok: false;
+      code: ConfirmReservationCode;
+      error: string;
+    };
+
+/* ----------------------------- Reservation cancellation ----------------------------- */
+
+/**
+ * Safe machine-readable codes returned by the cancel_reservation_atomic RPC.
+ * The application wrapper maps these to user-facing messages.
+ */
+export type CancelReservationCode =
+  "conflict" | "invalid_status" | "not_found" | "invalid_data" | "invalid_actor" | "unexpected";
+
+/**
+ * Result of cancelling a reservation (pre-arrival).
+ *
+ * Success carries the reservation ID, the new reservation updatedAt, and
+ * whether the reservation was already cancelled (idempotent recovery).
+ * Failure carries a safe code + message. Raw database errors are never exposed.
+ *
+ * Cancellation does NOT refund money or change payment status. The wrapper
+ * must not claim otherwise.
+ */
+export type CancelReservationResult =
+  | {
+      ok: true;
+      reservationId: string;
+      reservationUpdatedAt: string;
+      alreadyCancelled: boolean;
+    }
+  | {
+      ok: false;
+      code: CancelReservationCode;
+      error: string;
+    };
