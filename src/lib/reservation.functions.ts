@@ -27,31 +27,25 @@ import { createServerFn } from "@tanstack/react-start";
 import { getReservationRepository } from "@/lib/server/reservation-repository.server";
 import { resolveReservationStaffActor } from "@/lib/server/reservation-auth.server";
 import { handleSubmitReservationRequest } from "@/lib/server/reservation-submit.server";
+import { normalizeSubmitRequest } from "@/lib/server/reservation-submit-normalize.server";
+import { buildListReservationsFilters } from "@/lib/server/reservation-list-filters.server";
 import { submitReservationRequestSchema, listReservationsSchema } from "@/lib/reservation/schema";
 import { getOrderingRepository } from "@/lib/server/ordering-repository.server";
 import { toPublicCatalog } from "@/lib/booking/public-catalog";
 import type {
-  PublicAvailabilityOption,
   SubmitReservationResult,
   ReservationListItemDTO,
-  ReservationDetailDTO,
+  ReservationDetailTransport,
 } from "@/lib/reservation/types";
 import type { PublicOrderingCatalog } from "@/lib/booking/public-catalog";
+import { toReservationDetailTransport } from "@/lib/server/reservation-detail-transport.server";
+import { buildCapacityAvailability } from "@/lib/server/capacity-availability.server";
+import type { CapacityAvailabilityResult } from "@/lib/reservation/capacity-availability";
 
 /* ----------------------------- Public availability ----------------------------- */
 
 export const getPublicAvailability = createServerFn({ method: "GET" }).handler(
-  async (): Promise<
-    { ok: true; options: PublicAvailabilityOption[] } | { ok: false; error: string }
-  > => {
-    try {
-      const repo = getReservationRepository();
-      const options = await repo.listPublicAvailability();
-      return { ok: true, options };
-    } catch {
-      return { ok: false, error: "Availability is temporarily unavailable." };
-    }
-  },
+  async (): Promise<CapacityAvailabilityResult> => buildCapacityAvailability(),
 );
 
 /* ----------------------------- Public ordering catalog ----------------------------- */
@@ -84,7 +78,12 @@ export const getPublicOrderingCatalog = createServerFn({ method: "GET" }).handle
 export const submitReservationRequest = createServerFn({ method: "POST" })
   .validator((d: unknown) => submitReservationRequestSchema.parse(d))
   .handler(async ({ data }): Promise<SubmitReservationResult> => {
-    return handleSubmitReservationRequest(data);
+    // Normalize the parsed schema (optionals may be explicitly undefined) into
+    // the authoritative SubmitReservationRequestInput (exact optional props)
+    // without an unchecked cast. Preserves supplied empty strings, a zero
+    // preview subtotal, guest notes, and the idempotency key by identity.
+    const input = normalizeSubmitRequest(data);
+    return handleSubmitReservationRequest(input);
   });
 
 /* ----------------------------- Staff list ----------------------------- */
@@ -100,12 +99,12 @@ export const listReservations = createServerFn({ method: "GET" })
       try {
         await resolveReservationStaffActor();
         const repo = getReservationRepository();
-        const result = await repo.listReservations({
-          sundayServiceId: data.sundayServiceId,
-          seatingTimeId: data.seatingTimeId,
-          status: data.status,
-          search: data.search,
-        });
+        // Forward parsed filters to the repository via the shared server-only
+        // helper: each field is included only when its value is not undefined
+        // (exactOptionalPropertyTypes). The strict schema already validated the
+        // shape; supplied values are forwarded verbatim.
+        const filters = buildListReservationsFilters(data);
+        const result = await repo.listReservations(filters);
         if (!result.success) {
           return { ok: false, error: result.error ?? "Reservations are temporarily unavailable." };
         }
@@ -123,7 +122,9 @@ export const getReservationDetail = createServerFn({ method: "GET" })
   .handler(
     async ({
       data,
-    }): Promise<{ ok: true; reservation: ReservationDetailDTO } | { ok: false; error: string }> => {
+    }): Promise<
+      { ok: true; reservation: ReservationDetailTransport } | { ok: false; error: string }
+    > => {
       try {
         await resolveReservationStaffActor();
         const repo = getReservationRepository();
@@ -131,7 +132,11 @@ export const getReservationDetail = createServerFn({ method: "GET" })
         if (!result.success || !result.reservation) {
           return { ok: false, error: result.error ?? "Reservation not found." };
         }
-        return { ok: true, reservation: result.reservation };
+        const transport = toReservationDetailTransport(result.reservation);
+        if (!transport.success || !transport.reservation) {
+          return { ok: false, error: transport.error ?? "Reservation not found." };
+        }
+        return { ok: true, reservation: transport.reservation };
       } catch {
         return { ok: false, error: "You are not authorized to view this reservation." };
       }

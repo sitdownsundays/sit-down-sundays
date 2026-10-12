@@ -21,7 +21,7 @@ export function Field({
   children,
 }: {
   label: string;
-  error?: string;
+  error?: string | undefined;
   id: string;
   children: React.ReactNode;
 }) {

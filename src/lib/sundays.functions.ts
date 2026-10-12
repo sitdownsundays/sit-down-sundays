@@ -23,6 +23,10 @@ import { serverAssignReservationTables } from "./server/reservation-tables-actio
 import { serverGetReservationTableContext } from "./server/reservation-tables-context.server";
 import { serverCancelReservation } from "./server/reservation-cancel-actions.server";
 import { serverConfirmReservation } from "./server/reservation-confirm-actions.server";
+import { serverListServiceCapacityOptions } from "./server/service-capacity-options.server";
+import type { ServiceCapacityOptionsResult } from "./sundays/service-capacity-options";
+import { serverApproveReservation } from "./server/reservation-approval-actions.server";
+import type { ApprovalResult } from "./sundays/types";
 import type {
   SundayServiceDTO,
   SeatingTimeDTO,
@@ -139,6 +143,26 @@ export const confirmReservation = createServerFn({ method: "POST" })
     return serverConfirmReservation(data);
   });
 
+// ---------------------------------------------------------------------------
+// Service capacity options
+// ---------------------------------------------------------------------------
+
+export const listServiceCapacityOptions = createServerFn({ method: "GET" })
+  .validator((data: { spaceId: string }) => data)
+  .handler(async ({ data }): Promise<ServiceCapacityOptionsResult> => {
+    return serverListServiceCapacityOptions(data);
+  });
+
+// ---------------------------------------------------------------------------
+// Management approval (late-booking deposit authorization)
+// ---------------------------------------------------------------------------
+
+export const approveReservationForPayment = createServerFn({ method: "POST" })
+  .validator((d: unknown) => d)
+  .handler(async ({ data }): Promise<ApprovalResult> => {
+    return serverApproveReservation(data);
+  });
+
 export type {
   SundayServiceDTO,
   SeatingTimeDTO,
@@ -155,4 +179,6 @@ export type {
   ReservationTableContextResult,
   CancelReservationResult,
   ConfirmReservationResult,
+  ServiceCapacityOptionsResult,
+  ApprovalResult,
 };

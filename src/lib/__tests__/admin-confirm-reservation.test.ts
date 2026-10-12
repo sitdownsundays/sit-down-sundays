@@ -115,13 +115,13 @@ describe("buildConfirmPayload", () => {
 });
 
 describe("requiresReloadBeforeRetry", () => {
-  it("requires reload for conflict and unexpected codes", () => {
+  it("requires reload for conflict, unexpected, and invalid_status codes", () => {
     expect(requiresReloadBeforeRetry("conflict")).toBe(true);
     expect(requiresReloadBeforeRetry("unexpected")).toBe(true);
+    expect(requiresReloadBeforeRetry("invalid_status")).toBe(true);
   });
 
-  it("does not require reload for proven validation/status codes", () => {
-    expect(requiresReloadBeforeRetry("invalid_status")).toBe(false);
+  it("does not require reload for proven validation codes", () => {
     expect(requiresReloadBeforeRetry("invalid_data")).toBe(false);
     expect(requiresReloadBeforeRetry("not_found")).toBe(false);
     expect(requiresReloadBeforeRetry("invalid_actor")).toBe(false);

@@ -1,0 +1,1286 @@
+src/components/admin/admin-feast-offerings.tsx(455,33): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/components/admin/admin-feast-offerings.tsx(456,33): error TS4111: Property 'slug' comes from an index signature, so it must be accessed with ['slug'].
+src/components/admin/admin-feast-offerings.tsx(458,17): error TS4111: Property 'coverImageAlt' comes from an index signature, so it must be accessed with ['coverImageAlt'].
+src/components/admin/admin-feast-offerings.tsx(514,21): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/components/admin/admin-feast-offerings.tsx(514,82): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/components/admin/admin-feast-offerings.tsx(530,21): error TS4111: Property 'slug' comes from an index signature, so it must be accessed with ['slug'].
+src/components/admin/admin-feast-offerings.tsx(530,82): error TS4111: Property 'slug' comes from an index signature, so it must be accessed with ['slug'].
+src/components/admin/admin-feast-offerings.tsx(636,21): error TS4111: Property 'coverImageAlt' comes from an index signature, so it must be accessed with ['coverImageAlt'].
+src/components/admin/admin-feast-offerings.tsx(637,68): error TS4111: Property 'coverImageAlt' comes from an index signature, so it must be accessed with ['coverImageAlt'].
+src/components/admin/item-form.tsx(108,12): error TS2375: Type '{ children: Element[]; value: "starter" | "main" | "side" | "dessert" | "beverage" | "children"; onValueChange: (val: string) => void; disabled: boolean | undefined; }' is not assignable to type 'SelectSharedProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'disabled' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+src/components/admin/item-form.tsx(134,10): error TS2375: Type '{ children: Element[]; value: string; onValueChange: (val: string) => void; disabled: boolean | undefined; }' is not assignable to type 'SelectSharedProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'disabled' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+src/components/admin/item-form.tsx(186,10): error TS2375: Type '{ imageUrl: string; imageAlt: string; itemId: string; onUploaded: (url: string) => void; onRemoved: () => void; disabled: boolean | undefined; }' is not assignable to type 'ImageUploadFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'disabled' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+src/components/admin/item-table.tsx(119,33): error TS2345: Argument of type '(string | undefined)[]' is not assignable to parameter of type 'string[]'.
+  Type 'string | undefined' is not assignable to type 'string'.
+    Type 'undefined' is not assignable to type 'string'.
+src/components/admin/item-table.tsx(137,33): error TS2345: Argument of type '(string | undefined)[]' is not assignable to parameter of type 'string[]'.
+  Type 'string | undefined' is not assignable to type 'string'.
+    Type 'undefined' is not assignable to type 'string'.
+src/components/admin/item-table.tsx(278,4): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/components/admin/item-table.tsx(278,15): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/components/admin/menu-form.tsx(141,10): error TS2375: Type '{ id: string; label: string; value: ScheduleBoundaryValue; onChange: (b: ScheduleBoundaryValue) => void; error: string | undefined; timezoneLabel: string; disabled: boolean | undefined; }' is not assignable to type 'ScheduleFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/admin/menu-form.tsx(151,10): error TS2375: Type '{ id: string; label: string; value: ScheduleBoundaryValue; onChange: (b: ScheduleBoundaryValue) => void; error: string | undefined; timezoneLabel: string; disabled: boolean | undefined; }' is not assignable to type 'ScheduleFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/admin/menu-items-panel.tsx(106,26): error TS2339: Property 'message' does not exist on type 'MenuOneResult'.
+  Property 'message' does not exist on type '{ ok: true; menu: MenuWithContentDTO | null; }'.
+src/components/admin/menu-sections-panel.tsx(106,26): error TS2339: Property 'message' does not exist on type 'MenuOneResult'.
+  Property 'message' does not exist on type '{ ok: true; menu: MenuWithContentDTO | null; }'.
+src/components/admin/order-preview.tsx(91,9): error TS2322: Type 'OrderingConfigDTO | null | undefined' is not assignable to type 'OrderingConfigDTO | null'.
+  Type 'undefined' is not assignable to type 'OrderingConfigDTO | null'.
+src/components/admin/order-preview.tsx(552,32): error TS18048: 'want' is possibly 'undefined'.
+src/components/admin/order-preview.tsx(554,30): error TS18048: 'want' is possibly 'undefined'.
+src/components/admin/ordering-addon-dialog.tsx(66,25): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/components/admin/ordering-addon-dialog.tsx(67,25): error TS4111: Property 'slug' comes from an index signature, so it must be accessed with ['slug'].
+src/components/admin/ordering-addon-dialog.tsx(69,59): error TS4111: Property 'price' comes from an index signature, so it must be accessed with ['price'].
+src/components/admin/ordering-addon-dialog.tsx(117,45): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/components/admin/ordering-addon-dialog.tsx(120,45): error TS4111: Property 'slug' comes from an index signature, so it must be accessed with ['slug'].
+src/components/admin/ordering-addon-dialog.tsx(130,61): error TS4111: Property 'price' comes from an index signature, so it must be accessed with ['price'].
+src/components/admin/ordering-platter-dialog.tsx(55,25): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/components/admin/ordering-platter-dialog.tsx(56,25): error TS4111: Property 'slug' comes from an index signature, so it must be accessed with ['slug'].
+src/components/admin/ordering-platter-dialog.tsx(58,59): error TS4111: Property 'price' comes from an index signature, so it must be accessed with ['price'].
+src/components/admin/ordering-platter-dialog.tsx(106,45): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/components/admin/ordering-platter-dialog.tsx(109,45): error TS4111: Property 'slug' comes from an index signature, so it must be accessed with ['slug'].
+src/components/admin/ordering-platter-dialog.tsx(119,64): error TS4111: Property 'price' comes from an index signature, so it must be accessed with ['price'].
+src/components/admin/party-feast-helpers.ts(126,19): error TS18048: 'first' is possibly 'undefined'.
+src/components/admin/party-feast-helpers.ts(139,18): error TS18048: 'first' is possibly 'undefined'.
+src/components/admin/party-feast-helpers.ts(140,16): error TS18048: 'first' is possibly 'undefined'.
+src/components/admin/party-feast-summary-helpers.ts(32,20): error TS2532: Object is possibly 'undefined'.
+src/components/admin/party-feast-summary-helpers.ts(36,29): error TS2532: Object is possibly 'undefined'.
+src/components/admin/party-feast-summary-helpers.ts(53,20): error TS2532: Object is possibly 'undefined'.
+src/components/admin/party-feast-summary-helpers.ts(92,48): error TS18048: 'g0' is possibly 'undefined'.
+src/components/admin/party-feast-summary-helpers.ts(94,18): error TS18048: 'g0' is possibly 'undefined'.
+src/components/admin/party-feast-summary-helpers.ts(95,24): error TS18048: 'g0' is possibly 'undefined'.
+src/components/admin/section-table.tsx(42,6): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/components/admin/section-table.tsx(42,18): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/components/admin/service-capacity-panel.tsx(203,16): error TS2375: Type '{ children: Element[]; value: string | undefined; onValueChange: (value: string) => void; disabled: boolean; }' is not assignable to type '{ value?: string; defaultValue?: string; onValueChange?(value: string): void; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'value' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/admin/sundays-create-service-dialog.tsx(277,16): error TS2375: Type '{ children: Element[]; value: string | undefined; onValueChange: Dispatch<SetStateAction<string | null>>; disabled: boolean; }' is not assignable to type '{ value?: string; defaultValue?: string; onValueChange?(value: string): void; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'value' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/layout/date-field.tsx(24,6): error TS2375: Type '{ children: Element; label: string; htmlFor: string; error: string | undefined; hint: string | undefined; required: boolean | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/layout/internal-placeholder.tsx(24,8): error TS2375: Type '{ title: string; description: string | undefined; eyebrow: string | undefined; }' is not assignable to type 'PageHeaderProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'description' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/layout/select-field.tsx(34,6): error TS2375: Type '{ children: Element; label: string; htmlFor: string; error: string | undefined; hint: string | undefined; required: boolean | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/layout/simple-placeholder-page.tsx(39,8): error TS2375: Type '{ title: string; description: string | undefined; eyebrow: string | undefined; }' is not assignable to type 'PageHeaderProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'description' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/layout/simple-placeholder-page.tsx(41,10): error TS2375: Type '{ title: string; description: string | undefined; }' is not assignable to type 'PlaceholderPanelProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'description' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/layout/time-field.tsx(24,6): error TS2375: Type '{ children: Element; label: string; htmlFor: string; error: string | undefined; hint: string | undefined; required: boolean | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/public/booking-step-meals.tsx(72,12): error TS2375: Type '{ title: string; message: string | undefined; action: Element; }' is not assignable to type 'ErrorStateProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'message' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/public/booking-step-meals.tsx(119,14): error TS2739: Type '{ key: string; alloc: GuestAllocation; catalog: PublicOrderingCatalog; onApplyPackage: (pkgId: string) => void; onToggleSelection: (menuItemId: string, category: "side" | ... 2 more ... | "drink") => void; onAddonQty: (addonId: string, qty: number) => void; }' is missing the following properties from type 'Props': allocations, onCopyMeal
+src/components/public/booking-step-sunday.tsx(70,12): error TS2375: Type '{ title: string; message: string | undefined; action: Element; }' is not assignable to type 'ErrorStateProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'message' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/public/featured-menu-preview.tsx(30,3): error TS2375: Type '{ id: string; name: string; description: string; category: "starter" | "main" | "side" | "dessert" | "beverage" | "children"; priceCents: number; allergens: string[]; dietaryTags: string[]; available: boolean; imageUrl: string | undefined; imageAlt: string | undefined; }' is not assignable to type 'MenuItem' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'imageUrl' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/public/featured-menu-preview.tsx(45,63): error TS2379: Argument of type 'QueryObserverOptions<MenuItemDTO[], Error, MenuItemDTO[], MenuItemDTO[], readonly unknown[], never>' is not assignable to parameter of type 'UseSuspenseQueryOptions<MenuItemDTO[], Error, MenuItemDTO[], readonly unknown[]>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'queryFn' are incompatible.
+    Type 'unique symbol | QueryFunction<MenuItemDTO[], readonly unknown[], never>' is not assignable to type 'QueryFunction<MenuItemDTO[], readonly unknown[], never> | undefined'.
+      Type 'typeof skipToken' is not assignable to type 'QueryFunction<MenuItemDTO[], readonly unknown[], never>'.
+src/components/public/public-menu-view.tsx(25,3): error TS2375: Type '{ id: string; name: string; description: string; category: "starter" | "main" | "side" | "dessert" | "beverage" | "children"; priceCents: number; allergens: string[]; dietaryTags: string[]; available: boolean; imageUrl: string | undefined; imageAlt: string | undefined; }' is not assignable to type 'MenuItem' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'imageUrl' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/public/public-menu-view.tsx(40,84): error TS2379: Argument of type 'QueryObserverOptions<MenuWithContentDTO[], Error, MenuWithContentDTO[], MenuWithContentDTO[], readonly unknown[], never>' is not assignable to parameter of type 'UseSuspenseQueryOptions<MenuWithContentDTO[], Error, MenuWithContentDTO[], readonly unknown[]>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'queryFn' are incompatible.
+    Type 'unique symbol | QueryFunction<MenuWithContentDTO[], readonly unknown[], never>' is not assignable to type 'QueryFunction<MenuWithContentDTO[], readonly unknown[], never> | undefined'.
+      Type 'typeof skipToken' is not assignable to type 'QueryFunction<MenuWithContentDTO[], readonly unknown[], never>'.
+src/components/public/public-menu-view.tsx(42,24): error TS2532: Object is possibly 'undefined'.
+src/components/public/public-menu-view.tsx(56,42): error TS2532: Object is possibly 'undefined'.
+src/components/waitlist/waitlist-form.tsx(204,10): error TS2375: Type '{ children: Element; label: string; htmlFor: string; required: true; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/waitlist/waitlist-form.tsx(219,10): error TS2375: Type '{ children: Element; label: string; htmlFor: string; required: true; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/waitlist/waitlist-form.tsx(231,8): error TS2375: Type '{ children: Element; label: string; htmlFor: string; required: true; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/waitlist/waitlist-form.tsx(243,8): error TS2375: Type '{ children: Element; label: string; htmlFor: string; required: true; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/waitlist/waitlist-form.tsx(260,8): error TS2375: Type '{ children: Element; label: string; htmlFor: string; required: true; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/waitlist/waitlist-form.tsx(279,10): error TS2375: Type '{ children: Element; label: string; htmlFor: string; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/waitlist/waitlist-form.tsx(292,10): error TS2375: Type '{ children: Element; label: string; htmlFor: string; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/__tests__/admin-approval-reservation.test.ts(406,14): error TS2339: Property 'status' does not exist on type 'ApprovalReloadAssessment'.
+  Property 'status' does not exist on type '{ kind: "approvable"; reservation: ReservationDetailDTO; }'.
+src/lib/__tests__/admin-approval-reservation.test.ts(550,19): error TS2339: Property 'error' does not exist on type 'ApprovalReloadResult'.
+  Property 'error' does not exist on type '{ success: true; reservation: ReservationDetailDTO; }'.
+src/lib/__tests__/admin-approval-reservation.test.ts(557,19): error TS2339: Property 'error' does not exist on type 'ApprovalReloadResult'.
+  Property 'error' does not exist on type '{ success: true; reservation: ReservationDetailDTO; }'.
+src/lib/__tests__/admin-approval-reservation.test.ts(561,41): error TS2345: Argument of type '{ ok: true; reservation?: ReservationDetailDTO; }' is not assignable to parameter of type 'GetReservationDetailResponse'.
+  Type '{ ok: true; reservation?: ReservationDetailDTO; }' is not assignable to type '{ ok: true; reservation: ReservationDetailDTO; }'.
+    Property 'reservation' is optional in type '{ ok: true; reservation?: ReservationDetailDTO; }' but required in type '{ ok: true; reservation: ReservationDetailDTO; }'.
+src/lib/__tests__/admin-approval-reservation.test.ts(575,19): error TS2339: Property 'error' does not exist on type 'ApprovalReloadResult'.
+  Property 'error' does not exist on type '{ success: true; reservation: ReservationDetailDTO; }'.
+src/lib/__tests__/admin-cancel-reservation.test.ts(34,3): error TS2322: Type '{ id: string; reservationNumber: string; status: ReservationStatus; paymentStatus: ReservationPaymentStatus; ... 32 more ...; updatedAt: string; }' is not assignable to type 'ReservationDetailDTO'.
+  Property 'approval' is optional in type '{ id: string; reservationNumber: string; status: ReservationStatus; paymentStatus: ReservationPaymentStatus; experienceType: ReservationExperienceType; ... 31 more ...; updatedAt: string; }' but required in type 'ReservationDetailDTO'.
+src/lib/__tests__/admin-confirm-reservation-lifecycle.test.ts(55,3): error TS2322: Type '{ id: string; reservationNumber: string; status: ReservationStatus; paymentStatus: ReservationPaymentStatus; ... 32 more ...; updatedAt: string; }' is not assignable to type 'ReservationDetailDTO'.
+  Property 'approval' is optional in type '{ id: string; reservationNumber: string; status: ReservationStatus; paymentStatus: ReservationPaymentStatus; experienceType: ReservationExperienceType; ... 31 more ...; updatedAt: string; }' but required in type 'ReservationDetailDTO'.
+src/lib/__tests__/admin-confirm-reservation-lifecycle.test.ts(185,24): error TS2339: Property 'status' does not exist on type 'ReloadAssessment'.
+  Property 'status' does not exist on type '{ kind: "confirmable"; reservation: ReservationDetailDTO; }'.
+src/lib/__tests__/admin-confirm-reservation-lifecycle.test.ts(313,24): error TS2339: Property 'status' does not exist on type 'ReloadAssessment'.
+  Property 'status' does not exist on type '{ kind: "confirmable"; reservation: ReservationDetailDTO; }'.
+src/lib/__tests__/admin-confirm-reservation.test.ts(20,3): error TS2322: Type '{ id: string; reservationNumber: string; status: ReservationStatus; paymentStatus: ReservationPaymentStatus; ... 32 more ...; updatedAt: string; }' is not assignable to type 'ReservationDetailDTO'.
+  Property 'approval' is optional in type '{ id: string; reservationNumber: string; status: ReservationStatus; paymentStatus: ReservationPaymentStatus; experienceType: ReservationExperienceType; ... 31 more ...; updatedAt: string; }' but required in type 'ReservationDetailDTO'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(106,12): error TS18048: 'marie' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(107,30): error TS18048: 'marie' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(107,47): error TS18048: 'marie' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(108,12): error TS18048: 'marie' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(109,12): error TS18048: 'marie' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(110,12): error TS18048: 'marie' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(115,30): error TS18048: 'g2' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(115,44): error TS18048: 'g2' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(116,12): error TS18048: 'g2' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(117,12): error TS18048: 'g2' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(118,12): error TS18048: 'g2' is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(122,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(122,46): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(123,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(123,45): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(187,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-guest-dietary-needs.test.ts(188,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(79,7): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/admin-items.test.ts(124,7): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/admin-items.test.ts(159,9): error TS2322: Type 'string' is not assignable to type 'MenuStatus'.
+src/lib/__tests__/admin-items.test.ts(212,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/admin-items.test.ts(466,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(467,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(513,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/admin-items.test.ts(531,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/admin-items.test.ts(565,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(566,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(583,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(601,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(627,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(629,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(635,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(654,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(656,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(660,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(661,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(678,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/admin-items.test.ts(680,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/admin-menus.test.ts(107,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/admin-menus.test.ts(121,50): error TS2554: Expected 1 arguments, but got 2.
+src/lib/__tests__/admin-menus.test.ts(164,58): error TS2554: Expected 1 arguments, but got 2.
+src/lib/__tests__/admin-menus.test.ts(171,58): error TS2554: Expected 1 arguments, but got 2.
+src/lib/__tests__/admin-menus.test.ts(173,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-menus.test.ts(174,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-menus.test.ts(301,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/admin-menus.test.ts(550,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-menus.test.ts(590,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-menus.test.ts(607,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-party-feast-summary.test.ts(74,30): error TS2322: Type '{ menuItemId: string; selectionCategory: string; name: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }[]'.
+  Type '{ menuItemId: string; selectionCategory: string; name: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }'.
+    Types of property 'selectionCategory' are incompatible.
+      Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/admin-party-feast-summary.test.ts(75,30): error TS2322: Type '{ menuItemId: string; selectionCategory: string; name: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }[]'.
+  Type '{ menuItemId: string; selectionCategory: string; name: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }'.
+    Types of property 'selectionCategory' are incompatible.
+      Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/admin-party-feast-summary.test.ts(172,47): error TS2345: Argument of type '{ menuItemId: string; selectionCategory: string; name: string; }[]' is not assignable to parameter of type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }[]'.
+  Type '{ menuItemId: string; selectionCategory: string; name: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }'.
+    Types of property 'selectionCategory' are incompatible.
+      Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/admin-party-feast-summary.test.ts(174,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-party-feast-summary.test.ts(182,47): error TS2345: Argument of type '{ menuItemId: string; selectionCategory: string; name: string; }[]' is not assignable to parameter of type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }[]'.
+  Type '{ menuItemId: string; selectionCategory: string; name: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }'.
+    Types of property 'selectionCategory' are incompatible.
+      Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/admin-party-feast-summary.test.ts(183,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-party-feast-summary.test.ts(242,45): error TS2322: Type '{ menuItemId: string; selectionCategory: string; name: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }[]'.
+  Type '{ menuItemId: string; selectionCategory: string; name: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }'.
+    Types of property 'selectionCategory' are incompatible.
+      Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/admin-party-feast-summary.test.ts(243,45): error TS2322: Type '{ menuItemId: string; selectionCategory: string; name: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }[]'.
+  Type '{ menuItemId: string; selectionCategory: string; name: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }'.
+    Types of property 'selectionCategory' are incompatible.
+      Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/admin-party-feast-summary.test.ts(253,45): error TS2322: Type '{ menuItemId: string; selectionCategory: string; name: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }[]'.
+  Type '{ menuItemId: string; selectionCategory: string; name: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }'.
+    Types of property 'selectionCategory' are incompatible.
+      Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/admin-party-feast-summary.test.ts(257,9): error TS2322: Type '{ menuItemId: string; selectionCategory: string; name: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }[]'.
+  Type '{ menuItemId: string; selectionCategory: string; name: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }'.
+    Types of property 'selectionCategory' are incompatible.
+      Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/admin-reservations.test.ts(102,11): error TS2741: Property 'name' is missing in type '{ menuItemId: string; selectionCategory: "meat"; }' but required in type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }'.
+src/lib/__tests__/admin-reservations.test.ts(103,11): error TS2741: Property 'name' is missing in type '{ menuItemId: string; selectionCategory: "side"; }' but required in type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; name: string; }'.
+src/lib/__tests__/admin-reservations.test.ts(162,12): error TS18048: 'g' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(163,12): error TS18048: 'g' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(164,12): error TS18048: 'g' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(165,12): error TS18048: 'g' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(165,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(166,12): error TS18048: 'g' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(167,12): error TS18048: 'g' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(167,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(168,12): error TS18048: 'g' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(168,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(174,12): error TS18048: 'p' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(175,12): error TS18048: 'p' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(176,12): error TS18048: 'p' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(178,12): error TS18048: 'p' is possibly 'undefined'.
+src/lib/__tests__/admin-reservations.test.ts(178,40): error TS18048: 'p' is possibly 'undefined'.
+src/lib/__tests__/admin-schedule.test.ts(37,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/admin-schedule.test.ts(189,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-schedule.test.ts(190,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-schedule.test.ts(191,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-schedule.test.ts(209,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-schedule.test.ts(210,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-schedule.test.ts(212,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections-schemas.test.ts(80,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/admin-sections-schemas.test.ts(121,19): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/lib/__tests__/admin-sections-schemas.test.ts(122,19): error TS4111: Property 'displayOrder' comes from an index signature, so it must be accessed with ['displayOrder'].
+src/lib/__tests__/admin-sections-schemas.test.ts(123,19): error TS4111: Property 'status' comes from an index signature, so it must be accessed with ['status'].
+src/lib/__tests__/admin-sections-schemas.test.ts(124,19): error TS4111: Property 'isActive' comes from an index signature, so it must be accessed with ['isActive'].
+src/lib/__tests__/admin-sections-schemas.test.ts(125,19): error TS4111: Property 'id' comes from an index signature, so it must be accessed with ['id'].
+src/lib/__tests__/admin-sections-schemas.test.ts(147,19): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/lib/__tests__/admin-sections-schemas.test.ts(148,19): error TS4111: Property 'displayOrder' comes from an index signature, so it must be accessed with ['displayOrder'].
+src/lib/__tests__/admin-sections-schemas.test.ts(149,19): error TS4111: Property 'menuId' comes from an index signature, so it must be accessed with ['menuId'].
+src/lib/__tests__/admin-sections-schemas.test.ts(150,19): error TS4111: Property 'isActive' comes from an index signature, so it must be accessed with ['isActive'].
+src/lib/__tests__/admin-sections.test.ts(118,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/admin-sections.test.ts(250,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections.test.ts(251,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections.test.ts(362,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: string; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/admin-sections.test.ts(414,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections.test.ts(415,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections.test.ts(427,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections.test.ts(428,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections.test.ts(441,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections.test.ts(442,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections.test.ts(530,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections.test.ts(531,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/admin-sections.test.ts(706,19): error TS4111: Property 'id' comes from an index signature, so it must be accessed with ['id'].
+src/lib/__tests__/admin-sections.test.ts(707,19): error TS4111: Property 'createdAt' comes from an index signature, so it must be accessed with ['createdAt'].
+src/lib/__tests__/admin-sections.test.ts(708,19): error TS4111: Property 'updatedAt' comes from an index signature, so it must be accessed with ['updatedAt'].
+src/lib/__tests__/admin-tables.test.ts(105,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/auth-roles-migration.test.ts(124,43): error TS18048: 'k' is possibly 'undefined'.
+src/lib/__tests__/auth-roles-migration.test.ts(124,73): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/lib/__tests__/auth-roles-migration.test.ts(309,39): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/lib/__tests__/auth-roles-migration.test.ts(319,40): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/lib/__tests__/auth.test.ts(140,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/auth.test.ts(141,17): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/__tests__/auth.test.ts(448,34): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/auth.test.ts(448,34): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/lib/__tests__/auth.test.ts(565,17): error TS4111: Property 'SUPABASE_URL' comes from an index signature, so it must be accessed with ['SUPABASE_URL'].
+src/lib/__tests__/auth.test.ts(566,17): error TS4111: Property 'SUPABASE_ANON_KEY' comes from an index signature, so it must be accessed with ['SUPABASE_ANON_KEY'].
+src/lib/__tests__/auth.test.ts(567,17): error TS4111: Property 'SUPABASE_SERVICE_ROLE_KEY' comes from an index signature, so it must be accessed with ['SUPABASE_SERVICE_ROLE_KEY'].
+src/lib/__tests__/auth.test.ts(575,17): error TS4111: Property 'SUPABASE_SITE_URL' comes from an index signature, so it must be accessed with ['SUPABASE_SITE_URL'].
+src/lib/__tests__/auth.test.ts(581,17): error TS4111: Property 'SUPABASE_SITE_URL' comes from an index signature, so it must be accessed with ['SUPABASE_SITE_URL'].
+src/lib/__tests__/auth.test.ts(589,17): error TS4111: Property 'SUPABASE_SITE_URL' comes from an index signature, so it must be accessed with ['SUPABASE_SITE_URL'].
+src/lib/__tests__/auth.test.ts(595,17): error TS4111: Property 'SUPABASE_SITE_URL' comes from an index signature, so it must be accessed with ['SUPABASE_SITE_URL'].
+src/lib/__tests__/auth.test.ts(603,17): error TS4111: Property 'SUPABASE_SITE_URL' comes from an index signature, so it must be accessed with ['SUPABASE_SITE_URL'].
+src/lib/__tests__/auth.test.ts(608,24): error TS4111: Property 'SUPABASE_SITE_URL' comes from an index signature, so it must be accessed with ['SUPABASE_SITE_URL'].
+src/lib/__tests__/booking-copy-meal.test.ts(24,3): error TS2741: Property 'guestId' is missing in type '{ guestIndex: number; category: "adult" | "child" | "senior"; name: string; packageId: string | null; included: any; addons: { addonId: string; quantity: number; }[]; foodAllergies: string; dietaryPreferences: string; mealRequests: string; }' but required in type 'GuestAllocation'.
+src/lib/__tests__/booking-copy-meal.test.ts(45,5): error TS2353: Object literal may only specify known properties, and 'isActive' does not exist in type 'PublicIndividualAddon'.
+src/lib/__tests__/booking-copy-meal.test.ts(73,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(74,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(75,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(87,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(88,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(99,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(100,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(102,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(103,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(114,5): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(114,5): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(116,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(117,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(117,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(139,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(140,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(140,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(141,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(141,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(158,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(159,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(170,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(171,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-copy-meal.test.ts(193,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-guest-notes.test.ts(133,41): error TS2345: Argument of type '{ packageId: string; included: { menuItemId: string; selectionCategory: string; }[]; foodAllergies: string; dietaryPreferences: string; mealRequests: string; guestId: string; guestIndex: number; category: "adult" | ... 1 more ... | "senior"; name: string; addons: { ...; }[]; }[]' is not assignable to parameter of type 'GuestAllocation[]'.
+  Type '{ packageId: string; included: { menuItemId: string; selectionCategory: string; }[]; foodAllergies: string; dietaryPreferences: string; mealRequests: string; guestId: string; guestIndex: number; category: GuestCategory; name: string; addons: Array<{ addonId: string; quantity: number; }>; }' is not assignable to type 'GuestAllocation'.
+    Types of property 'included' are incompatible.
+      Type '{ menuItemId: string; selectionCategory: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; }[]'.
+        Type '{ menuItemId: string; selectionCategory: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; }'.
+          Types of property 'selectionCategory' are incompatible.
+            Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/booking-guest-notes.test.ts(167,38): error TS2322: Type '{ packageId: string; included: { menuItemId: string; selectionCategory: string; }[]; foodAllergies: string; dietaryPreferences: string; mealRequests: string; guestId: string; guestIndex: number; category: GuestCategory; name: string; addons: Array<{ addonId: string; quantity: number; }>; }' is not assignable to type 'GuestAllocation'.
+  Types of property 'included' are incompatible.
+    Type '{ menuItemId: string; selectionCategory: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; }[]'.
+      Type '{ menuItemId: string; selectionCategory: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; }'.
+        Types of property 'selectionCategory' are incompatible.
+          Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/booking-guest-notes.test.ts(221,29): error TS2345: Argument of type '{ packageId: string; included: { menuItemId: string; selectionCategory: string; }[]; foodAllergies: string; dietaryPreferences: string; mealRequests: string; guestId: string; guestIndex: number; category: "adult" | ... 1 more ... | "senior"; name: string; addons: { ...; }[]; }[]' is not assignable to parameter of type 'GuestAllocation[]'.
+  Type '{ packageId: string; included: { menuItemId: string; selectionCategory: string; }[]; foodAllergies: string; dietaryPreferences: string; mealRequests: string; guestId: string; guestIndex: number; category: GuestCategory; name: string; addons: Array<{ addonId: string; quantity: number; }>; }' is not assignable to type 'GuestAllocation'.
+    Types of property 'included' are incompatible.
+      Type '{ menuItemId: string; selectionCategory: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; }[]'.
+        Type '{ menuItemId: string; selectionCategory: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; }'.
+          Types of property 'selectionCategory' are incompatible.
+            Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/booking-guest-notes.test.ts(240,29): error TS2345: Argument of type '{ packageId: string; included: { menuItemId: string; selectionCategory: string; }[]; guestId: string; guestIndex: number; category: "adult" | "child" | "senior"; name: string; addons: { addonId: string; quantity: number; }[]; foodAllergies: string; dietaryPreferences: string; mealRequests: string; }[]' is not assignable to parameter of type 'GuestAllocation[]'.
+  Type '{ packageId: string; included: { menuItemId: string; selectionCategory: string; }[]; guestId: string; guestIndex: number; category: GuestCategory; name: string; addons: Array<{ addonId: string; quantity: number; }>; foodAllergies: string; dietaryPreferences: string; mealRequests: string; }' is not assignable to type 'GuestAllocation'.
+    Types of property 'included' are incompatible.
+      Type '{ menuItemId: string; selectionCategory: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; }[]'.
+        Type '{ menuItemId: string; selectionCategory: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; }'.
+          Types of property 'selectionCategory' are incompatible.
+            Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/__tests__/booking-shared-feast.test.ts(69,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-shared-feast.test.ts(70,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-shared-feast.test.ts(71,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-shared-feast.test.ts(72,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-shared-feast.test.ts(98,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-shared-feast.test.ts(99,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-shared-feast.test.ts(100,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-shared-feast.test.ts(101,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(80,23): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(80,23): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(80,46): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(86,23): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(86,23): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(86,46): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(158,22): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(158,22): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(158,45): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(159,26): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(159,26): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(159,49): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(162,26): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(162,26): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(162,49): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(215,22): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(215,22): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(215,45): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(221,23): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(221,23): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(221,46): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(280,22): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(280,22): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(280,45): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(281,26): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(281,26): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(281,49): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(465,22): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(465,22): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(465,45): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(466,26): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(466,26): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(466,49): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submission-controller.test.ts(469,23): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(469,23): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submission-controller.test.ts(469,46): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/booking-submit.test.ts(114,5): error TS2739: Type '{ guestIndex: number; category: "adult" | "child" | "senior"; name: string; packageId: string; included: ({ menuItemId: string; selectionCategory: "meat"; } | { menuItemId: string; selectionCategory: "side"; })[]; addons: { ...; }[]; }' is missing the following properties from type 'GuestAllocation': guestId, foodAllergies, dietaryPreferences, mealRequests
+src/lib/__tests__/booking-submit.test.ts(126,5): error TS2739: Type '{ guestIndex: number; category: "adult" | "child" | "senior"; name: string; packageId: string; included: ({ menuItemId: string; selectionCategory: "meat"; } | { menuItemId: string; selectionCategory: "side"; })[]; addons: never[]; }' is missing the following properties from type 'GuestAllocation': guestId, foodAllergies, dietaryPreferences, mealRequests
+src/lib/__tests__/booking-submit.test.ts(182,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submit.test.ts(183,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submit.test.ts(184,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submit.test.ts(185,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submit.test.ts(186,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submit.test.ts(187,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submit.test.ts(191,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submit.test.ts(192,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submit.test.ts(200,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-submit.test.ts(352,46): error TS18048: 'q.grandTotalCents' is possibly 'undefined'.
+src/lib/__tests__/booking-submit.test.ts(352,66): error TS18048: 'q.depositRequiredCents' is possibly 'undefined'.
+src/lib/__tests__/booking-success-display.test.ts(36,42): error TS2379: Argument of type '{ reservationNumber: undefined; }' is not assignable to parameter of type 'Partial<SubmitReservationResult>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'reservationNumber' are incompatible.
+    Type 'undefined' is not assignable to type 'string'.
+src/lib/__tests__/booking-success-display.test.ts(66,42): error TS2379: Argument of type '{ status: undefined; paymentStatus: undefined; }' is not assignable to parameter of type 'Partial<SubmitReservationResult>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'status' are incompatible.
+    Type 'undefined' is not assignable to type 'ReservationStatus'.
+src/lib/__tests__/booking-wizard.test.ts(75,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(76,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(78,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(78,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(79,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(79,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(80,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(81,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(81,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(82,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(82,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/booking-wizard.test.ts(123,7): error TS2322: Type 'CapacityAvailabilityOption | undefined' is not assignable to type 'PublicAvailabilityOption | null'.
+  Type 'undefined' is not assignable to type 'PublicAvailabilityOption | null'.
+src/lib/__tests__/booking-wizard.test.ts(467,3): error TS2741: Property 'guestId' is missing in type '{ guestIndex: number; category: "adult" | "child" | "senior"; name: string; packageId: string; included: ({ menuItemId: string; selectionCategory: "meat"; } | { menuItemId: string; selectionCategory: "side"; })[]; addons: { ...; }[]; foodAllergies: string; dietaryPreferences: string; mealRequests: string; }' but required in type 'GuestAllocation'.
+src/lib/__tests__/capacity-availability-fake-db.ts(296,35): error TS4111: Property 'released_at' comes from an index signature, so it must be accessed with ['released_at'].
+src/lib/__tests__/capacity-availability-fake-db.ts(300,36): error TS4111: Property 'id' comes from an index signature, so it must be accessed with ['id'].
+src/lib/__tests__/capacity-availability-fake-db.ts(300,63): error TS4111: Property 'id' comes from an index signature, so it must be accessed with ['id'].
+src/lib/__tests__/capacity-availability.test.ts(133,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(134,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(151,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(152,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(153,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(171,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(181,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(195,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(207,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(226,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(283,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(421,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(454,50): error TS18048: 'row' is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(454,71): error TS18048: 'row' is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(494,50): error TS18048: 'row' is possibly 'undefined'.
+src/lib/__tests__/capacity-availability.test.ts(494,71): error TS18048: 'row' is possibly 'undefined'.
+src/lib/__tests__/checkout-adapter.test.ts(52,32): error TS4111: Property 'line_items' comes from an index signature, so it must be accessed with ['line_items'].
+src/lib/__tests__/checkout-adapter.test.ts(53,41): error TS4111: Property 'price_data' comes from an index signature, so it must be accessed with ['price_data'].
+src/lib/__tests__/checkout-adapter.test.ts(54,36): error TS4111: Property 'currency' comes from an index signature, so it must be accessed with ['currency'].
+src/lib/__tests__/checkout-adapter.test.ts(55,34): error TS4111: Property 'unit_amount' comes from an index signature, so it must be accessed with ['unit_amount'].
+src/lib/__tests__/checkout-adapter.test.ts(56,31): error TS4111: Property 'metadata' comes from an index signature, so it must be accessed with ['metadata'].
+src/lib/__tests__/checkout-adapter.test.ts(60,28): error TS4111: Property 'expires_at' comes from an index signature, so it must be accessed with ['expires_at'].
+src/lib/__tests__/checkout-adapter.test.ts(155,15): error TS4111: Property 'STRIPE_SECRET_KEY' comes from an index signature, so it must be accessed with ['STRIPE_SECRET_KEY'].
+src/lib/__tests__/checkout-adapter.test.ts(161,17): error TS4111: Property 'STRIPE_SECRET_KEY' comes from an index signature, so it must be accessed with ['STRIPE_SECRET_KEY'].
+src/lib/__tests__/checkout-adapter.test.ts(169,17): error TS4111: Property 'STRIPE_SECRET_KEY' comes from an index signature, so it must be accessed with ['STRIPE_SECRET_KEY'].
+src/lib/__tests__/checkout-adapter.test.ts(186,17): error TS4111: Property 'STRIPE_SECRET_KEY' comes from an index signature, so it must be accessed with ['STRIPE_SECRET_KEY'].
+src/lib/__tests__/checkout-adapter.test.ts(418,23): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/checkout-failure-code-narrowing.test.ts(122,21): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-failure-code-narrowing.test.ts(123,21): error TS4111: Property 'record_checkout_session' comes from an index signature, so it must be accessed with ['record_checkout_session'].
+src/lib/__tests__/checkout-failure-code-narrowing.test.ts(128,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-failure-code-narrowing.test.ts(137,36): error TS2345: Argument of type 'RegExp | undefined' is not assignable to parameter of type 'string | RegExp'.
+  Type 'undefined' is not assignable to type 'string | RegExp'.
+src/lib/__tests__/checkout-failure-code-narrowing.test.ts(144,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-failure-code-narrowing.test.ts(163,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-failure-code-narrowing.test.ts(178,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-failure-code-narrowing.test.ts(193,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(70,27): error TS4111: Property 'expiresAt' comes from an index signature, so it must be accessed with ['expiresAt'].
+src/lib/__tests__/checkout-service.test.ts(74,29): error TS4111: Property 'depositAmountCents' comes from an index signature, so it must be accessed with ['depositAmountCents'].
+src/lib/__tests__/checkout-service.test.ts(75,26): error TS4111: Property 'currency' comes from an index signature, so it must be accessed with ['currency'].
+src/lib/__tests__/checkout-service.test.ts(76,31): error TS4111: Property 'reservationMetadataId' comes from an index signature, so it must be accessed with ['reservationMetadataId'].
+src/lib/__tests__/checkout-service.test.ts(77,27): error TS4111: Property 'attemptMetadataId' comes from an index signature, so it must be accessed with ['attemptMetadataId'].
+src/lib/__tests__/checkout-service.test.ts(84,54): error TS4111: Property 'reservationId' comes from an index signature, so it must be accessed with ['reservationId'].
+src/lib/__tests__/checkout-service.test.ts(85,50): error TS4111: Property 'attemptId' comes from an index signature, so it must be accessed with ['attemptId'].
+src/lib/__tests__/checkout-service.test.ts(86,52): error TS4111: Property 'depositAmountCents' comes from an index signature, so it must be accessed with ['depositAmountCents'].
+src/lib/__tests__/checkout-service.test.ts(87,49): error TS4111: Property 'currency' comes from an index signature, so it must be accessed with ['currency'].
+src/lib/__tests__/checkout-service.test.ts(198,21): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(199,21): error TS4111: Property 'record_checkout_session' comes from an index signature, so it must be accessed with ['record_checkout_session'].
+src/lib/__tests__/checkout-service.test.ts(226,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(238,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(245,23): error TS4111: Property 'record_checkout_session' comes from an index signature, so it must be accessed with ['record_checkout_session'].
+src/lib/__tests__/checkout-service.test.ts(267,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(288,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(294,23): error TS4111: Property 'record_checkout_session' comes from an index signature, so it must be accessed with ['record_checkout_session'].
+src/lib/__tests__/checkout-service.test.ts(319,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(335,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(358,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(372,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(385,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(417,23): error TS4111: Property 'record_checkout_session' comes from an index signature, so it must be accessed with ['record_checkout_session'].
+src/lib/__tests__/checkout-service.test.ts(431,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(451,16): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/lib/__tests__/checkout-service.test.ts(490,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(507,23): error TS4111: Property 'record_checkout_session' comes from an index signature, so it must be accessed with ['record_checkout_session'].
+src/lib/__tests__/checkout-service.test.ts(519,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(539,16): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/lib/__tests__/checkout-service.test.ts(553,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(566,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(576,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(587,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(603,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(623,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(643,23): error TS4111: Property 'prepare_checkout_session_atomic' comes from an index signature, so it must be accessed with ['prepare_checkout_session_atomic'].
+src/lib/__tests__/checkout-service.test.ts(659,23): error TS4111: Property 'record_checkout_session' comes from an index signature, so it must be accessed with ['record_checkout_session'].
+src/lib/__tests__/deposit-payment-processor.test.ts(651,49): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+src/lib/__tests__/dining-tables-actions.test.ts(162,16): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-actions.test.ts(163,16): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-actions.test.ts(333,13): error TS2488: Type 'any[] | undefined' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/lib/__tests__/dining-tables-auth.test.ts(27,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/dining-tables-repository.test.ts(66,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(67,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(137,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(185,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(186,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(258,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(259,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(272,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(273,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(333,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(371,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(372,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-repository.test.ts(373,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-room-options.test.ts(131,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/dining-tables-room-options.test.ts(132,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/eligible-item-filters.test.ts(17,3): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "starter" | "main" | "side" | "dessert" | "beverage" | "children"; imageUrl: null; ... 7 more ...; updatedAt: string; }' but required in type 'MenuItemDTO'.
+src/lib/__tests__/feast-offerings.test.ts(15,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/feast-offerings.test.ts(16,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/feast-offerings.test.ts(17,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/feast-offerings.test.ts(18,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/feast-offerings.test.ts(19,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/feast-offerings.test.ts(20,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/feast-offerings.test.ts(53,11): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/feast-offerings.test.ts(66,62): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/feast-offerings.test.ts(66,78): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/feast-offerings.test.ts(71,43): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/homepage-featured.test.ts(24,3): error TS2322: Type '{ id: string; menuId: string; sectionId: string | null; name: string; description: string; priceCents: number; category: MenuCategory; packageUseCategories?: PackageUseCategory[]; ... 8 more ...; updatedAt: ISODateString; }' is not assignable to type 'MenuItemDTO'.
+  Property 'packageUseCategories' is optional in type '{ id: string; menuId: string; sectionId: string | null; name: string; description: string; priceCents: number; category: "starter" | "main" | "side" | "dessert" | "beverage" | "children"; ... 9 more ...; updatedAt: string; }' but required in type 'MenuItemDTO'.
+src/lib/__tests__/homepage-featured.test.ts(87,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/homepage-featured.test.ts(177,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/homepage-featured.test.ts(223,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/homepage-featured.test.ts(245,23): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/image-upload.test.ts(107,20): error TS2322: Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'BlobPart'.
+  Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'ArrayBufferView<ArrayBuffer>'.
+    Types of property 'buffer' are incompatible.
+      Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+        Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+          Types of property '[Symbol.toStringTag]' are incompatible.
+            Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/lib/__tests__/image-upload.test.ts(195,7): error TS2554: Expected 1 arguments, but got 2.
+src/lib/__tests__/image-upload.test.ts(204,7): error TS2554: Expected 1 arguments, but got 2.
+src/lib/__tests__/image-upload.test.ts(216,7): error TS2554: Expected 1 arguments, but got 2.
+src/lib/__tests__/image-upload.test.ts(264,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-atomic-migration.test.ts(54,7): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-atomic-migration.test.ts(78,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/menu-cms.test.ts(29,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/menu-cms.test.ts(60,7): error TS2741: Property 'packageUseCategories' is missing in type '{ id: `${string}-${string}-${string}-${string}-${string}`; menuId: `${string}-${string}-${string}-${string}-${string}`; sectionId: null; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; ... 7 more ...; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-cms.test.ts(78,7): error TS2741: Property 'packageUseCategories' is missing in type '{ id: `${string}-${string}-${string}-${string}-${string}`; menuId: `${string}-${string}-${string}-${string}-${string}`; sectionId: null; name: string; description: string; priceCents: number; category: "side"; imageUrl: null; ... 7 more ...; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-cms.test.ts(102,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/menu-cms.test.ts(112,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-cms.test.ts(129,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-cms.test.ts(130,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-cms.test.ts(130,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-cms.test.ts(215,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/menu-cms.test.ts(335,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/menu-cms.test.ts(378,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: `${string}-${string}-${string}-${string}-${string}`; menuId: `${string}-${string}-${string}-${string}-${string}`; sectionId: null; name: string; description: string; priceCents: number; category: "side"; imageUrl: null; ... 7 more ...; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-cms.test.ts(396,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: `${string}-${string}-${string}-${string}-${string}`; menuId: `${string}-${string}-${string}-${string}-${string}`; sectionId: `${string}-${string}-${string}-${string}-${string}`; name: string; description: string; priceCents: number; ... 9 more ...; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-cms.test.ts(414,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: `${string}-${string}-${string}-${string}-${string}`; menuId: `${string}-${string}-${string}-${string}-${string}`; sectionId: `${string}-${string}-${string}-${string}-${string}`; name: string; description: string; priceCents: number; ... 9 more ...; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-cms.test.ts(441,19): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-functions.test.ts(56,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/menu-functions.test.ts(189,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-functions.test.ts(207,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "side"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: false; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-functions.test.ts(234,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-functions.test.ts(570,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "side"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-functions.test.ts(700,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "side"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-functions.test.ts(718,9): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "side"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-invariant.test.ts(49,7): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-invariant.test.ts(105,7): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: string; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-invariant.test.ts(162,7): error TS2741: Property 'packageUseCategories' is missing in type '{ id: string; menuId: string; sectionId: null; name: string; description: string; priceCents: number; category: "main"; imageUrl: null; imageAlt: null; dietaryTags: never[]; allergens: never[]; isActive: true; isFeatured: false; displayOrder: number; createdAt: string; updatedAt: string; }' but required in type 'MockItemRow'.
+src/lib/__tests__/menu-invariant.test.ts(186,15): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/menu-package-use-categories.test.ts(264,9): error TS2561: Object literal may only specify known properties, but 'display_order' does not exist in type 'MockMenuRow'. Did you mean to write 'displayOrder'?
+src/lib/__tests__/menu-package-use-categories.test.ts(286,12): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(299,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(311,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(327,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(331,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(334,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(350,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(354,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(357,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(373,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(377,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(380,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(398,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(402,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(404,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(405,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(406,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(407,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(436,7): error TS18048: 'item' is possibly 'undefined'.
+src/lib/__tests__/menu-package-use-categories.test.ts(444,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-package-pricing-actions.test.ts(123,18): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-package-pricing-actions.test.ts(135,18): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-package-pricing-actions.test.ts(159,18): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-package-pricing-actions.test.ts(178,18): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-package-pricing.test.ts(98,12): error TS18048: 'a' is possibly 'undefined'.
+src/lib/__tests__/ordering-package-pricing.test.ts(99,12): error TS18048: 'b' is possibly 'undefined'.
+src/lib/__tests__/ordering-package-pricing.test.ts(100,12): error TS18048: 'a' is possibly 'undefined'.
+src/lib/__tests__/ordering-package-pricing.test.ts(101,12): error TS18048: 'b' is possibly 'undefined'.
+src/lib/__tests__/ordering-pricing.test.ts(191,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-pricing.test.ts(326,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-repository.test.ts(44,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-repository.test.ts(45,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-repository.test.ts(46,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-repository.test.ts(107,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/ordering-selections.test.ts(31,3): error TS2322: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: boolean; includesSoftDrink: boolean; ... 12 more ...; seniorDiscountBasisPoints?: number | null; }' is not assignable to type 'MealPackageDTO'.
+  Property 'childRuleType' is optional in type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: boolean; includesSoftDrink: boolean; ... 12 more ...; seniorDiscountBasisPoints?: number | null; }' but required in type 'MealPackageDTO'.
+src/lib/__tests__/payment-access-token.test.ts(76,50): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/lib/__tests__/public-menu.test.ts(21,3): error TS2322: Type '{ id: string; menuId: string; sectionId: string | null; name: string; description: string; priceCents: number; category: MenuCategory; packageUseCategories?: PackageUseCategory[]; ... 8 more ...; updatedAt: ISODateString; }' is not assignable to type 'MenuItemDTO'.
+  Property 'packageUseCategories' is optional in type '{ id: string; menuId: string; sectionId: string | null; name: string; description: string; priceCents: number; category: "starter" | "main" | "side" | "dessert" | "beverage" | "children"; ... 9 more ...; updatedAt: string; }' but required in type 'MenuItemDTO'.
+src/lib/__tests__/public-menu.test.ts(84,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(85,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(85,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(99,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(100,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(101,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(101,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(115,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(116,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(129,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(129,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(130,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(130,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(142,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(150,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/public-menu.test.ts(214,42): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/public-menu.test.ts(238,5): error TS2322: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/lib/__tests__/reservation-approval-actions.test.ts(220,12): error TS18048: 'callArgs' is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-actions.test.ts(221,20): error TS18048: 'callArgs' is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-actions.test.ts(249,20): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-actions.test.ts(262,20): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-actions.test.ts(276,20): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-reader.test.ts(46,14): error TS18048: 'result.approval' is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-reader.test.ts(47,14): error TS18048: 'result.approval' is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-reader.test.ts(135,14): error TS18048: 'result.approval' is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-reader.test.ts(136,14): error TS18048: 'result.approval' is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-reader.test.ts(137,14): error TS18048: 'result.approval' is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-reader.test.ts(138,14): error TS18048: 'result.approval' is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-reader.test.ts(155,14): error TS18048: 'result.approval' is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-reader.test.ts(156,14): error TS18048: 'result.approval' is possibly 'undefined'.
+src/lib/__tests__/reservation-approval-reader.test.ts(157,14): error TS18048: 'result.approval' is possibly 'undefined'.
+src/lib/__tests__/reservation-availability.test.ts(51,5): error TS2353: Object literal may only specify known properties, and 'capacityResourceId' does not exist in type 'VenueSpaceDTO'.
+src/lib/__tests__/reservation-availability.test.ts(63,3): error TS2322: Type '{ id: string; date: string; label: string; status: SundayStatus; spaceId: string; onlineBookingLimit: number | null; capacityResourceId?: string | null; ... 5 more ...; updatedBy: string | null; }' is not assignable to type 'SundayServiceDTO'.
+  Property 'capacityResourceId' is optional in type '{ id: string; date: string; label: string; status: "scheduled" | "open" | "closed" | "sold_out"; spaceId: string; onlineBookingLimit: number | null; capacityResourceId?: string | null; ... 5 more ...; updatedBy: string | null; }' but required in type 'SundayServiceDTO'.
+src/lib/__tests__/reservation-cancel-actions.test.ts(177,12): error TS18048: 'call' is possibly 'undefined'.
+src/lib/__tests__/reservation-cancel-actions.test.ts(178,18): error TS18048: 'call' is possibly 'undefined'.
+src/lib/__tests__/reservation-confirm-actions.test.ts(174,18): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/reservation-eligibility.test.ts(46,5): error TS2353: Object literal may only specify known properties, and 'capacityResourceId' does not exist in type 'VenueSpaceDTO'.
+src/lib/__tests__/reservation-eligibility.test.ts(58,3): error TS2322: Type '{ id: string; date: string; label: string; status: SundayStatus; spaceId: string; onlineBookingLimit: number | null; capacityResourceId?: string | null; ... 5 more ...; updatedBy: string | null; }' is not assignable to type 'SundayServiceDTO'.
+  Property 'capacityResourceId' is optional in type '{ id: string; date: string; label: string; status: "scheduled" | "open" | "closed" | "sold_out"; spaceId: string; onlineBookingLimit: number | null; capacityResourceId?: string | null; ... 5 more ...; updatedBy: string | null; }' but required in type 'SundayServiceDTO'.
+src/lib/__tests__/reservation-eligibility.test.ts(521,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: ({ ...; } | ... 1 more ... | { ...; })[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-guest-notes-persistence.test.ts(52,7): error TS2741: Property 'capacityResourceId' is missing in type '{ id: string; date: string; label: string; status: "open"; spaceId: string; onlineBookingLimit: number; isActive: true; displayOrder: number; createdAt: string; updatedAt: string; createdBy: null; updatedBy: null; }' but required in type 'SundayServiceDTO'.
+src/lib/__tests__/reservation-guest-notes-persistence.test.ts(191,13): error TS2749: 'MockReservationRepository' refers to a value, but is being used as a type here. Did you mean 'typeof MockReservationRepository'?
+src/lib/__tests__/reservation-guest-notes-persistence.test.ts(279,49): error TS7006: Parameter 'g' implicitly has an 'any' type.
+src/lib/__tests__/reservation-guest-notes-persistence.test.ts(280,49): error TS7006: Parameter 'g' implicitly has an 'any' type.
+src/lib/__tests__/reservation-guest-notes-persistence.test.ts(322,21): error TS2352: Conversion of type 'undefined' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/__tests__/reservation-guest-notes-persistence.test.ts(322,30): error TS2493: Tuple type '[]' of length '0' has no element at index '1'.
+src/lib/__tests__/reservation-guest-notes-persistence.test.ts(341,21): error TS2352: Conversion of type 'undefined' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/__tests__/reservation-guest-notes-persistence.test.ts(341,30): error TS2493: Tuple type '[]' of length '0' has no element at index '1'.
+src/lib/__tests__/reservation-guest-notes-persistence.test.ts(371,21): error TS2352: Conversion of type 'undefined' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/__tests__/reservation-guest-notes-persistence.test.ts(371,30): error TS2493: Tuple type '[]' of length '0' has no element at index '1'.
+src/lib/__tests__/reservation-optional-properties.test.ts(37,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: ({ ...; } | { ...; })[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-outcome-tags.test.ts(70,5): error TS2353: Object literal may only specify known properties, and 'capacityResourceId' does not exist in type 'VenueSpaceDTO'.
+src/lib/__tests__/reservation-outcome-tags.test.ts(82,3): error TS2322: Type '{ id: string; date: string; label: string; status: SundayStatus; spaceId: string; onlineBookingLimit: number | null; capacityResourceId?: string | null; ... 5 more ...; updatedBy: string | null; }' is not assignable to type 'SundayServiceDTO'.
+  Property 'capacityResourceId' is optional in type '{ id: string; date: string; label: string; status: "scheduled" | "open" | "closed" | "sold_out"; spaceId: string; onlineBookingLimit: number | null; capacityResourceId?: string | null; ... 5 more ...; updatedBy: string | null; }' but required in type 'SundayServiceDTO'.
+src/lib/__tests__/reservation-outcome-tags.test.ts(136,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: ({ ...; } | ... 1 more ... | { ...; })[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-party-wide-integration.test.ts(28,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: ({ ...; } | ... 1 more ... | { ...; })[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-party-wide-integration.test.ts(89,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: { ...; }[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-party-wide-integration.test.ts(270,27): error TS2379: Argument of type '{ name: undefined; category: "child"; }' is not assignable to parameter of type 'Partial<ReservationGuestInput>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'name' are incompatible.
+    Type 'undefined' is not assignable to type 'string'.
+src/lib/__tests__/reservation-party-wide-wiring.test.ts(27,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: ({ ...; } | ... 1 more ... | { ...; })[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-party-wide-wiring.test.ts(81,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: ({ ...; } | ... 1 more ... | { ...; })[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-party-wide.test.ts(34,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: ({ ...; } | ... 1 more ... | { ...; })[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-party-wide.test.ts(102,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: ({ ...; } | ... 1 more ... | { ...; })[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-party-wide.test.ts(635,27): error TS2379: Argument of type '{ name: undefined; category: "child"; }' is not assignable to parameter of type 'Partial<ReservationGuestInput>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'name' are incompatible.
+    Type 'undefined' is not assignable to type 'string'.
+src/lib/__tests__/reservation-pricing.test.ts(29,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: ({ ...; } | { ...; })[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-reviewed-price-bypass.test.ts(33,7): error TS2740: Type '{ id: string; name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: true; includesSoftDrink: true; ... 6 more ...; eligibleItems: ({ ...; } | { ...; })[]; }' is missing the following properties from type 'MealPackageDTO': childRuleType, childFixedPriceCents, childDiscountBasisPoints, seniorRuleType, and 2 more.
+src/lib/__tests__/reservation-tables-actions.test.ts(169,12): error TS18048: 'call' is possibly 'undefined'.
+src/lib/__tests__/reservation-tables-actions.test.ts(170,18): error TS18048: 'call' is possibly 'undefined'.
+src/lib/__tests__/reservation-tables-context.test.ts(301,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/reservation-tables-context.test.ts(335,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/reservation-tables-context.test.ts(360,14): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/service-capacity-options.test.ts(104,19): error TS2339: Property 'error' does not exist on type 'ServiceCapacityOptionsResult'.
+  Property 'error' does not exist on type '{ ok: true; options: ServiceCapacityOption[]; }'.
+src/lib/__tests__/service-capacity-options.test.ts(116,19): error TS2339: Property 'error' does not exist on type 'ServiceCapacityOptionsResult'.
+  Property 'error' does not exist on type '{ ok: true; options: ServiceCapacityOption[]; }'.
+src/lib/__tests__/service-capacity-options.test.ts(129,19): error TS2339: Property 'error' does not exist on type 'ServiceCapacityOptionsResult'.
+  Property 'error' does not exist on type '{ ok: true; options: ServiceCapacityOption[]; }'.
+src/lib/__tests__/service-capacity-options.test.ts(159,9): error TS2345: Argument of type '{ id: string; space_id: null; total_capacity: number; parent_id: null; resource_type: "whole"; is_active: boolean; }' is not assignable to parameter of type '{ id: string; space_id: string; total_capacity: number; parent_id: null; resource_type: "standalone"; is_active: boolean; }'.
+  Types of property 'space_id' are incompatible.
+    Type 'null' is not assignable to type 'string'.
+src/lib/__tests__/service-capacity-options.test.ts(195,9): error TS2345: Argument of type '{ id: string; space_id: null; total_capacity: number; parent_id: null; resource_type: "whole"; is_active: boolean; }' is not assignable to parameter of type '{ id: string; space_id: string; total_capacity: number; parent_id: null; resource_type: "standalone"; is_active: boolean; }'.
+  Types of property 'space_id' are incompatible.
+    Type 'null' is not assignable to type 'string'.
+src/lib/__tests__/service-capacity-options.test.ts(226,9): error TS2345: Argument of type '{ id: string; space_id: null; total_capacity: number; parent_id: null; resource_type: "whole"; is_active: boolean; }' is not assignable to parameter of type '{ id: string; space_id: string; total_capacity: number; parent_id: null; resource_type: "standalone"; is_active: boolean; }'.
+  Types of property 'space_id' are incompatible.
+    Type 'null' is not assignable to type 'string'.
+src/lib/__tests__/service-capacity-options.test.ts(252,19): error TS2339: Property 'error' does not exist on type 'ServiceCapacityOptionsResult'.
+  Property 'error' does not exist on type '{ ok: true; options: ServiceCapacityOption[]; }'.
+src/lib/__tests__/service-capacity-options.test.ts(264,19): error TS2339: Property 'error' does not exist on type 'ServiceCapacityOptionsResult'.
+  Property 'error' does not exist on type '{ ok: true; options: ServiceCapacityOption[]; }'.
+src/lib/__tests__/service-capacity-options.test.ts(273,9): error TS2345: Argument of type '{ id: string; space_id: string; total_capacity: number; parent_id: string; resource_type: "section"; is_active: boolean; }' is not assignable to parameter of type '{ id: string; space_id: string; total_capacity: number; parent_id: null; resource_type: "standalone"; is_active: boolean; }'.
+  Types of property 'parent_id' are incompatible.
+    Type 'string' is not assignable to type 'null'.
+src/lib/__tests__/service-capacity-options.test.ts(285,19): error TS2339: Property 'error' does not exist on type 'ServiceCapacityOptionsResult'.
+  Property 'error' does not exist on type '{ ok: true; options: ServiceCapacityOption[]; }'.
+src/lib/__tests__/service-capacity-options.test.ts(292,9): error TS2345: Argument of type '{ id: string; space_id: null; total_capacity: number; parent_id: null; resource_type: "whole"; is_active: boolean; }' is not assignable to parameter of type '{ id: string; space_id: string; total_capacity: number; parent_id: null; resource_type: "standalone"; is_active: boolean; }'.
+  Types of property 'space_id' are incompatible.
+    Type 'null' is not assignable to type 'string'.
+src/lib/__tests__/service-capacity-options.test.ts(300,19): error TS2339: Property 'error' does not exist on type 'ServiceCapacityOptionsResult'.
+  Property 'error' does not exist on type '{ ok: true; options: ServiceCapacityOption[]; }'.
+src/lib/__tests__/service-capacity-options.test.ts(314,19): error TS2339: Property 'error' does not exist on type 'ServiceCapacityOptionsResult'.
+  Property 'error' does not exist on type '{ ok: true; options: ServiceCapacityOption[]; }'.
+src/lib/__tests__/service-capacity-options.test.ts(315,19): error TS2339: Property 'error' does not exist on type 'ServiceCapacityOptionsResult'.
+  Property 'error' does not exist on type '{ ok: true; options: ServiceCapacityOption[]; }'.
+src/lib/__tests__/service-capacity-options.test.ts(316,19): error TS2339: Property 'error' does not exist on type 'ServiceCapacityOptionsResult'.
+  Property 'error' does not exist on type '{ ok: true; options: ServiceCapacityOption[]; }'.
+src/lib/__tests__/waitlist-crm.test.ts(125,18): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/waitlist-crm.test.ts(181,24): error TS4111: Property 'WAITLIST_WEBHOOK_URL' comes from an index signature, so it must be accessed with ['WAITLIST_WEBHOOK_URL'].
+src/lib/__tests__/waitlist-crm.test.ts(191,17): error TS4111: Property 'WAITLIST_WEBHOOK_URL' comes from an index signature, so it must be accessed with ['WAITLIST_WEBHOOK_URL'].
+src/lib/__tests__/waitlist-crm.test.ts(217,17): error TS4111: Property 'WAITLIST_WEBHOOK_URL' comes from an index signature, so it must be accessed with ['WAITLIST_WEBHOOK_URL'].
+src/lib/__tests__/waitlist-crm.test.ts(220,32): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/waitlist-repository.test.ts(81,22): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/lib/__tests__/waitlist-repository.test.ts(81,22): error TS18048: 'step' is possibly 'undefined'.
+src/lib/__tests__/waitlist-repository.test.ts(144,27): error TS4111: Property 'email_marketing_consent' comes from an index signature, so it must be accessed with ['email_marketing_consent'].
+src/lib/__tests__/waitlist-repository.test.ts(145,27): error TS4111: Property 'email_consent_text' comes from an index signature, so it must be accessed with ['email_consent_text'].
+src/lib/__tests__/waitlist-repository.test.ts(146,27): error TS4111: Property 'email_consent_text_version' comes from an index signature, so it must be accessed with ['email_consent_text_version'].
+src/lib/__tests__/waitlist-repository.test.ts(147,27): error TS4111: Property 'email_consent_timestamp' comes from an index signature, so it must be accessed with ['email_consent_timestamp'].
+src/lib/__tests__/waitlist-repository.test.ts(148,27): error TS4111: Property 'sms_consent' comes from an index signature, so it must be accessed with ['sms_consent'].
+src/lib/__tests__/waitlist-repository.test.ts(149,27): error TS4111: Property 'sms_consent_text' comes from an index signature, so it must be accessed with ['sms_consent_text'].
+src/lib/__tests__/waitlist-repository.test.ts(150,27): error TS4111: Property 'sms_consent_text_version' comes from an index signature, so it must be accessed with ['sms_consent_text_version'].
+src/lib/__tests__/waitlist-repository.test.ts(151,27): error TS4111: Property 'sms_consent_timestamp' comes from an index signature, so it must be accessed with ['sms_consent_timestamp'].
+src/lib/__tests__/waitlist-repository.test.ts(211,27): error TS4111: Property 'email_marketing_consent' comes from an index signature, so it must be accessed with ['email_marketing_consent'].
+src/lib/__tests__/waitlist-repository.test.ts(212,27): error TS4111: Property 'email_consent_text' comes from an index signature, so it must be accessed with ['email_consent_text'].
+src/lib/__tests__/waitlist-repository.test.ts(213,27): error TS4111: Property 'email_consent_text_version' comes from an index signature, so it must be accessed with ['email_consent_text_version'].
+src/lib/__tests__/waitlist-repository.test.ts(214,27): error TS4111: Property 'email_consent_timestamp' comes from an index signature, so it must be accessed with ['email_consent_timestamp'].
+src/lib/__tests__/waitlist-repository.test.ts(215,27): error TS4111: Property 'sms_consent' comes from an index signature, so it must be accessed with ['sms_consent'].
+src/lib/__tests__/waitlist-repository.test.ts(216,27): error TS4111: Property 'sms_consent_text' comes from an index signature, so it must be accessed with ['sms_consent_text'].
+src/lib/__tests__/waitlist-repository.test.ts(217,27): error TS4111: Property 'sms_consent_text_version' comes from an index signature, so it must be accessed with ['sms_consent_text_version'].
+src/lib/__tests__/waitlist-repository.test.ts(218,27): error TS4111: Property 'sms_consent_timestamp' comes from an index signature, so it must be accessed with ['sms_consent_timestamp'].
+src/lib/__tests__/waitlist.test.ts(88,37): error TS4111: Property 'partySize' comes from an index signature, so it must be accessed with ['partySize'].
+src/lib/__tests__/waitlist.test.ts(93,37): error TS4111: Property 'partySize' comes from an index signature, so it must be accessed with ['partySize'].
+src/lib/__tests__/waitlist.test.ts(309,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/waitlist.test.ts(310,17): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/__tests__/waitlist.test.ts(316,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/waitlist.test.ts(317,17): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/__tests__/waitlist.test.ts(323,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/waitlist.test.ts(324,17): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/__tests__/waitlist.test.ts(330,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/waitlist.test.ts(331,17): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/__tests__/waitlist.test.ts(332,17): error TS4111: Property 'SUPABASE_URL' comes from an index signature, so it must be accessed with ['SUPABASE_URL'].
+src/lib/__tests__/waitlist.test.ts(333,17): error TS4111: Property 'SUPABASE_ANON_KEY' comes from an index signature, so it must be accessed with ['SUPABASE_ANON_KEY'].
+src/lib/__tests__/waitlist.test.ts(334,17): error TS4111: Property 'SUPABASE_SERVICE_ROLE_KEY' comes from an index signature, so it must be accessed with ['SUPABASE_SERVICE_ROLE_KEY'].
+src/lib/__tests__/waitlist.test.ts(362,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/waitlist.test.ts(363,17): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/__tests__/waitlist.test.ts(370,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/waitlist.test.ts(371,17): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/__tests__/waitlist.test.ts(397,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/waitlist.test.ts(398,17): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/__tests__/waitlist.test.ts(422,17): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/__tests__/waitlist.test.ts(423,17): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/__tests__/waitlist.test.ts(457,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/waitlist.test.ts(458,12): error TS2532: Object is possibly 'undefined'.
+src/lib/__tests__/waitlist.test.ts(459,12): error TS2532: Object is possibly 'undefined'.
+src/lib/auth.functions.ts(77,7): error TS2322: Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type 'AuthResult & { redirectTo?: string; }'.
+  Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type '({ ok: false; kind: "validation"; errors: Record<string, string>; } & { redirectTo?: string; }) | ({ ok: false; kind: "unauthorized"; message: string; } & { redirectTo?: string; }) | ({ ...; } & { ...; })'.
+    Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type '{ ok: false; kind: "unexpected"; message: string; } & { redirectTo?: string; }'.
+      Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type '{ ok: false; kind: "unexpected"; message: string; }'.
+        Types of property 'kind' are incompatible.
+          Type '"validation" | "unauthorized" | "unexpected"' is not assignable to type '"unexpected"'.
+            Type '"validation"' is not assignable to type '"unexpected"'.
+src/lib/auth.functions.ts(115,9): error TS2375: Type '{ ok: true; redirectTo: string; roleKey: RoleKey | undefined; }' is not assignable to type 'AuthResult & { redirectTo?: string; roleKey?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Type '{ ok: true; redirectTo: string; roleKey: RoleKey | undefined; }' is not assignable to type '{ ok: true; } & { redirectTo?: string; roleKey?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+    Type '{ ok: true; redirectTo: string; roleKey: RoleKey | undefined; }' is not assignable to type '{ redirectTo?: string; roleKey?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+      Types of property 'roleKey' are incompatible.
+        Type 'string | undefined' is not assignable to type 'string'.
+          Type 'undefined' is not assignable to type 'string'.
+src/lib/auth.functions.ts(117,7): error TS2322: Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type 'AuthResult & { redirectTo?: string; roleKey?: string; }'.
+  Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type '({ ok: false; kind: "validation"; errors: Record<string, string>; } & { redirectTo?: string; roleKey?: string; }) | ({ ok: false; kind: "unauthorized"; message: string; } & { redirectTo?: string; roleKey?: string; }) | ({ ...; } & { ...; })'.
+    Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type '{ ok: false; kind: "unexpected"; message: string; } & { redirectTo?: string; roleKey?: string; }'.
+      Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type '{ ok: false; kind: "unexpected"; message: string; }'.
+        Types of property 'kind' are incompatible.
+          Type '"validation" | "unauthorized" | "unexpected"' is not assignable to type '"unexpected"'.
+            Type '"validation"' is not assignable to type '"unexpected"'.
+src/lib/auth.functions.ts(158,9): error TS2379: Argument of type '{ authCode: string; codeVerifier: string | undefined; }' is not assignable to parameter of type 'AuthCallbackInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'codeVerifier' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/auth.functions.ts(214,9): error TS2379: Argument of type '{ newPassword: string; accessToken: string | undefined; code: string | undefined; }' is not assignable to parameter of type 'AuthResetInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'accessToken' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/auth.functions.ts(225,7): error TS2322: Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type 'AuthResult'.
+  Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type '{ ok: false; kind: "validation"; errors: Record<string, string>; } | { ok: false; kind: "unauthorized"; message: string; } | { ok: false; kind: "unexpected"; message: string; }'.
+    Type '{ ok: false; kind: "validation" | "unauthorized" | "unexpected"; message: string; }' is not assignable to type '{ ok: false; kind: "unexpected"; message: string; }'.
+      Types of property 'kind' are incompatible.
+        Type '"validation" | "unauthorized" | "unexpected"' is not assignable to type '"unexpected"'.
+          Type '"validation"' is not assignable to type '"unexpected"'.
+src/lib/menu.functions.ts(147,82): error TS2379: Argument of type '{ name: string; description: string; slug: string; displayOrder: number; publishAt?: string | null | undefined; unpublishAt?: string | null | undefined; }' is not assignable to parameter of type 'MenuInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'publishAt' are incompatible.
+    Type 'string | null | undefined' is not assignable to type 'string | null'.
+      Type 'undefined' is not assignable to type 'string | null'.
+src/lib/menu.functions.ts(150,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(169,9): error TS2379: Argument of type '{ name?: string | undefined; description?: string | undefined; slug?: string | undefined; displayOrder?: number | undefined; publishAt?: string | null | undefined; unpublishAt?: string | null | undefined; }' is not assignable to parameter of type 'Partial<MenuInput>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/menu.functions.ts(174,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(202,49): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/lib/menu.functions.ts(207,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(221,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(235,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(258,9): error TS2379: Argument of type '{ name?: string | undefined; description?: string | undefined; displayOrder?: number | undefined; }' is not assignable to parameter of type 'Partial<MenuSectionInput>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/menu.functions.ts(263,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(287,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(298,82): error TS2379: Argument of type '{ name: string; description: string; imageAlt: string | null; category: string; priceCents: number; allergens: string[]; dietaryTags: string[]; imageUrl: string | null; displayOrder: number; menuId: string; isFeatured: boolean; sectionId?: string | ... 1 more ... | undefined; packageUseCategories?: ("side" | ... 2 m...' is not assignable to parameter of type 'MenuItemInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'sectionId' are incompatible.
+    Type 'string | null | undefined' is not assignable to type 'string | null'.
+      Type 'undefined' is not assignable to type 'string | null'.
+src/lib/menu.functions.ts(301,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(320,9): error TS2379: Argument of type '{ name?: string | undefined; description?: string | undefined; imageAlt?: string | null | undefined; category?: string | undefined; priceCents?: number | undefined; allergens?: string[] | undefined; ... 5 more ...; isFeatured?: boolean | undefined; }' is not assignable to parameter of type 'Partial<MenuItemInput>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'sectionId' are incompatible.
+    Type 'string | null | undefined' is not assignable to type 'string | null'.
+      Type 'undefined' is not assignable to type 'string | null'.
+src/lib/menu.functions.ts(325,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(349,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(372,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/menu.functions.ts(391,27): error TS2322: Type '"unexpected"' is not assignable to type '"validation" | "unauthorized" | "conflict"'.
+src/lib/ordering.functions.ts(69,53): error TS2345: Argument of type '{ name: string; description: string; slug: string; displayOrder: number; isActive: boolean; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: boolean; includesSoftDrink: boolean; eligibleItems: { ...; }[]; }' is not assignable to parameter of type 'CreateMealPackageInput'.
+  Types of property 'eligibleItems' are incompatible.
+    Type '{ selectionCategory: string; menuItemId: string; }[]' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; }[]'.
+      Type '{ selectionCategory: string; menuItemId: string; }' is not assignable to type '{ menuItemId: string; selectionCategory: "side" | "meat" | "bread" | "drink"; }'.
+        Types of property 'selectionCategory' are incompatible.
+          Type 'string' is not assignable to type '"side" | "meat" | "bread" | "drink"'.
+src/lib/ordering.functions.ts(81,53): error TS2379: Argument of type '{ id: string; expectedUpdatedAt: string; name?: string | undefined; description?: string | undefined; slug?: string | undefined; displayOrder?: number | undefined; isActive?: boolean | undefined; ... 5 more ...; eligibleItems?: { ...; }[] | undefined; }' is not assignable to parameter of type 'UpdateMealPackageInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/ordering.functions.ts(107,51): error TS2379: Argument of type '{ id: string; expectedUpdatedAt: string; name?: string | undefined; description?: string | undefined; priceCents?: number | undefined; slug?: string | undefined; displayOrder?: number | undefined; isActive?: boolean | undefined; eligiblePackageIds?: string[] | undefined; }' is not assignable to parameter of type 'UpdateIndividualAddonInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/ordering.functions.ts(133,53): error TS2379: Argument of type '{ id: string; expectedUpdatedAt: string; name?: string | undefined; description?: string | undefined; slug?: string | undefined; displayOrder?: number | undefined; isActive?: boolean | undefined; pricePerPlatterCents?: number | undefined; servingGuidance?: string | ... 1 more ... | undefined; }' is not assignable to parameter of type 'UpdateSharedPlatterInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/ordering.functions.ts(147,63): error TS2345: Argument of type '{ expectedUpdatedAt: string; seniorDiscountPercent: number | null; seniorMinAge: number | null; childRuleType: string; childDiscountPercent: number | null; childFixedPackagePriceCents: number | null; ... 6 more ...; childAppliesToPlatters: boolean; }' is not assignable to parameter of type 'UpdateGuestPricingRulesInput'.
+  Types of property 'childRuleType' are incompatible.
+    Type 'string' is not assignable to type '"none" | "fixed_package_price" | "percentage_discount"'.
+src/lib/ordering.functions.ts(212,37): error TS2345: Argument of type '{ id: string; category: "adult" | "child" | "senior"; includedSelections: { selectionCategory: string; menuItemId: string; }[]; addons: { quantity: number; addonId: string; }[]; packageId: string; name?: string | undefined; }[]' is not assignable to parameter of type 'OrderGuest[]'.
+  Type '{ id: string; category: "adult" | "child" | "senior"; includedSelections: { selectionCategory: string; menuItemId: string; }[]; addons: { quantity: number; addonId: string; }[]; packageId: string; name?: string | undefined; }' is not assignable to type 'OrderGuest' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+    Types of property 'name' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
+src/lib/public-quote.functions.ts(172,7): error TS2375: Type '{ ok: true; lines: ReservationPriceLine[]; subtotalCents: number; depositRequiredCents: number; grandTotalCents: number; remainingBalanceCents: number; projectedBalanceAfterDepositCents: number | undefined; hasUnresolvedRules: false; unresolvedNotes: string[]; reviewedPrice: ReviewedPrice | undefined; }' is not assignable to type 'QuoteResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'projectedBalanceAfterDepositCents' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+src/lib/reservation/pricing.ts(250,7): error TS2322: Type '"gratuity"' is not assignable to type '"package" | "platter" | "addon" | "senior_discount" | "child_rule"'.
+src/lib/reservation/pricing.ts(260,7): error TS2322: Type '"tax"' is not assignable to type '"package" | "platter" | "addon" | "senior_discount" | "child_rule"'.
+src/lib/reservation/timezone.ts(81,5): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(year: number, monthIndex?: number | undefined, date?: number | undefined, hours?: number | undefined, minutes?: number | undefined, seconds?: number | undefined, ms?: number | undefined): number', gave the following error.
+    Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+  Overload 2 of 2, '(year: number, monthIndex: number, date?: number | undefined, hours?: number | undefined, minutes?: number | undefined, seconds?: number | undefined, ms?: number | undefined): number', gave the following error.
+    Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+src/lib/reservation/timezone.ts(81,9): error TS4111: Property 'year' comes from an index signature, so it must be accessed with ['year'].
+src/lib/reservation/timezone.ts(82,5): error TS18048: 'map.month' is possibly 'undefined'.
+src/lib/reservation/timezone.ts(82,9): error TS4111: Property 'month' comes from an index signature, so it must be accessed with ['month'].
+src/lib/reservation/timezone.ts(83,9): error TS4111: Property 'day' comes from an index signature, so it must be accessed with ['day'].
+src/lib/reservation/timezone.ts(84,9): error TS4111: Property 'hour' comes from an index signature, so it must be accessed with ['hour'].
+src/lib/reservation/timezone.ts(84,31): error TS4111: Property 'hour' comes from an index signature, so it must be accessed with ['hour'].
+src/lib/reservation/timezone.ts(85,9): error TS4111: Property 'minute' comes from an index signature, so it must be accessed with ['minute'].
+src/lib/reservation/timezone.ts(86,9): error TS4111: Property 'second' comes from an index signature, so it must be accessed with ['second'].
+src/lib/server/auth-repository.server.ts(363,41): error TS2379: Argument of type 'AuthError' is not assignable to parameter of type '{ message?: string; status?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'status' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+src/lib/server/auth-repository.server.ts(380,41): error TS2379: Argument of type 'AuthError' is not assignable to parameter of type '{ message?: string; status?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'status' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+src/lib/server/deposit-payment-processor.server.ts(65,27): error TS4111: Property 'STRIPE_SECRET_KEY' comes from an index signature, so it must be accessed with ['STRIPE_SECRET_KEY'].
+src/lib/server/env.server.ts(48,28): error TS4111: Property 'APP_DATA_MODE' comes from an index signature, so it must be accessed with ['APP_DATA_MODE'].
+src/lib/server/env.server.ts(49,36): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/server/env.server.ts(70,27): error TS4111: Property 'SUPABASE_URL' comes from an index signature, so it must be accessed with ['SUPABASE_URL'].
+src/lib/server/env.server.ts(71,31): error TS4111: Property 'SUPABASE_ANON_KEY' comes from an index signature, so it must be accessed with ['SUPABASE_ANON_KEY'].
+src/lib/server/env.server.ts(72,38): error TS4111: Property 'SUPABASE_SERVICE_ROLE_KEY' comes from an index signature, so it must be accessed with ['SUPABASE_SERVICE_ROLE_KEY'].
+src/lib/server/env.server.ts(73,31): error TS4111: Property 'SUPABASE_SITE_URL' comes from an index signature, so it must be accessed with ['SUPABASE_SITE_URL'].
+src/lib/server/env.server.ts(85,3): error TS2375: Type '{ url: string; anonKey: string; serviceRoleKey: string; siteUrl: string | undefined; }' is not assignable to type 'SupabaseEnv' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'siteUrl' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/server/feast-actions.server.ts(24,30): error TS18047: 'actor' is possibly 'null'.
+src/lib/server/feast-actions.server.ts(33,30): error TS18047: 'actor' is possibly 'null'.
+src/lib/server/feast-actions.server.ts(33,44): error TS2379: Argument of type '{ id: string; expectedUpdatedAt: string; name?: string | undefined; description?: string | undefined; slug?: string | undefined; displayOrder?: number | undefined; pricePerPersonCents?: number | ... 1 more ... | undefined; inclusions?: string[] | undefined; coverImageUrl?: string | ... 1 more ... | undefined; coverI...' is not assignable to parameter of type 'UpdateFeastOfferingInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/server/feast-actions.server.ts(48,5): error TS18047: 'actor' is possibly 'null'.
+src/lib/server/feast-mock.server.ts(145,9): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-mock.server.ts(153,38): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-mock.server.ts(160,11): error TS2322: Type '{ name: string; slug: string; description: string; pricePerPersonCents: number | null; inclusions: string[]; coverImageUrl: string | null; coverImageAlt: string | null; isPublished: boolean; ... 5 more ...; createdBy?: string | null; }' is not assignable to type 'FeastOffering'.
+  Property 'id' is optional in type '{ name: string; slug: string; description: string; pricePerPersonCents: number | null; inclusions: string[]; coverImageUrl: string | null; coverImageAlt: string | null; isPublished: boolean; ... 5 more ...; createdBy?: string | null; }' but required in type 'FeastOffering'.
+src/lib/server/feast-mock.server.ts(162,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-mock.server.ts(163,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-mock.server.ts(164,74): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-mock.server.ts(168,13): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-mock.server.ts(169,71): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-mock.server.ts(171,67): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-mock.server.ts(173,67): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-mock.server.ts(174,74): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-mock.server.ts(175,77): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/feast-supabase.server.ts(165,41): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/lib/server/feast-supabase.server.ts(166,41): error TS4111: Property 'slug' comes from an index signature, so it must be accessed with ['slug'].
+src/lib/server/feast-supabase.server.ts(167,48): error TS4111: Property 'description' comes from an index signature, so it must be accessed with ['description'].
+src/lib/server/feast-supabase.server.ts(169,13): error TS4111: Property 'price_per_person_cents' comes from an index signature, so it must be accessed with ['price_per_person_cents'].
+src/lib/server/feast-supabase.server.ts(170,47): error TS4111: Property 'inclusions' comes from an index signature, so it must be accessed with ['inclusions'].
+src/lib/server/feast-supabase.server.ts(171,50): error TS4111: Property 'cover_image_url' comes from an index signature, so it must be accessed with ['cover_image_url'].
+src/lib/server/feast-supabase.server.ts(172,50): error TS4111: Property 'cover_image_alt' comes from an index signature, so it must be accessed with ['cover_image_alt'].
+src/lib/server/feast-supabase.server.ts(173,48): error TS4111: Property 'is_published' comes from an index signature, so it must be accessed with ['is_published'].
+src/lib/server/feast-supabase.server.ts(174,49): error TS4111: Property 'display_order' comes from an index signature, so it must be accessed with ['display_order'].
+src/lib/server/menu-supabase.server.ts(196,41): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/lib/server/menu-supabase.server.ts(197,41): error TS4111: Property 'slug' comes from an index signature, so it must be accessed with ['slug'].
+src/lib/server/menu-supabase.server.ts(198,48): error TS4111: Property 'description' comes from an index signature, so it must be accessed with ['description'].
+src/lib/server/menu-supabase.server.ts(199,49): error TS4111: Property 'display_order' comes from an index signature, so it must be accessed with ['display_order'].
+src/lib/server/menu-supabase.server.ts(200,46): error TS4111: Property 'publish_at' comes from an index signature, so it must be accessed with ['publish_at'].
+src/lib/server/menu-supabase.server.ts(201,48): error TS4111: Property 'unpublish_at' comes from an index signature, so it must be accessed with ['unpublish_at'].
+src/lib/server/menu-supabase.server.ts(202,11): error TS4111: Property 'updated_by' comes from an index signature, so it must be accessed with ['updated_by'].
+src/lib/server/menu-supabase.server.ts(319,41): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/lib/server/menu-supabase.server.ts(320,48): error TS4111: Property 'description' comes from an index signature, so it must be accessed with ['description'].
+src/lib/server/menu-supabase.server.ts(321,49): error TS4111: Property 'display_order' comes from an index signature, so it must be accessed with ['display_order'].
+src/lib/server/menu-supabase.server.ts(324,11): error TS4111: Property 'updated_by' comes from an index signature, so it must be accessed with ['updated_by'].
+src/lib/server/menu-supabase.server.ts(484,43): error TS4111: Property 'menu_id' comes from an index signature, so it must be accessed with ['menu_id'].
+src/lib/server/menu-supabase.server.ts(485,46): error TS4111: Property 'section_id' comes from an index signature, so it must be accessed with ['section_id'].
+src/lib/server/menu-supabase.server.ts(486,41): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/lib/server/menu-supabase.server.ts(487,48): error TS4111: Property 'description' comes from an index signature, so it must be accessed with ['description'].
+src/lib/server/menu-supabase.server.ts(488,47): error TS4111: Property 'price_cents' comes from an index signature, so it must be accessed with ['price_cents'].
+src/lib/server/menu-supabase.server.ts(489,45): error TS4111: Property 'category' comes from an index signature, so it must be accessed with ['category'].
+src/lib/server/menu-supabase.server.ts(491,13): error TS4111: Property 'package_use_categories' comes from an index signature, so it must be accessed with ['package_use_categories'].
+src/lib/server/menu-supabase.server.ts(492,45): error TS4111: Property 'image_url' comes from an index signature, so it must be accessed with ['image_url'].
+src/lib/server/menu-supabase.server.ts(493,45): error TS4111: Property 'image_alt' comes from an index signature, so it must be accessed with ['image_alt'].
+src/lib/server/menu-supabase.server.ts(494,48): error TS4111: Property 'dietary_tags' comes from an index signature, so it must be accessed with ['dietary_tags'].
+src/lib/server/menu-supabase.server.ts(495,46): error TS4111: Property 'allergens' comes from an index signature, so it must be accessed with ['allergens'].
+src/lib/server/menu-supabase.server.ts(496,45): error TS4111: Property 'is_active' comes from an index signature, so it must be accessed with ['is_active'].
+src/lib/server/menu-supabase.server.ts(497,47): error TS4111: Property 'is_featured' comes from an index signature, so it must be accessed with ['is_featured'].
+src/lib/server/menu-supabase.server.ts(498,49): error TS4111: Property 'display_order' comes from an index signature, so it must be accessed with ['display_order'].
+src/lib/server/menu-supabase.server.ts(499,11): error TS4111: Property 'updated_by' comes from an index signature, so it must be accessed with ['updated_by'].
+src/lib/server/ordering-mock.server.ts(194,9): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(203,22): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(208,11): error TS2322: Type '{ name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: boolean; includesSoftDrink: boolean; ... 13 more ...; seniorDiscountBasisPoints?: number | null; }' is not assignable to type 'MealPackageDTO'.
+  Property 'id' is optional in type '{ name: string; slug: string; description: string; pricePerPersonCents: number; includedMeatsCount: number; includedSidesCount: number; includesBread: boolean; includesSoftDrink: boolean; ... 13 more ...; seniorDiscountBasisPoints?: number | null; }' but required in type 'MealPackageDTO'.
+src/lib/server/ordering-mock.server.ts(210,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(211,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(212,74): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(213,57): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(214,55): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(215,55): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(216,45): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(217,53): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(218,35): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(219,43): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(226,26): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(231,13): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(273,9): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(282,22): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(287,11): error TS2322: Type '{ name: string; slug: string; description: string; priceCents: number; isActive: boolean; displayOrder: number; eligiblePackageIds: string[]; updatedAt: string; updatedBy: string; id?: string; createdAt?: string; createdBy?: string | null; }' is not assignable to type 'IndividualAddonDTO'.
+  Property 'id' is optional in type '{ name: string; slug: string; description: string; priceCents: number; isActive: boolean; displayOrder: number; eligiblePackageIds: string[]; updatedAt: string; updatedBy: string; id?: string; createdAt?: string; createdBy?: string | null; }' but required in type 'IndividualAddonDTO'.
+src/lib/server/ordering-mock.server.ts(289,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(290,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(291,74): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(292,39): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(293,35): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(294,43): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(298,13): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(342,9): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(351,22): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(356,11): error TS2322: Type '{ name: string; slug: string; description: string; pricePerPlatterCents: number; servingGuidance: string | null; isActive: boolean; displayOrder: number; updatedAt: string; updatedBy: string; id?: string; createdAt?: string; createdBy?: string | null; }' is not assignable to type 'SharedPlatterDTO'.
+  Property 'id' is optional in type '{ name: string; slug: string; description: string; pricePerPlatterCents: number; servingGuidance: string | null; isActive: boolean; displayOrder: number; updatedAt: string; updatedBy: string; id?: string; createdAt?: string; createdBy?: string | null; }' but required in type 'SharedPlatterDTO'.
+src/lib/server/ordering-mock.server.ts(358,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(359,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(360,74): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(361,59): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(363,71): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(364,35): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-mock.server.ts(365,43): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/ordering-package-pricing-actions.server.ts(241,9): error TS2322: Type 'string | null' is not assignable to type '"none" | "fixed_package_price" | "percentage_discount" | null'.
+  Type 'string' is not assignable to type '"none" | "fixed_package_price" | "percentage_discount" | null'.
+src/lib/server/ordering-package-pricing-actions.server.ts(244,9): error TS2322: Type 'string | null' is not assignable to type '"none" | "fixed_package_price" | "percentage_discount" | null'.
+  Type 'string' is not assignable to type '"none" | "fixed_package_price" | "percentage_discount" | null'.
+src/lib/server/ordering-supabase.server.ts(157,7): error TS2375: Type '{ success: false; error: string; conflict: boolean | undefined; }' is not assignable to type 'MealPackageOperationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'conflict' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+src/lib/server/ordering-supabase.server.ts(199,7): error TS2375: Type '{ success: false; error: string; conflict: boolean | undefined; }' is not assignable to type 'MealPackageOperationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'conflict' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+src/lib/server/ordering-supabase.server.ts(268,7): error TS2375: Type '{ success: false; error: string; conflict: boolean | undefined; }' is not assignable to type 'IndividualAddonOperationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'conflict' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+src/lib/server/ordering-supabase.server.ts(304,7): error TS2375: Type '{ success: false; error: string; conflict: boolean | undefined; }' is not assignable to type 'IndividualAddonOperationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'conflict' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+src/lib/server/ordering-supabase.server.ts(386,7): error TS2375: Type '{ success: false; error: string; conflict: boolean | undefined; }' is not assignable to type 'SharedPlatterOperationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'conflict' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+src/lib/server/ordering-supabase.server.ts(429,14): error TS4111: Property 'seniorAppliesToPackages' comes from an index signature, so it must be accessed with ['seniorAppliesToPackages'].
+src/lib/server/ordering-supabase.server.ts(431,14): error TS4111: Property 'seniorAppliesToAddons' comes from an index signature, so it must be accessed with ['seniorAppliesToAddons'].
+src/lib/server/ordering-supabase.server.ts(433,14): error TS4111: Property 'seniorAppliesToPlatters' comes from an index signature, so it must be accessed with ['seniorAppliesToPlatters'].
+src/lib/server/ordering-supabase.server.ts(435,14): error TS4111: Property 'childAppliesToPackages' comes from an index signature, so it must be accessed with ['childAppliesToPackages'].
+src/lib/server/ordering-supabase.server.ts(437,14): error TS4111: Property 'childAppliesToAddons' comes from an index signature, so it must be accessed with ['childAppliesToAddons'].
+src/lib/server/ordering-supabase.server.ts(439,14): error TS4111: Property 'childAppliesToPlatters' comes from an index signature, so it must be accessed with ['childAppliesToPlatters'].
+src/lib/server/ordering-supabase.server.ts(451,7): error TS2375: Type '{ success: false; error: string; conflict: boolean | undefined; }' is not assignable to type 'GuestPricingRulesOperationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'conflict' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+src/lib/server/reservation-mock.server.ts(156,7): error TS2322: Type '{ id: `${string}-${string}-${string}-${string}-${string}`; guestIndex: number; guestCategory: string; guestName: string | null; packageId: string; packageNameSnapshot: string; packagePriceSnapshot: number; ... 4 more ...; mealRequests: string; }[]' is not assignable to type '{ id: string; guestIndex: number; guestCategory: "adult" | "child" | "senior"; guestName: string | null; packageId: string; packageNameSnapshot: string; packagePriceSnapshot: number; ... 4 more ...; mealRequests: string; }[]'.
+  Type '{ id: `${string}-${string}-${string}-${string}-${string}`; guestIndex: number; guestCategory: string; guestName: string | null; packageId: string; packageNameSnapshot: string; packagePriceSnapshot: number; ... 4 more ...; mealRequests: string; }' is not assignable to type '{ id: string; guestIndex: number; guestCategory: "adult" | "child" | "senior"; guestName: string | null; packageId: string; packageNameSnapshot: string; packagePriceSnapshot: number; ... 4 more ...; mealRequests: string; }'.
+    Types of property 'guestCategory' are incompatible.
+      Type 'string' is not assignable to type '"adult" | "child" | "senior"'.
+src/lib/server/reservation-supabase.server.ts(187,5): error TS2375: Type '{ success: true; reservationId: string; reservationNumber: string; status: SubmitReservationResult["status"]; paymentStatus: SubmitReservationResult["paymentStatus"]; idempotentReplay: true; }' is not assignable to type 'SubmitReservationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'status' are incompatible.
+    Type 'ReservationStatus | undefined' is not assignable to type 'ReservationStatus'.
+      Type 'undefined' is not assignable to type 'ReservationStatus'.
+src/lib/server/reservation-supabase.server.ts(372,5): error TS2375: Type '{ success: true; reservationId: string; reservationNumber: string | undefined; status: SubmitReservationResult["status"]; paymentStatus: SubmitReservationResult["paymentStatus"]; idempotentReplay: boolean; holdId: string | undefined; holdDeadline: string | undefined; capacityState: string | undefined; }' is not assignable to type 'SubmitReservationResult' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'reservationNumber' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/server/reservation-supabase.server.ts(469,7): error TS2375: Type '{ success: false; error: string | undefined; }' is not assignable to type '{ success: boolean; reservation?: ReservationDetailDTO; error?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/server/reservation-supabase.server.ts(552,7): error TS2322: Type 'ReservationApprovalDetail | undefined' is not assignable to type 'ReservationApprovalDetail'.
+  Type 'undefined' is not assignable to type 'ReservationApprovalDetail'.
+src/lib/server/space-actions.server.ts(64,43): error TS2379: Argument of type '{ id: string; expectedUpdatedAt: string; name?: string | undefined; description?: string | undefined; slug?: string | undefined; displayOrder?: number | undefined; isActive?: boolean | undefined; onlineBookingLimit?: number | ... 1 more ... | undefined; spaceType?: "general_dining" | ... 2 more ... | undefined; repo...' is not assignable to parameter of type 'UpdateVenueSpaceInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'name' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/server/space-mock.server.ts(106,9): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/space-mock.server.ts(113,38): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/space-mock.server.ts(118,11): error TS2322: Type '{ name: string; slug: string; description: string; spaceType: "general_dining" | "request_only" | "not_bookable"; reportedCapacity: number; onlineBookingLimit: number | null; isActive: boolean; ... 5 more ...; createdBy?: string | null; }' is not assignable to type 'VenueSpaceDTO'.
+  Property 'id' is optional in type '{ name: string; slug: string; description: string; spaceType: "general_dining" | "request_only" | "not_bookable"; reportedCapacity: number; onlineBookingLimit: number | null; isActive: boolean; ... 5 more ...; createdBy?: string | null; }' but required in type 'VenueSpaceDTO'.
+src/lib/server/space-mock.server.ts(120,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/space-mock.server.ts(121,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/space-mock.server.ts(122,74): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/space-mock.server.ts(123,37): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/space-mock.server.ts(124,51): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/space-mock.server.ts(128,13): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/space-mock.server.ts(129,65): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/space-mock.server.ts(130,77): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/space-supabase.server.ts(123,41): error TS4111: Property 'name' comes from an index signature, so it must be accessed with ['name'].
+src/lib/server/space-supabase.server.ts(124,41): error TS4111: Property 'slug' comes from an index signature, so it must be accessed with ['slug'].
+src/lib/server/space-supabase.server.ts(125,48): error TS4111: Property 'description' comes from an index signature, so it must be accessed with ['description'].
+src/lib/server/space-supabase.server.ts(126,46): error TS4111: Property 'space_type' comes from an index signature, so it must be accessed with ['space_type'].
+src/lib/server/space-supabase.server.ts(127,53): error TS4111: Property 'reported_capacity' comes from an index signature, so it must be accessed with ['reported_capacity'].
+src/lib/server/space-supabase.server.ts(129,13): error TS4111: Property 'online_booking_limit' comes from an index signature, so it must be accessed with ['online_booking_limit'].
+src/lib/server/space-supabase.server.ts(130,45): error TS4111: Property 'is_active' comes from an index signature, so it must be accessed with ['is_active'].
+src/lib/server/space-supabase.server.ts(131,49): error TS4111: Property 'display_order' comes from an index signature, so it must be accessed with ['display_order'].
+src/lib/server/stripe-checkout.server.ts(27,27): error TS4111: Property 'STRIPE_SECRET_KEY' comes from an index signature, so it must be accessed with ['STRIPE_SECRET_KEY'].
+src/lib/server/stripe-webhook.server.ts(17,30): error TS4111: Property 'STRIPE_WEBHOOK_SECRET' comes from an index signature, so it must be accessed with ['STRIPE_WEBHOOK_SECRET'].
+src/lib/server/sundays-actions.server.ts(84,57): error TS2379: Argument of type '{ date: string; spaceId: string; status?: "scheduled" | "open" | "closed" | "sold_out" | undefined; label?: string | undefined; displayOrder?: number | undefined; isActive?: boolean | undefined; onlineBookingLimit?: number | ... 1 more ... | undefined; capacityResourceId?: string | ... 1 more ... | undefined; }' is not assignable to parameter of type 'CreateSundayServiceInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'label' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/server/sundays-actions.server.ts(106,57): error TS2379: Argument of type '{ id: string; expectedUpdatedAt: string; status?: "scheduled" | "open" | "closed" | "sold_out" | undefined; date?: string | undefined; label?: string | undefined; displayOrder?: number | undefined; isActive?: boolean | undefined; spaceId?: string | undefined; onlineBookingLimit?: number | ... 1 more ... | undefined;...' is not assignable to parameter of type 'UpdateSundayServiceInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'date' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/server/sundays-actions.server.ts(141,55): error TS2379: Argument of type '{ label: string; sundayServiceId: string; startTime: string; endTime: string; displayOrder?: number | undefined; isActive?: boolean | undefined; onlineBookingLimit?: number | null | undefined; }' is not assignable to parameter of type 'CreateSeatingTimeInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'onlineBookingLimit' are incompatible.
+    Type 'number | null | undefined' is not assignable to type 'number | null'.
+      Type 'undefined' is not assignable to type 'number | null'.
+src/lib/server/sundays-actions.server.ts(163,55): error TS2379: Argument of type '{ id: string; expectedUpdatedAt: string; label?: string | undefined; displayOrder?: number | undefined; isActive?: boolean | undefined; onlineBookingLimit?: number | null | undefined; startTime?: string | undefined; endTime?: string | undefined; }' is not assignable to parameter of type 'UpdateSeatingTimeInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'label' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/server/sundays-actions.server.ts(180,5): error TS2739: Type '{ depositPercent: number; defaultBalanceDeadlineHours: number; restaurantTimezone: null; taxRateBasisPoints: null; gratuityRateBasisPoints: null; taxOnGratuity: null; updatedAt: string; }' is missing the following properties from type 'PaymentPolicyDTO': createdAt, createdBy, updatedBy
+src/lib/server/sundays-actions.server.ts(206,57): error TS2379: Argument of type '{ expectedUpdatedAt: string; depositPercent: number; defaultBalanceDeadlineHours: number; restaurantTimezone: string | null; taxRateBasisPoints?: number | null | undefined; gratuityRateBasisPoints?: number | ... 1 more ... | undefined; taxOnGratuity?: boolean | ... 1 more ... | undefined; }' is not assignable to parameter of type 'UpdatePaymentPolicyInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'taxRateBasisPoints' are incompatible.
+    Type 'number | null | undefined' is not assignable to type 'number | null'.
+      Type 'undefined' is not assignable to type 'number | null'.
+src/lib/server/sundays-actions.server.ts(268,55): error TS2379: Argument of type '{ label: string; spaceId: string; seats: 4 | 8 | 6 | 10 | 12; displayOrder?: number | undefined; isActive?: boolean | undefined; zone?: string | undefined; }' is not assignable to parameter of type 'CreateDiningTableInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'zone' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/server/sundays-actions.server.ts(294,55): error TS2379: Argument of type '{ id: string; expectedUpdatedAt: string; label?: string | undefined; displayOrder?: number | undefined; isActive?: boolean | undefined; seats?: 4 | 8 | 6 | 10 | 12 | undefined; zone?: string | undefined; }' is not assignable to parameter of type 'UpdateDiningTableInput' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'label' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/lib/server/sundays-mock.server.ts(46,10): error TS18048: 'h' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(46,19): error TS18048: 'm' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(127,9): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(137,11): error TS2322: Type '{ date: string; label: string; status: "scheduled" | "open" | "closed" | "sold_out"; spaceId: string; onlineBookingLimit: number | null; capacityResourceId: string | null; isActive: boolean; ... 5 more ...; createdBy?: string | null; }' is not assignable to type 'SundayServiceDTO'.
+  Property 'id' is optional in type '{ date: string; label: string; status: "scheduled" | "open" | "closed" | "sold_out"; spaceId: string; onlineBookingLimit: number | null; capacityResourceId: string | null; isActive: boolean; ... 5 more ...; createdBy?: string | null; }' but required in type 'SundayServiceDTO'.
+src/lib/server/sundays-mock.server.ts(139,27): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(140,29): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(141,31): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(142,33): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(146,13): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(150,13): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(151,65): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(152,77): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(201,9): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(208,42): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(209,38): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(212,11): error TS2322: Type '{ label: string; startTime: string; endTime: string; onlineBookingLimit: number | null; isActive: boolean; displayOrder: number; updatedAt: string; updatedBy: string; id?: string; sundayServiceId?: string; createdAt?: string; createdBy?: string | null; }' is not assignable to type 'SeatingTimeDTO'.
+  Property 'id' is optional in type '{ label: string; startTime: string; endTime: string; onlineBookingLimit: number | null; isActive: boolean; displayOrder: number; updatedAt: string; updatedBy: string; id?: string; sundayServiceId?: string; createdAt?: string; createdBy?: string | null; }' but required in type 'SeatingTimeDTO'.
+src/lib/server/sundays-mock.server.ts(214,29): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(220,13): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(221,65): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(222,77): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(338,9): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(354,25): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(364,11): error TS2322: Type '{ label: string; seats: 4 | 8 | 6 | 10 | 12; zone: string; isActive: boolean; displayOrder: number; updatedAt: string; createdBy: string; updatedBy: string; id?: string; spaceId?: string; createdAt?: string; }' is not assignable to type 'DiningTableDTO & { createdBy: string; updatedBy: string; }'.
+  Type '{ label: string; seats: 4 | 8 | 6 | 10 | 12; zone: string; isActive: boolean; displayOrder: number; updatedAt: string; createdBy: string; updatedBy: string; id?: string; spaceId?: string; createdAt?: string; }' is not assignable to type 'DiningTableDTO'.
+    Property 'id' is optional in type '{ label: string; seats: 4 | 8 | 6 | 10 | 12; zone: string; isActive: boolean; displayOrder: number; updatedAt: string; createdBy: string; updatedBy: string; id?: string; spaceId?: string; createdAt?: string; }' but required in type 'DiningTableDTO'.
+src/lib/server/sundays-mock.server.ts(366,63): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(367,29): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(368,60): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(369,65): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(370,77): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(371,59): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-mock.server.ts(372,18): error TS18048: 'existing' is possibly 'undefined'.
+src/lib/server/sundays-supabase.server.ts(44,10): error TS18048: 'h' is possibly 'undefined'.
+src/lib/server/sundays-supabase.server.ts(44,19): error TS18048: 'm' is possibly 'undefined'.
+src/lib/server/sundays-supabase.server.ts(266,41): error TS4111: Property 'date' comes from an index signature, so it must be accessed with ['date'].
+src/lib/server/sundays-supabase.server.ts(267,42): error TS4111: Property 'label' comes from an index signature, so it must be accessed with ['label'].
+src/lib/server/sundays-supabase.server.ts(268,43): error TS4111: Property 'status' comes from an index signature, so it must be accessed with ['status'].
+src/lib/server/sundays-supabase.server.ts(269,44): error TS4111: Property 'space_id' comes from an index signature, so it must be accessed with ['space_id'].
+src/lib/server/sundays-supabase.server.ts(271,13): error TS4111: Property 'online_booking_limit' comes from an index signature, so it must be accessed with ['online_booking_limit'].
+src/lib/server/sundays-supabase.server.ts(273,13): error TS4111: Property 'capacity_resource_id' comes from an index signature, so it must be accessed with ['capacity_resource_id'].
+src/lib/server/sundays-supabase.server.ts(274,45): error TS4111: Property 'is_active' comes from an index signature, so it must be accessed with ['is_active'].
+src/lib/server/sundays-supabase.server.ts(275,49): error TS4111: Property 'display_order' comes from an index signature, so it must be accessed with ['display_order'].
+src/lib/server/sundays-supabase.server.ts(371,42): error TS4111: Property 'label' comes from an index signature, so it must be accessed with ['label'].
+src/lib/server/sundays-supabase.server.ts(372,46): error TS4111: Property 'start_time' comes from an index signature, so it must be accessed with ['start_time'].
+src/lib/server/sundays-supabase.server.ts(373,44): error TS4111: Property 'end_time' comes from an index signature, so it must be accessed with ['end_time'].
+src/lib/server/sundays-supabase.server.ts(375,13): error TS4111: Property 'online_booking_limit' comes from an index signature, so it must be accessed with ['online_booking_limit'].
+src/lib/server/sundays-supabase.server.ts(376,45): error TS4111: Property 'is_active' comes from an index signature, so it must be accessed with ['is_active'].
+src/lib/server/sundays-supabase.server.ts(377,49): error TS4111: Property 'display_order' comes from an index signature, so it must be accessed with ['display_order'].
+src/lib/server/sundays-supabase.server.ts(378,11): error TS4111: Property 'updated_by' comes from an index signature, so it must be accessed with ['updated_by'].
+src/lib/server/sundays-supabase.server.ts(446,15): error TS4111: Property 'tax_rate_basis_points' comes from an index signature, so it must be accessed with ['tax_rate_basis_points'].
+src/lib/server/sundays-supabase.server.ts(448,15): error TS4111: Property 'gratuity_rate_basis_points' comes from an index signature, so it must be accessed with ['gratuity_rate_basis_points'].
+src/lib/server/sundays-supabase.server.ts(450,15): error TS4111: Property 'tax_on_gratuity' comes from an index signature, so it must be accessed with ['tax_on_gratuity'].
+src/lib/server/sundays-supabase.server.ts(473,13): error TS4111: Property 'tax_rate_basis_points' comes from an index signature, so it must be accessed with ['tax_rate_basis_points'].
+src/lib/server/sundays-supabase.server.ts(476,13): error TS4111: Property 'gratuity_rate_basis_points' comes from an index signature, so it must be accessed with ['gratuity_rate_basis_points'].
+src/lib/server/sundays-supabase.server.ts(479,13): error TS4111: Property 'tax_on_gratuity' comes from an index signature, so it must be accessed with ['tax_on_gratuity'].
+src/lib/server/sundays-supabase.server.ts(567,42): error TS4111: Property 'label' comes from an index signature, so it must be accessed with ['label'].
+src/lib/server/sundays-supabase.server.ts(568,42): error TS4111: Property 'seats' comes from an index signature, so it must be accessed with ['seats'].
+src/lib/server/sundays-supabase.server.ts(569,41): error TS4111: Property 'zone' comes from an index signature, so it must be accessed with ['zone'].
+src/lib/server/sundays-supabase.server.ts(570,45): error TS4111: Property 'is_active' comes from an index signature, so it must be accessed with ['is_active'].
+src/lib/server/sundays-supabase.server.ts(571,49): error TS4111: Property 'display_order' comes from an index signature, so it must be accessed with ['display_order'].
+src/lib/server/waitlist-repository.server.ts(122,7): error TS2412: Type 'string | null | undefined' is not assignable to type 'string | null' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'string | null'.
+src/lib/server/waitlist-repository.server.ts(123,7): error TS2412: Type 'string | null | undefined' is not assignable to type 'string | null' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+  Type 'undefined' is not assignable to type 'string | null'.
+src/lib/server/waitlist-webhook.server.ts(72,34): error TS4111: Property 'WAITLIST_WEBHOOK_URL' comes from an index signature, so it must be accessed with ['WAITLIST_WEBHOOK_URL'].
+src/lib/waitlist/analytics.ts(60,19): error TS4111: Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].
+src/lib/waitlist/analytics.ts(68,3): error TS2375: Type '{ partySize: number; privateRoomInterest: boolean; emailConsent: boolean; smsConsent: boolean; hasUtm: boolean; utmSource: string | null | undefined; utmCampaign: string | null | undefined; }' is not assignable to type 'AnalyticsContext' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'utmSource' are incompatible.
+    Type 'string | null | undefined' is not assignable to type 'string | null'.
+      Type 'undefined' is not assignable to type 'string | null'.
+src/lib/waitlist/analytics.ts(81,3): error TS2375: Type '{ partySize: number; privateRoomInterest: boolean; emailConsent: boolean; smsConsent: boolean; hasUtm: boolean; utmSource: string | null | undefined; utmCampaign: string | null | undefined; }' is not assignable to type 'AnalyticsContext' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'utmSource' are incompatible.
+    Type 'string | null | undefined' is not assignable to type 'string | null'.
+      Type 'undefined' is not assignable to type 'string | null'.
+src/lib/waitlist/record.ts(30,3): error TS2375: Type '{ firstName: string; lastName: string; email: string; normalizedEmail: string; phone: string; normalizedPhone: string; partySize: number; preferredDate: string | null | undefined; preferredSeatingTime: string | ... 1 more ... | undefined; ... 18 more ...; status: "new"; }' is not assignable to type 'WaitlistRecord' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'preferredDate' are incompatible.
+    Type 'string | null | undefined' is not assignable to type 'string | null'.
+      Type 'undefined' is not assignable to type 'string | null'.
+src/lib/waitlist/schema.ts(69,17): error TS2538: Type 'undefined' cannot be used as an index type.
+src/lib/waitlist/schema.ts(70,14): error TS2538: Type 'undefined' cannot be used as an index type.
+src/routes/_public.create-account.tsx(60,22): error TS2339: Property 'message' does not exist on type '{ ok: false; kind: "validation"; errors: Record<string, string>; } & { redirectTo?: string; }'.
+src/routes/_public.create-account.tsx(114,12): error TS2375: Type '{ children: Element; label: string; htmlFor: string; required: true; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/routes/_public.create-account.tsx(118,32): error TS4111: Property 'firstName' comes from an index signature, so it must be accessed with ['firstName'].
+src/routes/_public.create-account.tsx(128,12): error TS2375: Type '{ children: Element; label: string; htmlFor: string; required: true; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/routes/_public.create-account.tsx(128,90): error TS4111: Property 'lastName' comes from an index signature, so it must be accessed with ['lastName'].
+src/routes/_public.create-account.tsx(138,10): error TS2375: Type '{ children: Element; label: string; htmlFor: string; required: true; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/routes/_public.create-account.tsx(138,81): error TS4111: Property 'email' comes from an index signature, so it must be accessed with ['email'].
+src/routes/_public.create-account.tsx(148,10): error TS2375: Type '{ children: Element; label: string; htmlFor: string; required: true; hint: string; error: string | undefined; }' is not assignable to type 'FormFieldProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/routes/_public.create-account.tsx(153,30): error TS4111: Property 'password' comes from an index signature, so it must be accessed with ['password'].
+src/routes/_public.index.tsx(138,32): error TS2375: Type 'OmitKeyof<UseQueryOptions<MenuItemDTO[], Error, MenuItemDTO[], string[]>, "queryFn"> & { queryFn?: QueryFunction<MenuItemDTO[], string[], never>; } & { ...; }' is not assignable to type 'QueryObserverOptions<MenuItemDTO[], Error, MenuItemDTO[], MenuItemDTO[], readonly unknown[], never>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'enabled' are incompatible.
+    Type 'QueryBooleanOption<MenuItemDTO[], Error, MenuItemDTO[], string[]>' is not assignable to type 'QueryBooleanOption<MenuItemDTO[], Error, MenuItemDTO[], readonly unknown[]>'.
+      Type '(query: Query<MenuItemDTO[], Error, MenuItemDTO[], string[]>) => boolean' is not assignable to type 'QueryBooleanOption<MenuItemDTO[], Error, MenuItemDTO[], readonly unknown[]>'.
+        Type '(query: Query<MenuItemDTO[], Error, MenuItemDTO[], string[]>) => boolean' is not assignable to type '(query: Query<MenuItemDTO[], Error, MenuItemDTO[], readonly unknown[]>) => boolean'.
+          Types of parameters 'query' and 'query' are incompatible.
+            Type 'Query<MenuItemDTO[], Error, MenuItemDTO[], readonly unknown[]>' is not assignable to type 'Query<MenuItemDTO[], Error, MenuItemDTO[], string[]>'.
+              Types of property 'queryKey' are incompatible.
+                The type 'readonly unknown[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/routes/_public.menu.tsx(68,9): error TS2375: Type 'OmitKeyof<UseQueryOptions<MenuWithContentDTO[], Error, MenuWithContentDTO[], string[]>, "queryFn"> & { ...; } & { ...; }' is not assignable to type 'QueryObserverOptions<MenuWithContentDTO[], Error, MenuWithContentDTO[], MenuWithContentDTO[], readonly unknown[], never>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'enabled' are incompatible.
+    Type 'QueryBooleanOption<MenuWithContentDTO[], Error, MenuWithContentDTO[], string[]>' is not assignable to type 'QueryBooleanOption<MenuWithContentDTO[], Error, MenuWithContentDTO[], readonly unknown[]>'.
+      Type '(query: Query<MenuWithContentDTO[], Error, MenuWithContentDTO[], string[]>) => boolean' is not assignable to type 'QueryBooleanOption<MenuWithContentDTO[], Error, MenuWithContentDTO[], readonly unknown[]>'.
+        Type '(query: Query<MenuWithContentDTO[], Error, MenuWithContentDTO[], string[]>) => boolean' is not assignable to type '(query: Query<MenuWithContentDTO[], Error, MenuWithContentDTO[], readonly unknown[]>) => boolean'.
+          Types of parameters 'query' and 'query' are incompatible.
+            Type 'Query<MenuWithContentDTO[], Error, MenuWithContentDTO[], readonly unknown[]>' is not assignable to type 'Query<MenuWithContentDTO[], Error, MenuWithContentDTO[], string[]>'.
+              Types of property 'queryKey' are incompatible.
+                The type 'readonly unknown[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/routes/_public.menu.tsx(69,9): error TS2322: Type '(slug: string) => OmitKeyof<UseQueryOptions<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, string[]>, "queryFn"> & { ...; } & { ...; }' is not assignable to type '(slug: string) => QueryObserverOptions<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, MenuWithContentDTO | null, readonly unknown[], never>'.
+  Call signature return types 'OmitKeyof<UseQueryOptions<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, string[]>, "queryFn"> & { ...; } & { ...; }' and 'QueryObserverOptions<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, MenuWithContentDTO | null, readonly unknown[], never>' are incompatible.
+    The types of 'enabled' are incompatible between these types.
+      Type 'QueryBooleanOption<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, string[]>' is not assignable to type 'QueryBooleanOption<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, readonly unknown[]>'.
+        Type '(query: Query<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, string[]>) => boolean' is not assignable to type 'QueryBooleanOption<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, readonly unknown[]>'.
+          Type '(query: Query<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, string[]>) => boolean' is not assignable to type '(query: Query<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, readonly unknown[]>) => boolean'.
+            Types of parameters 'query' and 'query' are incompatible.
+              Type 'Query<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, readonly unknown[]>' is not assignable to type 'Query<MenuWithContentDTO | null, Error, MenuWithContentDTO | null, string[]>'.
+                Types of property 'queryKey' are incompatible.
+                  The type 'readonly unknown[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/routes/_public.private-room.tsx(40,76): error TS18048: 'room' is possibly 'undefined'.
+src/routes/_public.private-room.tsx(48,60): error TS18048: 'room' is possibly 'undefined'.
+src/routes/_public.private-room.tsx(52,60): error TS18048: 'room' is possibly 'undefined'.
+src/routes/_public.private-room.tsx(57,41): error TS18048: 'room' is possibly 'undefined'.
+src/routes/_public.reset-password.tsx(65,20): error TS2339: Property 'message' does not exist on type '{ ok: false; kind: "validation"; errors: Record<string, string>; } | { ok: false; kind: "unauthorized"; message: string; } | { ok: false; kind: "unexpected"; message: string; }'.
+  Property 'message' does not exist on type '{ ok: false; kind: "validation"; errors: Record<string, string>; }'.
+src/routes/_public.sign-in.tsx(63,22): error TS2339: Property 'message' does not exist on type '({ ok: false; kind: "validation"; errors: Record<string, string>; } & { redirectTo?: string; roleKey?: string; }) | ({ ok: false; kind: "unauthorized"; message: string; } & { redirectTo?: string; roleKey?: string; }) | ({ ...; } & { ...; })'.
+  Property 'message' does not exist on type '{ ok: false; kind: "validation"; errors: Record<string, string>; } & { redirectTo?: string; roleKey?: string; }'.

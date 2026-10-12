@@ -78,6 +78,14 @@ export function PricingEstimatePanel({ result, loading, error, onRetry }: Props)
               </span>
             </div>
           )}
+          {result.grandTotalCents !== undefined && (
+            <div className="flex items-center justify-between border-t border-border pt-2 text-sm">
+              <span className="font-medium text-foreground">Estimated total</span>
+              <span className="font-semibold text-foreground">
+                {formatCents(result.grandTotalCents)}
+              </span>
+            </div>
+          )}
           {result.depositRequiredCents !== undefined && result.depositRequiredCents > 0 && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Deposit due to reserve</span>
@@ -86,11 +94,17 @@ export function PricingEstimatePanel({ result, loading, error, onRetry }: Props)
               </span>
             </div>
           )}
-          {result.grandTotalCents !== undefined && (
-            <div className="flex items-center justify-between border-t border-border pt-2 text-sm">
-              <span className="font-medium text-foreground">Estimated total</span>
-              <span className="font-semibold text-foreground">
-                {formatCents(result.grandTotalCents)}
+          {result.remainingBalanceCents !== undefined && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Balance due (full, unpaid)</span>
+              <span className="text-foreground">{formatCents(result.remainingBalanceCents)}</span>
+            </div>
+          )}
+          {result.projectedBalanceAfterDepositCents !== undefined && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Projected balance after deposit is paid</span>
+              <span className="font-medium text-foreground">
+                {formatCents(result.projectedBalanceAfterDepositCents)}
               </span>
             </div>
           )}

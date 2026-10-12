@@ -69,12 +69,18 @@ export function buildCancelPayload(
 
 /**
  * Safe codes that require an explicit reload before another cancellation
- * attempt: conflict (stale timestamp) and unexpected (uncertain outcome).
- * For these, the outcome of the previous attempt is unknown until the user
- * reloads the reservation.
+ * attempt: conflict (stale timestamp), unexpected (uncertain outcome), and
+ * invalid_status (the reservation is no longer in a cancellable state). For
+ * these, the outcome of the previous attempt is unknown until the user
+ * reloads.
+ *
+ * invalid_status is included because the server rejected the transition —
+ * the reservation may already have been cancelled by someone else, or moved
+ * to a non-cancellable state. The user must see the current state before
+ * acting again.
  */
 export function requiresReloadBeforeRetry(code: string): boolean {
-  return code === "conflict" || code === "unexpected";
+  return code === "conflict" || code === "unexpected" || code === "invalid_status";
 }
 
 /** Party display name for the cancellation confirmation. */
@@ -86,3 +92,61 @@ export function partyDisplayName(reservation: ReservationDetailDTO): string {
   if (last) return last;
   return reservation.reservationNumber;
 }
+
+/**
+ * Result of an explicit "Reload latest" operation — a discriminated union.
+ *
+ * Success requires the freshly-fetched ReservationDetailDTO (the exact record
+ * the parent adopts into the displayed detail; no second fetch). Failure
+ * requires reservation:null and a safe error. There is no "unknown" success
+ * variant — a malformed server response is a failure.
+ */
+export type CancelReloadResult =
+  | { success: true; reservation: ReservationDetailDTO }
+  | { success: false; reservation: null; error: string };
+
+/** Assessment of a reloaded reservation for the cancellation flow. */
+export type CancelReloadAssessment =
+  | { kind: "cancellable"; reservation: ReservationDetailDTO }
+  | { kind: "already_cancelled"; reservation: ReservationDetailDTO }
+  | { kind: "non_cancellable"; reservation: ReservationDetailDTO; status: string };
+
+/**
+ * Assess a freshly reloaded reservation to decide what to do next:
+ * - "cancellable": status is in the cancellable allow-list — show fresh
+ *   detail and allow a new cancellation using the fresh timestamp.
+ * - "already_cancelled": status is cancelled — show that state; do NOT mutate.
+ * - "non_cancellable": any other status — show current status and remove the
+ *   cancellation action; do NOT mutate.
+ */
+export function assessReloadedReservationForCancel(
+  reservation: ReservationDetailDTO,
+): CancelReloadAssessment {
+  if (reservation.status === "cancelled") {
+    return { kind: "already_cancelled", reservation };
+  }
+  if (isCancellableStatus(reservation.status)) {
+    return { kind: "cancellable", reservation };
+  }
+  return { kind: "non_cancellable", reservation, status: reservation.status };
+}
+
+/**
+ * Status-specific message to show after a successful reload that did NOT
+ * yield a cancellable reservation. Returns null for cancellable — in that
+ * case the fresh detail is shown without an extra message.
+ */
+export function reloadOutcomeMessage(status: string): string | null {
+  if (status === "cancelled") return "This reservation is already cancelled.";
+  if (isCancellableStatus(status)) return null;
+  const label = status.replace(/_/g, " ");
+  return `This reservation is now ${label}. Cancellation is not available.`;
+}
+
+/**
+ * Refresh-failure toast shown when the cancellation succeeded but the display
+ * could not be refreshed. The mutation result is preserved; this does not
+ * invite another mutation.
+ */
+export const REFRESH_FAILURE_MSG =
+  "Cancelled, but the display could not be refreshed. Reload the page to see updates.";

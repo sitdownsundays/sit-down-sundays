@@ -28,6 +28,7 @@ import { PlatterDialog } from "./ordering-platter-dialog";
 import { RulesTab } from "./ordering-rules-tab";
 import { OrderPreview } from "./order-preview";
 import { centsToDollars } from "./ordering-helpers";
+import type { PricingReloadResult } from "./package-pricing-helpers";
 
 type DialogState =
   | { kind: "package-create" }
@@ -42,6 +43,7 @@ export function AdminOrderingPage() {
   const queryClient = useQueryClient();
   const actionLockRef = useRef(false);
   const [dialog, setDialog] = useState<DialogState>(null);
+  const [activeTab, setActiveTab] = useState("packages");
 
   const configQuery = useQuery({
     queryKey: ["ordering-config"],
@@ -54,6 +56,28 @@ export function AdminOrderingPage() {
   async function reload() {
     await queryClient.invalidateQueries({ queryKey: ["ordering-config"] });
     await configQuery.refetch();
+  }
+
+  /** Fresh-read result for pricing-recovery validation. Returns the actual
+   *  returned configuration only when the server read succeeded; never
+   *  falls back to cached data. */
+  async function reloadPricingConfig(): Promise<
+    { ok: true; config: OrderingConfigDTO } | { ok: false }
+  > {
+    await queryClient.invalidateQueries({ queryKey: ["ordering-config"] });
+    const res = await configQuery.refetch();
+    if (res.isError || !res.data) return { ok: false };
+    return { ok: true, config: res.data };
+  }
+
+  /** Fresh-read recovery for a single package's pricing. Returns the actual
+   *  package from the server read — never cached/fallback data. Missing or
+   *  mismatched packages must NOT clear the recovery gate. */
+  async function reloadPricingPackage(packageId: string): Promise<PricingReloadResult> {
+    const res = await reloadPricingConfig();
+    if (!res.ok) return { ok: false, pkg: null };
+    const pkg = res.config.packages.find((p) => p.id === packageId) ?? null;
+    return { ok: true, pkg };
   }
 
   if (configQuery.isLoading) return <LoadingState label="Loading ordering configuration…" />;
@@ -69,7 +93,7 @@ export function AdminOrderingPage() {
         }
       />
     );
-  const config: OrderingConfigDTO | null = configQuery.data;
+  const config: OrderingConfigDTO | null = configQuery.data ?? null;
   if (!config)
     return (
       <EmptyState
@@ -90,7 +114,7 @@ export function AdminOrderingPage() {
         description="Meal packages, individual add-ons, shared platters, and guest pricing rules. These power the order preview and future checkout."
       />
 
-      <Tabs defaultValue="packages">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="packages">Packages</TabsTrigger>
           <TabsTrigger value="addons">Add-ons</TabsTrigger>
@@ -249,7 +273,12 @@ export function AdminOrderingPage() {
 
         {/* Pricing rules */}
         <TabsContent value="rules">
-          <RulesTab config={config} actionLockRef={actionLockRef} onReload={reload} />
+          <RulesTab
+            config={config}
+            actionLockRef={actionLockRef}
+            onReload={reload}
+            onPricingReload={reloadPricingPackage}
+          />
         </TabsContent>
 
         {/* Preview */}
@@ -264,6 +293,10 @@ export function AdminOrderingPage() {
           actionLockRef={actionLockRef}
           onClose={() => setDialog(null)}
           onSaved={reload}
+          goToRules={() => {
+            setDialog(null);
+            setActiveTab("rules");
+          }}
         />
       )}
       {dialog?.kind === "package-edit" && (
@@ -273,6 +306,10 @@ export function AdminOrderingPage() {
           actionLockRef={actionLockRef}
           onClose={() => setDialog(null)}
           onSaved={reload}
+          goToRules={() => {
+            setDialog(null);
+            setActiveTab("rules");
+          }}
         />
       )}
       {dialog?.kind === "addon-create" && (

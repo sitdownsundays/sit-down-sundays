@@ -18,20 +18,24 @@ import { GUEST_CATEGORIES, SELECTION_CATEGORIES } from "@/lib/ordering/constants
 import { getOrderingRepository } from "@/lib/server/ordering-repository.server";
 import { getSundaysRepository } from "@/lib/server/sundays-repository.server";
 import { validatePartyWideMeal } from "@/lib/server/party-meal-validation.server";
+import { normalizeQuoteGuests } from "@/lib/server/public-quote-normalize.server";
 import { calculateReservationPricing, defaultPaymentPolicy } from "@/lib/reservation/pricing";
 import { seatingStartISO } from "@/lib/reservation/timezone";
-import type { ReservationGuestInput } from "@/lib/reservation/types";
+import type { ReviewedPrice } from "@/lib/reservation/types";
 
 const quoteGuestSchema = z.object({
   guestIndex: z.number().int().min(0),
-  category: z.enum(GUEST_CATEGORIES as unknown as [string, ...string[]]),
+  // Pass the readonly literal tuple directly so z.enum infers the exact
+  // GuestCategory union ("adult" | "senior" | "child") rather than widening
+  // to string through an `as unknown as [string, ...string[]]` cast.
+  category: z.enum(GUEST_CATEGORIES),
   name: z.string().max(160).optional(),
   packageId: z.string().min(1),
   included: z
     .array(
       z.object({
         menuItemId: z.string().min(1),
-        selectionCategory: z.enum(SELECTION_CATEGORIES as unknown as [string, ...string[]]),
+        selectionCategory: z.enum(SELECTION_CATEGORIES),
       }),
     )
     .default([]),
@@ -60,9 +64,22 @@ export interface QuoteResult {
   subtotalCents?: number;
   depositRequiredCents?: number;
   grandTotalCents?: number;
+  /**
+   * The FULL actual unpaid balance for a new request (equals grandTotalCents
+   * before any payment). Do NOT repurpose this as the projected balance after
+   * deposit.
+   */
   remainingBalanceCents?: number;
+  /**
+   * Projected balance AFTER the required deposit is paid (grandTotal −
+   * deposit). This is a PROJECTION of what will remain after the deposit is
+   * collected — NOT the actual outstanding balance before any payment.
+   */
+  projectedBalanceAfterDepositCents?: number;
   hasUnresolvedRules?: boolean;
   unresolvedNotes?: string[];
+  /** Full reviewed-price snapshot for the submission drift check. */
+  reviewedPrice?: ReviewedPrice;
   error?: string;
 }
 
@@ -80,7 +97,13 @@ export const quoteOrder = createServerFn({ method: "POST" })
       // duplicate selections, wrong counts, ineligible items, and
       // individual add-ons in public ordering. Returns a safe error without
       // calculating pricing.
-      const mealValidation = validatePartyWideMeal(data.guests as ReservationGuestInput[], config);
+      // Normalize the parsed guests (exact GuestCategory/SelectionCategory
+      // unions) into authoritative ReservationGuestInput[] without an
+      // unchecked cast. The same normalized guests are passed to both the
+      // party-wide validation and the pricing engine.
+      const guests = normalizeQuoteGuests(data.guests);
+
+      const mealValidation = validatePartyWideMeal(guests, config);
       if (!mealValidation.ok) {
         return { ok: false, error: mealValidation.error.message };
       }
@@ -88,12 +111,18 @@ export const quoteOrder = createServerFn({ method: "POST" })
       // Resolve the seating start instant in the restaurant timezone for the
       // balance deadline. If the policy/timezone is unavailable, fall back to
       // defaults with a null seating instant (deadline will be null).
+      // Populate the three nullable tax/gratuity settings from the server-
+      // fetched payment policy. Never accept rates or taxability from the
+      // browser.
       const policyConfig =
         policy !== null
           ? {
               depositPercent: policy.depositPercent,
               balanceDeadlineHours: policy.defaultBalanceDeadlineHours,
               restaurantTimezone: policy.restaurantTimezone,
+              taxRateBasisPoints: policy.taxRateBasisPoints,
+              gratuityRateBasisPoints: policy.gratuityRateBasisPoints,
+              taxOnGratuity: policy.taxOnGratuity,
             }
           : defaultPaymentPolicy();
 
@@ -112,12 +141,33 @@ export const quoteOrder = createServerFn({ method: "POST" })
       }
 
       const result = calculateReservationPricing(
-        data.guests,
+        guests,
         data.platters,
         config,
         policyConfig,
         seatingStart,
+        undefined,
+        undefined,
       );
+
+      // The public quote handler must check pricing.success and return
+      // ok:false on failure. Do not wrap a failed pricing calculation in
+      // ok:true — a food-only subtotal is not a valid estimate when charges
+      // were expected.
+      if (!result.success) {
+        return { ok: false, error: result.error ?? "We couldn't calculate your estimate." };
+      }
+
+      // Unresolved pricing rules (e.g. a malformed per-package child/senior
+      // override) must NOT produce a usable estimate beside a warning. The
+      // incomplete total is not a valid estimate — fail closed.
+      if (result.hasUnresolvedRules) {
+        return {
+          ok: false,
+          error:
+            "Some pricing rules are not configured. Please contact us to complete this reservation.",
+        };
+      }
 
       return {
         ok: true,
@@ -126,8 +176,10 @@ export const quoteOrder = createServerFn({ method: "POST" })
         depositRequiredCents: result.depositRequiredCents,
         grandTotalCents: result.grandTotalCents,
         remainingBalanceCents: result.remainingBalanceCents,
+        projectedBalanceAfterDepositCents: result.projectedBalanceAfterDepositCents,
         hasUnresolvedRules: result.hasUnresolvedRules,
         unresolvedNotes: result.unresolvedNotes,
+        reviewedPrice: result.reviewedPrice,
       };
     } catch {
       return {

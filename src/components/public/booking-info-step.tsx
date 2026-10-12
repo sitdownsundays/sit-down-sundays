@@ -42,11 +42,20 @@ export function InfoStep({ state, onFieldChange, onBack, onContinue }: Props) {
     }
   }, [valid]);
 
+  // Single source of the input id + ARIA wiring. Spread onto the Input /
+  // Textarea so the explicit `id` is not duplicated.
   const fieldProps = (field: keyof ContactFieldErrors, id: string) => ({
     id,
     "aria-invalid": Boolean(errors[field]) || undefined,
     "aria-describedby": errors[field] ? `${id}-error` : undefined,
   });
+
+  // Omit the optional `error` prop on FormField when there is no message, so
+  // an explicit `undefined` is never passed under exactOptionalPropertyTypes.
+  const fieldError = (field: keyof ContactFieldErrors): { error?: string } => {
+    const message = errors[field];
+    return message ? { error: message } : {};
+  };
 
   return (
     <section aria-labelledby="step-info-heading">
@@ -67,10 +76,9 @@ export function InfoStep({ state, onFieldChange, onBack, onContinue }: Props) {
               label="First name"
               htmlFor="contact-first-name"
               required
-              error={errors.contactFirstName}
+              {...fieldError("contactFirstName")}
             >
               <Input
-                id="contact-first-name"
                 type="text"
                 autoComplete="given-name"
                 maxLength={CONTACT_LIMITS.firstNameMax}
@@ -88,10 +96,9 @@ export function InfoStep({ state, onFieldChange, onBack, onContinue }: Props) {
               label="Last name"
               htmlFor="contact-last-name"
               required
-              error={errors.contactLastName}
+              {...fieldError("contactLastName")}
             >
               <Input
-                id="contact-last-name"
                 type="text"
                 autoComplete="family-name"
                 maxLength={CONTACT_LIMITS.lastNameMax}
@@ -109,10 +116,9 @@ export function InfoStep({ state, onFieldChange, onBack, onContinue }: Props) {
               label="Email address"
               htmlFor="contact-email"
               required
-              error={errors.contactEmail}
+              {...fieldError("contactEmail")}
             >
               <Input
-                id="contact-email"
                 type="email"
                 inputMode="email"
                 autoComplete="email"
@@ -131,10 +137,9 @@ export function InfoStep({ state, onFieldChange, onBack, onContinue }: Props) {
               label="Phone number"
               htmlFor="contact-phone"
               required
-              error={errors.contactPhone}
+              {...fieldError("contactPhone")}
             >
               <Input
-                id="contact-phone"
                 type="tel"
                 inputMode="tel"
                 autoComplete="tel"
@@ -162,29 +167,17 @@ export function InfoStep({ state, onFieldChange, onBack, onContinue }: Props) {
             follow up if we need more details.
           </p>
           <div className="mt-4 space-y-4">
-            <FormField
-              label="Dietary notes / allergies"
-              htmlFor="dietary-notes"
-              error={errors.dietaryNotes}
-              hint={`Up to ${CONTACT_LIMITS.notesMax} characters`}
-            >
-              <Textarea
-                id="dietary-notes"
-                rows={3}
-                maxLength={CONTACT_LIMITS.notesMax}
-                value={state.contact.dietaryNotes}
-                onChange={(e) => onFieldChange("dietaryNotes", e.target.value)}
-                {...fieldProps("dietaryNotes", "dietary-notes")}
-              />
-            </FormField>
+            <div className="flex items-start gap-1.5 text-sm text-muted-foreground">
+              <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+              <p>{"Enter each guest's allergies and dietary needs in Meals & extras."}</p>
+            </div>
             <FormField
               label="Accessibility requests"
               htmlFor="accessibility-requests"
-              error={errors.accessibilityRequests}
+              {...fieldError("accessibilityRequests")}
               hint={`Up to ${CONTACT_LIMITS.notesMax} characters`}
             >
               <Textarea
-                id="accessibility-requests"
                 rows={3}
                 maxLength={CONTACT_LIMITS.notesMax}
                 value={state.contact.accessibilityRequests}
@@ -195,11 +188,10 @@ export function InfoStep({ state, onFieldChange, onBack, onContinue }: Props) {
             <FormField
               label="Occasion"
               htmlFor="occasion"
-              error={errors.occasion}
+              {...fieldError("occasion")}
               hint={`Up to ${CONTACT_LIMITS.occasionMax} characters`}
             >
               <Input
-                id="occasion"
                 type="text"
                 maxLength={CONTACT_LIMITS.occasionMax}
                 value={state.contact.occasion}
@@ -210,11 +202,10 @@ export function InfoStep({ state, onFieldChange, onBack, onContinue }: Props) {
             <FormField
               label="General requests"
               htmlFor="guest-notes"
-              error={errors.guestNotes}
+              {...fieldError("guestNotes")}
               hint={`Up to ${CONTACT_LIMITS.notesMax} characters`}
             >
               <Textarea
-                id="guest-notes"
                 rows={3}
                 maxLength={CONTACT_LIMITS.notesMax}
                 value={state.contact.guestNotes}

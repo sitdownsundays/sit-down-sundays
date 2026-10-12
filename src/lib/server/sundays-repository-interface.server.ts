@@ -55,6 +55,12 @@ export interface ISundaysRepository {
     input: UpdatePaymentPolicyInput,
   ): Promise<PaymentPolicyOperationResult>;
 
+  // Capacity enforcement readiness (from capacity_control.ready).
+  // Installed as false; the atomic submission RPC rejects new requests with
+  // capacity_not_ready until activation. This read is advisory only — the RPC
+  // remains authoritative.
+  capacityReady(): Promise<boolean>;
+
   // Physical dining tables
   listDiningTables(spaceId?: string): Promise<DiningTableDTO[]>;
   createDiningTable(

@@ -197,6 +197,89 @@ export const updateGuestPricingRulesSchema = z
     }
   });
 
+/* --------------------- Per-package guest pricing (0025) --------------------- */
+
+/**
+ * Strict browser input for update_package_guest_pricing_atomic (migration 0025).
+ *
+ * All six pricing fields are REQUIRED, including explicit nulls. The actor
+ * user ID is derived from the verified server session — never from the
+ * browser. Unknown keys are rejected.
+ *
+ * Rule-type combination rules match the 0024 CHECK constraints:
+ *   - null or "none": both amount fields must be null.
+ *   - fixed_package_price: nonnegative integer cents; percentage must be null.
+ *   - percentage_discount: integer basis points 0–10000; fixed cents must be null.
+ *
+ * The database remains authoritative for checking fixed price against the
+ * current package price — this schema only validates shape.
+ */
+const nullableRuleType = z.enum(["none", "fixed_package_price", "percentage_discount"] as [
+  string,
+  ...string[],
+]);
+
+export const updatePackageGuestPricingSchema = z
+  .object({
+    packageId: z.string().uuid("Invalid package ID"),
+    expectedUpdatedAt: z.string().min(1, "expectedUpdatedAt is required"),
+    childRuleType: nullableRuleType.nullable(),
+    childFixedPriceCents: z.number().int().min(0).nullable(),
+    childDiscountBasisPoints: z.number().int().min(0).max(10000).nullable(),
+    seniorRuleType: nullableRuleType.nullable(),
+    seniorFixedPriceCents: z.number().int().min(0).nullable(),
+    seniorDiscountBasisPoints: z.number().int().min(0).max(10000).nullable(),
+  })
+  .strict()
+  .superRefine((val, ctx) => {
+    for (const prefix of ["child", "senior"] as const) {
+      const ruleType = val[`${prefix}RuleType` as "childRuleType"] as string | null;
+      const fixed = val[`${prefix}FixedPriceCents` as "childFixedPriceCents"];
+      const pct = val[`${prefix}DiscountBasisPoints` as "childDiscountBasisPoints"];
+      if (ruleType === null || ruleType === "none") {
+        if (fixed !== null || pct !== null) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [`${prefix}FixedPriceCents`],
+            message: `${prefix} amount fields must be null when the rule type is ${ruleType === null ? "null" : "none"}.`,
+          });
+        }
+      } else if (ruleType === "fixed_package_price") {
+        if (fixed === null) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [`${prefix}FixedPriceCents`],
+            message: `A fixed ${prefix} package price is required when the rule type is fixed package price.`,
+          });
+        }
+        if (pct !== null) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [`${prefix}DiscountBasisPoints`],
+            message: `${prefix} discount basis points must be null when the rule type is fixed package price.`,
+          });
+        }
+      } else if (ruleType === "percentage_discount") {
+        if (pct === null) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [`${prefix}DiscountBasisPoints`],
+            message: `A ${prefix} discount percentage is required when the rule type is percentage discount.`,
+          });
+        }
+        if (fixed !== null) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [`${prefix}FixedPriceCents`],
+            message: `${prefix} fixed price must be null when the rule type is percentage discount.`,
+          });
+        }
+      }
+    }
+  });
+
+export type UpdatePackageGuestPricingSchema = z.infer<typeof updatePackageGuestPricingSchema>;
+
 export type CreateMealPackageSchema = z.infer<typeof createMealPackageSchema>;
 export type UpdateMealPackageSchema = z.infer<typeof updateMealPackageSchema>;
 export type CreateIndividualAddonSchema = z.infer<typeof createIndividualAddonSchema>;

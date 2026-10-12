@@ -32,6 +32,7 @@ import { useBookingMeals } from "@/lib/booking/use-booking-meals";
 import { MealsStep } from "@/components/public/booking-meals-step";
 import { InfoStep } from "@/components/public/booking-info-step";
 import { ReviewStep } from "@/components/public/booking-review-step";
+import { OptionCard } from "@/components/public/booking-option-card";
 import { useSubmissionController } from "@/lib/booking/use-submission-controller";
 import { validateContact } from "@/lib/booking/contact-rules";
 
@@ -51,6 +52,7 @@ import {
   type BookWizardState,
   type SundayGroup,
   applyRefresh,
+  capacityFromOption,
   findOption,
   formatServiceDate,
   formatSeatingTime,
@@ -59,9 +61,8 @@ import {
   reconcileSelection,
   totalGuests,
   validateParty,
+  validatePartyCapacity,
 } from "@/lib/booking/wizard-helpers";
-
-const SCHEMA_PARTY_LIMIT = 200;
 
 type LoadStatus = "loading" | "success" | "error";
 
@@ -156,8 +157,8 @@ export function BookingWizard() {
   const submission = useSubmissionController(async (input) => submitFn(input));
 
   const groups: SundayGroup[] = loadStatus === "success" ? groupOptionsBySunday(options) : [];
-  const selectedCeiling = state.selectedOption?.configuredRequestCeiling ?? null;
-  const party = validateParty(state, selectedCeiling);
+  const selectedCapacity = capacityFromOption(state.selectedOption);
+  const party = validatePartyCapacity(state, selectedCapacity);
   const guestCount = totalGuests(state);
 
   const selectOption = useCallback((opt: PublicAvailabilityOption) => {
@@ -197,6 +198,14 @@ export function BookingWizard() {
   } | null>(null);
 
   const goToMeals = useCallback(() => {
+    // Guard the handler itself, not just the disabled button: loading/error
+    // states, missing/invalid capacity, and over-capacity party sizes must all
+    // block progression before any state changes or meal reconciliation.
+    if (loadStatus !== "success") return;
+    const cap = capacityFromOption(stateRef.current.selectedOption);
+    if (!cap) return;
+    const partyCheck = validatePartyCapacity(stateRef.current, cap);
+    if (partyCheck.error) return;
     // Compute reconciliation OUTSIDE the setState updater so side effects
     // (setPendingReconcile) are not called inside a pure state transition.
     // Use the shared-feast reconciliation so NEW guests inherit the existing
@@ -224,7 +233,7 @@ export function BookingWizard() {
       step: "meals" as BookStep,
       meals: { ...s.meals, allocations: rec.allocations },
     }));
-  }, []);
+  }, [loadStatus]);
 
   const confirmReconcile = useCallback(() => {
     if (!pendingReconcile) return;
@@ -279,8 +288,10 @@ export function BookingWizard() {
   }, []);
 
   const canContinueStep1 =
+    loadStatus === "success" &&
     state.sundayServiceId !== null &&
     state.seatingTimeId !== null &&
+    selectedCapacity !== null &&
     party.error === null &&
     guestCount >= 1;
 
@@ -340,7 +351,7 @@ export function BookingWizard() {
                 <div className="mt-6">
                   <ErrorState
                     title="Couldn't load availability"
-                    message={loadError ?? undefined}
+                    {...(loadError ? { message: loadError } : {})}
                     action={
                       <Button variant="outline" onClick={() => void loadAvailability()}>
                         Try again
@@ -395,37 +406,17 @@ export function BookingWizard() {
                         </div>
 
                         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                          {group.options.map((opt) => {
-                            const selected =
-                              state.sundayServiceId === opt.sundayService.id &&
-                              state.seatingTimeId === opt.seatingTime.id;
-                            return (
-                              <button
-                                key={opt.seatingTime.id}
-                                type="button"
-                                onClick={() => selectOption(opt)}
-                                aria-pressed={selected}
-                                className={[
-                                  "flex flex-col gap-1 rounded-md border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                                  selected
-                                    ? "border-primary bg-primary/10"
-                                    : "border-border bg-background hover:border-primary/40 hover:bg-accent/40",
-                                ].join(" ")}
-                              >
-                                <span className="flex items-center gap-2 text-sm font-medium text-foreground">
-                                  <Clock className="size-4 text-primary" aria-hidden />
-                                  {formatSeatingTime(opt.seatingTime.startTime)} –{" "}
-                                  {formatSeatingTime(opt.seatingTime.endTime)}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {opt.spaceName}
-                                </span>
-                                <span className="mt-1 text-xs text-muted-foreground">
-                                  Up to {opt.configuredRequestCeiling} guests per request
-                                </span>
-                              </button>
-                            );
-                          })}
+                          {group.options.map((o) => (
+                            <OptionCard
+                              key={o.seatingTime.id}
+                              option={o}
+                              selected={
+                                state.sundayServiceId === o.sundayService.id &&
+                                state.seatingTimeId === o.seatingTime.id
+                              }
+                              onSelect={selectOption}
+                            />
+                          ))}
                         </div>
                       </div>
                     );
@@ -481,11 +472,14 @@ export function BookingWizard() {
                   </p>
                 )}
 
-                {selectedCeiling !== null && guestCount > 0 && guestCount <= selectedCeiling && (
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    Within the {selectedCeiling}-guest request limit for this seating.
-                  </p>
-                )}
+                {selectedCapacity !== null &&
+                  guestCount > 0 &&
+                  guestCount <= selectedCapacity.maxBookablePartySize && (
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      Within the {selectedCapacity.maxBookablePartySize}-guest limit for this
+                      seating.
+                    </p>
+                  )}
               </div>
 
               {/* Navigation */}

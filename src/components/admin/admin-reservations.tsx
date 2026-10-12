@@ -13,17 +13,17 @@
  * Stale-response protection: a request-generation counter guards both the
  * list and the detail fetch so an older async response cannot overwrite a
  * newer selection or filter set.
+ *
+ * The ReservationDetail presentation component and its label helpers were
+ * extracted to @/components/admin/reservation-detail for file-size
+ * reorganization. Behavior is unchanged.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, RefreshCw, Search, X } from "lucide-react";
+import { RefreshCw, Search, X } from "lucide-react";
 
 import { getReservationDetail, listReservations } from "@/lib/reservation.functions";
 import type { ReservationDetailDTO, ReservationListItemDTO } from "@/lib/reservation/types";
-import type {
-  PaymentStatus as DomainPaymentStatus,
-  ReservationStatus as DomainReservationStatus,
-} from "@/lib/domain/types";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/layout/empty-state";
@@ -32,21 +32,38 @@ import { LoadingState } from "@/components/layout/loading-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StatusBadge } from "@/components/layout/status-badge";
-import { GuestDietaryNeeds } from "@/components/admin/guest-dietary-needs";
-import { PartyFeastSummary } from "@/components/admin/party-feast-summary";
 import { AssignTablesDialog } from "@/components/admin/assign-tables-dialog";
-import { CancelReservationDialog } from "@/components/admin/cancel-reservation-dialog";
-import { isCancellableStatus } from "@/components/admin/cancel-reservation-helpers";
-import { ConfirmReservationDialog } from "@/components/admin/confirm-reservation-dialog";
-import { isConfirmableStatus } from "@/components/admin/confirm-reservation-helpers";
-import { CurrencyDisplay, formatCurrency } from "@/components/layout/currency-display";
-import { PermissionGate } from "@/components/layout/permission-gate";
+import { CancelReservationPanel } from "@/components/admin/cancel-reservation-panel";
+import { ConfirmReservationPanel } from "@/components/admin/confirm-reservation-panel";
+import { ApprovalReservationDialog } from "@/components/admin/approval-reservation-dialog";
 import {
-  PAYMENT_STATUS_LABELS,
-  PAYMENT_STATUS_TONE,
-  RESERVATION_STATUS_LABELS,
-  RESERVATION_STATUS_TONE,
-} from "@/lib/domain/statuses";
+  createApprovalGate,
+  blockGate,
+  clearGate,
+  isGateBlocked,
+  applyReloadToGate,
+  type ApprovalGateMap,
+} from "@/components/admin/approval-reservation-controller";
+import {
+  assessReloadResponse,
+  type ApprovalReloadResult,
+} from "@/components/admin/approval-reservation-helpers";
+import { toast } from "sonner";
+import { formatCurrency } from "@/components/layout/currency-display";
+import {
+  ReservationDetail,
+  paymentLabel,
+  paymentTone,
+  statusLabel,
+  statusTone,
+} from "@/components/admin/reservation-detail";
+import {
+  REFRESH_SUCCESS,
+  refreshFailure,
+  refreshSuperseded,
+  type RefreshResult,
+  type CombinedRefreshResult,
+} from "@/components/admin/refresh-result-helpers";
 
 /* ----------------------------- Status filters ----------------------------- */
 
@@ -54,247 +71,9 @@ const STATUS_FILTERS: Array<{ value: string; label: string }> = [
   { value: "pending_review", label: "Pending Review" },
   { value: "confirmed", label: "Confirmed" },
   { value: "balance_due", label: "Balance Due" },
-  { value: "paid_in_full", label: "Paid in Full" },
+  { value: "paid_in_full", label: "Paid In Full" },
   { value: "cancelled", label: "Cancelled" },
 ];
-
-function statusLabel(s: string): string {
-  if (s === "pending_review") return "Pending review";
-  return RESERVATION_STATUS_LABELS[s as DomainReservationStatus] ?? s;
-}
-function statusTone(s: string) {
-  return RESERVATION_STATUS_TONE[s as DomainReservationStatus] ?? "neutral";
-}
-function paymentLabel(s: string): string {
-  return PAYMENT_STATUS_LABELS[s as DomainPaymentStatus] ?? s;
-}
-function paymentTone(s: string) {
-  return PAYMENT_STATUS_TONE[s as DomainPaymentStatus] ?? "neutral";
-}
-
-function formatDateLabel(iso: string): string {
-  try {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  } catch {
-    return iso;
-  }
-}
-
-/* ----------------------------- Detail view ----------------------------- */
-
-function ReservationDetail({
-  reservation,
-  onBack,
-  onAssignTables,
-  onCancel,
-  onConfirm,
-}: {
-  reservation: ReservationDetailDTO;
-  onBack: () => void;
-  onAssignTables: () => void;
-  onCancel: () => void;
-  onConfirm: () => void;
-}) {
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button variant="outline" onClick={onBack} size="sm">
-          <ArrowLeft className="size-4" aria-hidden />
-          Back to list
-        </Button>
-        <div className="flex flex-wrap items-center gap-2">
-          <PermissionGate permission="seating.manage">
-            <Button variant="default" onClick={onAssignTables} size="sm">
-              Assign tables
-            </Button>
-          </PermissionGate>
-          <PermissionGate permission="reservations.manage">
-            {isConfirmableStatus(reservation.status) && (
-              <Button variant="default" onClick={onConfirm} size="sm">
-                Confirm reservation
-              </Button>
-            )}
-          </PermissionGate>
-          <PermissionGate permission="reservations.manage">
-            {isCancellableStatus(reservation.status) && (
-              <Button variant="destructive" onClick={onCancel} size="sm">
-                Cancel reservation
-              </Button>
-            )}
-          </PermissionGate>
-          <StatusBadge tone={statusTone(reservation.status)}>
-            {statusLabel(reservation.status)}
-          </StatusBadge>
-          <StatusBadge tone={paymentTone(reservation.paymentStatus)}>
-            {paymentLabel(reservation.paymentStatus)}
-          </StatusBadge>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-border bg-card p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Reservation
-            </p>
-            <p className="font-display text-2xl font-bold text-foreground">
-              {reservation.reservationNumber}
-            </p>
-          </div>
-          <div className="text-right text-sm text-muted-foreground">
-            <p>Submitted {formatDateLabel(reservation.createdAt)}</p>
-            <p>Updated {formatDateLabel(reservation.updatedAt)}</p>
-          </div>
-        </div>
-
-        <dl className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Field label="Contact name">
-            {reservation.contactFirstName} {reservation.contactLastName}
-          </Field>
-          <Field label="Email">{reservation.contactEmail}</Field>
-          <Field label="Phone">{reservation.contactPhone}</Field>
-          <Field label="Service date">{reservation.serviceDate}</Field>
-          <Field label="Seating">
-            {reservation.seatingStartTime}–{reservation.seatingEndTime}
-          </Field>
-          <Field label="Room">{reservation.spaceName}</Field>
-          <Field label="Party size">{reservation.partySize}</Field>
-          <Field label="Adults / Seniors / Children">
-            {reservation.adults} / {reservation.seniors} / {reservation.children}
-          </Field>
-          <Field label="Experience">
-            {reservation.experienceType === "private_room" ? "Private room" : "Standard"}
-          </Field>
-        </dl>
-      </div>
-
-      {/* Guest dietary needs — personal notes within one party order */}
-      <GuestDietaryNeeds guests={reservation.guests} />
-
-      {/* Party-level notes & requests (separate from per-guest) */}
-      {(reservation.dietaryNotes ||
-        reservation.accessibilityRequests ||
-        reservation.guestNotes ||
-        reservation.occasion) && (
-        <div className="rounded-lg border border-border bg-card p-6">
-          <h3 className="font-display text-lg font-semibold text-foreground">
-            Party notes &amp; requests
-          </h3>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Requests are not guarantees. Staff review each reservation.
-          </p>
-          <div className="mt-4 space-y-3">
-            {reservation.dietaryNotes && (
-              <NoteBlock label="Dietary / allergy" text={reservation.dietaryNotes} />
-            )}
-            {reservation.accessibilityRequests && (
-              <NoteBlock label="Accessibility" text={reservation.accessibilityRequests} />
-            )}
-            {reservation.occasion && <NoteBlock label="Occasion" text={reservation.occasion} />}
-            {reservation.guestNotes && (
-              <NoteBlock label="General notes" text={reservation.guestNotes} />
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Meal summary — shared feast or guest-level breakdown */}
-      <PartyFeastSummary guests={reservation.guests} />
-
-      {/* Shared platters */}
-      {reservation.platters.length > 0 && (
-        <div className="rounded-lg border border-border bg-card p-6">
-          <h3 className="font-display text-lg font-semibold text-foreground">Shared platters</h3>
-          <ul className="mt-4 space-y-2 text-sm">
-            {reservation.platters.map((p) => (
-              <li key={p.id} className="flex justify-between">
-                <span>
-                  {p.platterNameSnapshot} × {p.quantity}
-                </span>
-                <CurrencyDisplay cents={p.pricePerPlatterSnapshot * p.quantity} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Pricing & payment snapshot */}
-      <div className="rounded-lg border border-border bg-card p-6">
-        <h3 className="font-display text-lg font-semibold text-foreground">Pricing & payment</h3>
-        <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Row label="Subtotal">
-            <CurrencyDisplay cents={reservation.subtotalCents} />
-          </Row>
-          <Row label="Deposit required">
-            <CurrencyDisplay cents={reservation.depositRequiredCents} />
-          </Row>
-          <Row label="Grand total">
-            <CurrencyDisplay cents={reservation.grandTotalCents} />
-          </Row>
-          <Row label="Amount paid">
-            <CurrencyDisplay cents={reservation.amountPaidCents} />
-          </Row>
-          <Row label="Remaining balance">
-            <CurrencyDisplay cents={reservation.remainingBalanceCents} />
-          </Row>
-          <Row label="Balance deadline">
-            {reservation.balanceDeadline ? formatDateLabel(reservation.balanceDeadline) : "—"}
-          </Row>
-        </dl>
-        <p className="mt-4 text-xs text-muted-foreground">
-          These are saved snapshots of the agreed terms at submission. No payment has been collected
-          in this phase.
-        </p>
-      </div>
-
-      {reservation.internalNotes && (
-        <div className="rounded-lg border border-border bg-card p-6">
-          <h3 className="font-display text-lg font-semibold text-foreground">Internal notes</h3>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-foreground">
-            {reservation.internalNotes}
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        {label}
-      </dt>
-      <dd className="mt-1 text-sm text-foreground">{children}</dd>
-    </div>
-  );
-}
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between border-b border-border pb-2">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium text-foreground">{children}</dd>
-    </div>
-  );
-}
-
-function NoteBlock({ label, text }: { label: string; text: string }) {
-  return (
-    <div className="rounded-md bg-accent/40 p-3">
-      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">{text}</p>
-    </div>
-  );
-}
 
 /* ----------------------------- List view ----------------------------- */
 
@@ -320,6 +99,8 @@ export function AdminReservationsPage() {
   const [cancelReservation, setCancelReservation] = useState<ReservationDetailDTO | null>(null);
   const [confirmReservationState, setConfirmReservationState] =
     useState<ReservationDetailDTO | null>(null);
+  const [approvalReservation, setApprovalReservation] = useState<ReservationDetailDTO | null>(null);
+  const [approvalGate, setApprovalGate] = useState<ApprovalGateMap>({});
 
   const listGenRef = useRef(0);
   const detailGenRef = useRef(0);
@@ -330,7 +111,7 @@ export function AdminReservationsPage() {
     return () => clearTimeout(t);
   }, [search]);
 
-  const reload = useCallback(async () => {
+  const reload = useCallback(async (): Promise<RefreshResult> => {
     const gen = ++listGenRef.current;
     setLoadState("loading");
     setLoadError("");
@@ -342,18 +123,21 @@ export function AdminReservationsPage() {
         },
       });
       // Stale-response guard: ignore if a newer request started.
-      if (gen !== listGenRef.current) return;
+      if (gen !== listGenRef.current) return refreshSuperseded();
       if (res.ok) {
         setReservations(res.reservations);
         setLoadState("loaded");
+        return REFRESH_SUCCESS;
       } else {
         setLoadError(res.error);
         setLoadState("error");
+        return refreshFailure(res.error);
       }
     } catch {
-      if (gen !== listGenRef.current) return;
+      if (gen !== listGenRef.current) return refreshSuperseded();
       setLoadError("Reservations could not be loaded.");
       setLoadState("error");
+      return refreshFailure("Reservations could not be loaded.");
     }
   }, [listReservationsFn, statusFilter, debouncedSearch]);
 
@@ -362,7 +146,7 @@ export function AdminReservationsPage() {
   }, [reload]);
 
   const openDetail = useCallback(
-    async (id: string) => {
+    async (id: string): Promise<RefreshResult> => {
       const gen = ++detailGenRef.current;
       setSelectedId(id);
       setDetail(null);
@@ -370,18 +154,21 @@ export function AdminReservationsPage() {
       setDetailError("");
       try {
         const res = await getReservationDetailFn({ data: { id } });
-        if (gen !== detailGenRef.current) return;
+        if (gen !== detailGenRef.current) return refreshSuperseded();
         if (res.ok) {
           setDetail(res.reservation);
           setDetailState("loaded");
+          return REFRESH_SUCCESS;
         } else {
           setDetailError(res.error);
           setDetailState("error");
+          return refreshFailure(res.error);
         }
       } catch {
-        if (gen !== detailGenRef.current) return;
+        if (gen !== detailGenRef.current) return refreshSuperseded();
         setDetailError("This reservation could not be loaded.");
         setDetailState("error");
+        return refreshFailure("This reservation could not be loaded.");
       }
     },
     [getReservationDetailFn],
@@ -394,6 +181,42 @@ export function AdminReservationsPage() {
     setDetailState("loading");
     setDetailError("");
   }, []);
+
+  /* -------- Approval: reload + save callbacks -------- */
+  const reloadApprovalReservation = useCallback(async (): Promise<ApprovalReloadResult> => {
+    if (!selectedId)
+      return { success: false, reservation: null, error: "No reservation selected." };
+    const gen = ++detailGenRef.current;
+    try {
+      const res = await getReservationDetailFn({ data: { id: selectedId } });
+      if (gen !== detailGenRef.current) {
+        return { success: false, reservation: null, error: "A newer request is in progress." };
+      }
+      // Discriminate the endpoint's { ok, reservation? } contract via the
+      // extracted helper. The caller still owns generation/identity guards;
+      // a stale or failed response never adopts state or clears the gate.
+      const reloadResult = assessReloadResponse(res);
+      if (reloadResult.success && reloadResult.reservation) {
+        setDetail(reloadResult.reservation);
+        setApprovalReservation(reloadResult.reservation);
+        setApprovalGate((g) => applyReloadToGate(g, reloadResult).gate);
+      }
+      return reloadResult;
+    } catch {
+      return { success: false, reservation: null, error: "Could not reload the reservation." };
+    }
+  }, [selectedId, getReservationDetailFn]);
+
+  const handleApprovalSaved = useCallback(
+    async (message: string): Promise<CombinedRefreshResult> => {
+      if (selectedId) setApprovalGate((g) => clearGate(g, selectedId));
+      toast.success(message);
+      const detailResult = selectedId ? await openDetail(selectedId) : refreshSuperseded();
+      const listResult = await reload();
+      return { detail: detailResult, list: listResult };
+    },
+    [selectedId, openDetail, reload],
+  );
 
   /* ---------------- Detail panel ---------------- */
   if (selectedId) {
@@ -429,6 +252,7 @@ export function AdminReservationsPage() {
             onAssignTables={() => setAssignTablesId(selectedId)}
             onCancel={() => setCancelReservation(detail)}
             onConfirm={() => setConfirmReservationState(detail)}
+            onApproveForPayment={() => setApprovalReservation(detail)}
           />
         )}
         <AssignTablesDialog
@@ -439,29 +263,44 @@ export function AdminReservationsPage() {
           }}
           onClose={() => setAssignTablesId(null)}
         />
-        <CancelReservationDialog
+        <CancelReservationPanel
           reservation={cancelReservation}
-          onSaved={() => {
-            if (selectedId) void openDetail(selectedId);
-            void reload();
-          }}
           onClose={() => setCancelReservation(null)}
-          onReload={() => {
-            if (selectedId) void openDetail(selectedId);
-            void reload();
+          onAdoptDetail={(fresh) => {
+            setDetail(fresh);
+            setCancelReservation(fresh);
           }}
+          onRefreshDetail={async () => {
+            if (!selectedId) return refreshSuperseded();
+            return openDetail(selectedId);
+          }}
+          onRefreshList={() => reload()}
         />
-        <ConfirmReservationDialog
+        <ConfirmReservationPanel
           reservation={confirmReservationState}
-          onSaved={() => {
-            if (selectedId) void openDetail(selectedId);
-            void reload();
-          }}
           onClose={() => setConfirmReservationState(null)}
-          onReload={() => {
-            if (selectedId) void openDetail(selectedId);
-            void reload();
+          onAdoptDetail={(fresh) => {
+            // Adopt the exact fetched record into the displayed detail — no
+            // second fetch. Update the confirmation dialog state too so it
+            // shows the fresh record/timestamp.
+            setDetail(fresh);
+            setConfirmReservationState(fresh);
           }}
+          onRefreshDetail={async () => {
+            if (!selectedId) return refreshSuperseded();
+            return openDetail(selectedId);
+          }}
+          onRefreshList={() => reload()}
+        />
+        <ApprovalReservationDialog
+          reservation={approvalReservation}
+          onSaved={handleApprovalSaved}
+          onClose={() => setApprovalReservation(null)}
+          onReload={reloadApprovalReservation}
+          gateBlocked={
+            approvalReservation ? isGateBlocked(approvalGate, approvalReservation.id) : false
+          }
+          onRequireReload={(id) => setApprovalGate((g) => blockGate(g, id))}
         />
       </div>
     );

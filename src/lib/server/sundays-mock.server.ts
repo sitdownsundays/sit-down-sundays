@@ -71,7 +71,13 @@ export class MockSundaysRepository implements ISundaysRepository {
     depositPercent: DEFAULT_DEPOSIT_PERCENT,
     defaultBalanceDeadlineHours: DEFAULT_BALANCE_DEADLINE_HOURS,
     restaurantTimezone: null,
+    taxRateBasisPoints: null,
+    gratuityRateBasisPoints: null,
+    taxOnGratuity: null,
+    createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    createdBy: null,
+    updatedBy: null,
   };
 
   async listAllSundayServices(): Promise<SundayServiceDTO[]> {
@@ -99,6 +105,7 @@ export class MockSundaysRepository implements ISundaysRepository {
       status: (input.status ?? "scheduled") as SundayStatus,
       spaceId: input.spaceId,
       onlineBookingLimit: input.onlineBookingLimit ?? null,
+      capacityResourceId: input.capacityResourceId ?? null,
       isActive: input.isActive ?? true,
       displayOrder: input.displayOrder ?? 0,
       createdAt: now,
@@ -137,6 +144,10 @@ export class MockSundaysRepository implements ISundaysRepository {
         input.onlineBookingLimit !== undefined
           ? input.onlineBookingLimit
           : existing.onlineBookingLimit,
+      capacityResourceId:
+        input.capacityResourceId !== undefined
+          ? input.capacityResourceId
+          : existing.capacityResourceId,
       isActive: input.isActive !== undefined ? input.isActive : existing.isActive,
       displayOrder: input.displayOrder !== undefined ? input.displayOrder : existing.displayOrder,
       updatedAt: new Date().toISOString(),
@@ -231,12 +242,26 @@ export class MockSundaysRepository implements ISundaysRepository {
         error: "Payment policy was modified by another user. Please reload the latest data.",
       };
     }
+    // Omitted optional fields leave the existing value unchanged. Explicit
+    // null clears to "not configured". 0 and false are valid supplied values.
     const updated: PaymentPolicyDTO = {
       ...this.paymentPolicy,
       depositPercent: input.depositPercent,
       defaultBalanceDeadlineHours: input.defaultBalanceDeadlineHours,
       restaurantTimezone: input.restaurantTimezone,
-      updatedAt: new Date().toISOString(),
+      taxRateBasisPoints:
+        input.taxRateBasisPoints !== undefined
+          ? input.taxRateBasisPoints
+          : this.paymentPolicy.taxRateBasisPoints,
+      gratuityRateBasisPoints:
+        input.gratuityRateBasisPoints !== undefined
+          ? input.gratuityRateBasisPoints
+          : this.paymentPolicy.gratuityRateBasisPoints,
+      taxOnGratuity:
+        input.taxOnGratuity !== undefined ? input.taxOnGratuity : this.paymentPolicy.taxOnGratuity,
+      updatedAt: new Date(
+        Math.max(Date.now(), Date.parse(this.paymentPolicy.updatedAt) + 1),
+      ).toISOString(),
       updatedBy: actorUserId,
     };
     this.paymentPolicy = updated;
@@ -349,5 +374,13 @@ export class MockSundaysRepository implements ISundaysRepository {
     };
     this.diningTables[idx] = updated;
     return { success: true, data: { ...updated } };
+  }
+
+  // Capacity enforcement readiness (from capacity_control.ready). Mock
+  // returns false — mirrors the installed default (capacity_control row
+  // seeded with ready=false in 0019). The atomic submission RPC rejects new
+  // requests with capacity_not_ready until activation.
+  async capacityReady(): Promise<boolean> {
+    return false;
   }
 }

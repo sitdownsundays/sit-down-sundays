@@ -43,6 +43,7 @@ function space(over: Partial<VenueSpaceDTO> = {}): VenueSpaceDTO {
     spaceType: "general_dining",
     reportedCapacity: 950,
     onlineBookingLimit: 100,
+    capacityResourceId: null,
     isActive: true,
     displayOrder: 0,
     createdAt: "2026-01-01T00:00:00.000Z",
@@ -93,6 +94,11 @@ function policy(over: Partial<PaymentPolicyDTO> = {}): PaymentPolicyDTO {
   return {
     depositPercent: 50,
     defaultBalanceDeadlineHours: 72,
+    // Explicit "no charges" — valid configured policy (food-only total).
+    // NULL/undefined would fail pricing under the corrected contract.
+    taxRateBasisPoints: 0,
+    gratuityRateBasisPoints: 0,
+    taxOnGratuity: false,
     restaurantTimezone: "America/Chicago",
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
@@ -635,6 +641,17 @@ function baseInput(over: Record<string, unknown> = {}) {
     guests: validGuests(2),
     platters: [] as Array<{ platterId: string; quantity: number }>,
     idempotencyKey: "key-1",
+    clientPreviewPrice: {
+      subtotalCents: 5900,
+      gratuityCents: 0,
+      taxCents: 0,
+      grandTotalCents: 5900,
+      depositRequiredCents: 2950,
+      appliedGratuityRateBasisPoints: 0,
+      appliedTaxRateBasisPoints: 0,
+      appliedTaxOnGratuity: false,
+      appliedDepositPercent: 50,
+    },
     ...over,
   };
 }
@@ -785,9 +802,21 @@ describe("handleSubmitReservationRequest — eligibility + party validation", ()
     expect(reservationMock.submitRequest).not.toHaveBeenCalled();
   });
 
-  it("rejects a preview-to-submit subtotal drift with a review-required result", async () => {
+  it("rejects a preview-to-submit drift with a review-required result", async () => {
     const r = await handleSubmitReservationRequest(
-      baseInput({ clientPreviewSubtotalCents: 999999 }) as never,
+      baseInput({
+        clientPreviewPrice: {
+          subtotalCents: 999999,
+          gratuityCents: 0,
+          taxCents: 0,
+          grandTotalCents: 999999,
+          depositRequiredCents: 2950,
+          appliedGratuityRateBasisPoints: 0,
+          appliedTaxRateBasisPoints: 0,
+          appliedTaxOnGratuity: false,
+          appliedDepositPercent: 50,
+        },
+      }) as never,
     );
     expect(r.success).toBe(false);
     expect(reservationMock.submitRequest).not.toHaveBeenCalled();

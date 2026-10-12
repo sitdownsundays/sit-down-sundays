@@ -28,7 +28,7 @@
  *    UNCONFIGURED until the owner confirms. The engine does not enforce
  *    uniqueness; it only enforces the count and eligibility.
  */
-import type { GuestCategory } from "./constants";
+import type { GuestCategory, ChildRuleType } from "./constants";
 import type {
   GuestPricingRulesDTO,
   MealPackageDTO,
@@ -97,6 +97,27 @@ function discountAmount(chargeCents: number, percent: number): number {
 }
 
 /**
+ * Per-package percentage discount computed directly from integer cents and
+ * integer basis points — no intermediate floating-point percentage.
+ *
+ * 100 basis points = 1%, so the discount is (baseCents × basisPoints) / 10000,
+ * rounded once, half-up (positive half-cents round up via Math.round). This
+ * avoids the floating-point drift of dividing basis points by 100 BEFORE
+ * multiplying (e.g. 6460/100 = 64.6 is not exactly representable, so
+ * 250 × 64.6 / 100 could land at 161.4999… and round to 161 instead of 162).
+ *
+ * The integer product is validated as a safe integer; if it is not, returns
+ * null so the caller can reject unsafe arithmetic rather than returning a
+ * misleading amount.
+ */
+function discountFromBasisPoints(baseCents: number, basisPoints: number): number | null {
+  if (baseCents <= 0 || basisPoints <= 0) return 0;
+  const product = baseCents * basisPoints;
+  if (!Number.isSafeInteger(product)) return null;
+  return roundCents(product / 10000);
+}
+
+/**
  * Validate a guest's included selections against the package's eligible items
  * and included counts. Returns notes for ineligible or over-count selections.
  * Included selections are NEVER charged again — this only produces validation
@@ -155,8 +176,143 @@ export function validateIncludedSelections(guest: OrderGuest, pkg: MealPackageDT
 }
 
 /**
+ * Per-package override resolution for a single guest category.
+ *
+ * An explicit package rule REPLACES the corresponding global package rule;
+ * never stack both discounts. null = preserve existing global behavior
+ * exactly. "none" = explicitly charge this package's regular price (no
+ * discount). Malformed explicit rules FAIL; they never silently fall back
+ * to global pricing.
+ *
+ * Returns the resolved charge (base), discount (>= 0), and optional note.
+ * chargeCents is the GROSS package price; discountCents is the single
+ * discount applied as a separate line (calculateOrder subtracts it once).
+ */
+function resolvePackageOverride(
+  base: number,
+  ruleType: ChildRuleType | null,
+  fixedCents: number | null,
+  discountBasisPoints: number | null,
+  fieldLabel: string,
+): { chargeCents: number; discountCents: number; note?: string } {
+  // null = no override; caller applies the global rule. Both numeric fields
+  // must still be null — a non-null value alongside a null rule is a
+  // contradictory configuration and must surface as unresolved.
+  if (ruleType === null) {
+    if (fixedCents !== null || discountBasisPoints !== null) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} pricing rule is not set but an amount is present; full package price applied.`,
+      };
+    }
+    return { chargeCents: base, discountCents: 0 };
+  }
+  if (ruleType === "none") {
+    // Explicitly no discount — full regular package price. Both numeric
+    // fields must be null; a non-null value is contradictory.
+    if (fixedCents !== null || discountBasisPoints !== null) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} pricing rule is "none" but an amount is present; full package price applied.`,
+      };
+    }
+    return { chargeCents: base, discountCents: 0 };
+  }
+  if (ruleType === "fixed_package_price") {
+    // fixed_package_price requires a fixed price and must NOT have a
+    // percentage value — both present is a contradictory configuration.
+    if (discountBasisPoints !== null) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} fixed-price rule also has a percentage value; full package price applied.`,
+      };
+    }
+    if (fixedCents === null) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} fixed price is not configured; full package price applied.`,
+      };
+    }
+    if (!Number.isInteger(fixedCents) || fixedCents < 0) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} fixed price is not a valid nonnegative integer; full package price applied.`,
+      };
+    }
+    if (fixedCents > base) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} fixed price exceeds the regular package price; full package price applied.`,
+      };
+    }
+    // Gross base charged; discount line carries (base − fixedPrice).
+    return { chargeCents: base, discountCents: base - fixedCents };
+  }
+  if (ruleType === "percentage_discount") {
+    // percentage_discount requires basis points and must NOT have a fixed
+    // price — both present is a contradictory configuration.
+    if (fixedCents !== null) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} percentage-discount rule also has a fixed price; full package price applied.`,
+      };
+    }
+    if (discountBasisPoints === null) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} discount basis points are not configured; full package price applied.`,
+      };
+    }
+    if (!Number.isInteger(discountBasisPoints) || discountBasisPoints < 0) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} discount basis points are not a valid nonnegative integer; full package price applied.`,
+      };
+    }
+    if (discountBasisPoints > 10000) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} discount basis points exceed 10000; full package price applied.`,
+      };
+    }
+    // Integer cents × integer basis points, rounded once: 100 bp = 1%.
+    // Avoids floating-point drift from dividing basis points by 100 first.
+    const disc = discountFromBasisPoints(base, discountBasisPoints);
+    if (disc === null) {
+      return {
+        chargeCents: base,
+        discountCents: 0,
+        note: `${fieldLabel} discount cannot be calculated safely; full package price applied.`,
+      };
+    }
+    return { chargeCents: base, discountCents: disc };
+  }
+  // Unknown rule type — fail safely, never silently fall back.
+  return {
+    chargeCents: base,
+    discountCents: 0,
+    note: `${fieldLabel} pricing rule type is unrecognized; full package price applied.`,
+  };
+}
+
+/**
  * Compute the per-person package charge for a guest, applying any configured
  * senior/child rule. Returns the charge and the discount applied (0 if none).
+ *
+ * Per-package overrides (0024) take precedence over global rules when
+ * explicitly configured. A null override preserves the existing global
+ * behavior exactly. "none" on the package explicitly charges the regular
+ * price, overriding any global discount for that category.
  */
 function guestPackageCharge(
   guest: OrderGuest,
@@ -166,8 +322,21 @@ function guestPackageCharge(
   const base = pkg.pricePerPersonCents;
 
   if (guest.category === "senior") {
+    // Per-package senior override replaces the global senior package rule.
+    const perPackage = resolvePackageOverride(
+      base,
+      pkg.seniorRuleType,
+      pkg.seniorFixedPriceCents,
+      pkg.seniorDiscountBasisPoints,
+      "Senior",
+    );
+    // Even a null rule type must surface a note when a numeric field is
+    // non-null — a contradictory config is unresolved, not a global fallback.
+    if (pkg.seniorRuleType !== null || perPackage.note) {
+      return perPackage;
+    }
+    // Fall through to the global senior rule (null = preserve global behavior).
     if (rules.seniorDiscountPercent === null || rules.seniorMinAge === null) {
-      // Senior rule not fully configured — flag as unresolved, charge full price.
       return {
         chargeCents: base,
         discountCents: 0,
@@ -178,13 +347,24 @@ function guestPackageCharge(
       return { chargeCents: base, discountCents: 0 };
     }
     const disc = discountAmount(base, rules.seniorDiscountPercent);
-    // chargeCents is the GROSS package price; discountCents is the single
-    // discount applied as a separate line. Returning the net here would
-    // double-discount because calculateOrder also subtracts discountCents.
     return { chargeCents: base, discountCents: disc };
   }
 
   if (guest.category === "child") {
+    // Per-package child override replaces the global child package rule.
+    const perPackage = resolvePackageOverride(
+      base,
+      pkg.childRuleType,
+      pkg.childFixedPriceCents,
+      pkg.childDiscountBasisPoints,
+      "Child",
+    );
+    // Even a null rule type must surface a note when a numeric field is
+    // non-null — a contradictory config is unresolved, not a global fallback.
+    if (pkg.childRuleType !== null || perPackage.note) {
+      return perPackage;
+    }
+    // Fall through to the global child rule (null = preserve global behavior).
     if (rules.childRuleType === "none" || rules.childMaxAge === null) {
       return {
         chargeCents: base,
@@ -201,7 +381,6 @@ function guestPackageCharge(
         };
       }
       const childPrice = rules.childFixedPackagePriceCents;
-      // Gross base charged; the discount line carries (base - childPrice).
       return { chargeCents: base, discountCents: base - childPrice };
     }
     if (rules.childRuleType === "percentage_discount") {

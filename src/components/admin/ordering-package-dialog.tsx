@@ -5,6 +5,8 @@
  * separated by selection category (meats / sides / bread / drink). Saving
  * replaces the package's eligible-item set through the authorized server
  * function and reloads the configuration.
+ *
+ * Child & senior pricing is configured in the Pricing rules tab, not here.
  */
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -30,6 +32,13 @@ import type { MealPackageDTO } from "@/lib/ordering/types";
 import type { SelectionCategory } from "@/lib/ordering/constants";
 import { SELECTION_CATEGORY_LABELS } from "@/lib/ordering/constants";
 import { Field, centsToDollars, dollarsToCents } from "./ordering-helpers";
+import {
+  itemsForSelectionCategory,
+  partitionSavedSelection,
+  toggleSelectionSet,
+  removeFromSelectionSet,
+  validateCatalogEligibility,
+} from "./eligible-item-filters";
 
 interface PackageDialogProps {
   mode: "create" | "edit";
@@ -37,10 +46,27 @@ interface PackageDialogProps {
   actionLockRef: React.RefObject<boolean>;
   onClose: () => void;
   onSaved: () => Promise<void>;
+  goToRules: () => void;
 }
 
 /** A flat catalog item for the eligible-dish picker. */
-type CatalogItem = { id: string; name: string; menuName: string };
+type CatalogItem = {
+  id: string;
+  name: string;
+  menuName: string;
+  category: import("@/lib/menu/types").MenuItemDTO["category"];
+  isActive: boolean;
+};
+
+/** Precise form-error fields for the package editor (avoids TS4111). */
+type PackageFormErrors = {
+  name?: string;
+  slug?: string;
+  price?: string;
+  meats?: string;
+  sides?: string;
+  eligible?: string;
+};
 
 const SELECTION_CATS: SelectionCategory[] = ["meat", "side", "bread", "drink"];
 
@@ -50,6 +76,7 @@ export function PackageDialog({
   actionLockRef,
   onClose,
   onSaved,
+  goToRules,
 }: PackageDialogProps) {
   const createFn = useServerFn(createMealPackage);
   const updateFn = useServerFn(updateMealPackage);
@@ -59,7 +86,7 @@ export function PackageDialog({
     queryKey: ["admin-menus-all"],
     queryFn: async () => {
       const res = await listAllMenus();
-      if (!res.ok) return [];
+      if (!res.ok) throw new Error("Failed to load menus");
       return res.menus;
     },
   });
@@ -69,7 +96,13 @@ export function PackageDialog({
     const out: CatalogItem[] = [];
     for (const m of menus) {
       for (const it of m.items) {
-        out.push({ id: it.id, name: it.name, menuName: m.name });
+        out.push({
+          id: it.id,
+          name: it.name,
+          menuName: m.name,
+          category: it.category,
+          isActive: it.isActive,
+        });
       }
     }
     return out;
@@ -102,23 +135,31 @@ export function PackageDialog({
     return init;
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<PackageFormErrors>({});
   const [serverError, setServerError] = useState("");
   const [conflict, setConflict] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   function toggleEligible(cat: SelectionCategory, itemId: string) {
     setEligible((prev) => {
-      const next = { ...prev, [cat]: new Set(prev[cat]) };
-      if (next[cat].has(itemId)) next[cat].delete(itemId);
-      else next[cat].add(itemId);
-      return next;
+      const next = toggleSelectionSet(prev[cat], catalogItems, cat, itemId);
+      if (next === prev[cat]) return prev;
+      return { ...prev, [cat]: next };
+    });
+  }
+
+  /** Remove a saved item from a category, regardless of catalog match. */
+  function removeEligible(cat: SelectionCategory, itemId: string) {
+    setEligible((prev) => {
+      if (!prev[cat].has(itemId)) return prev;
+      const next = removeFromSelectionSet(prev[cat], itemId);
+      return { ...prev, [cat]: next };
     });
   }
 
   async function submit() {
     if (actionLockRef.current) return;
-    const e: Record<string, string> = {};
+    const e: PackageFormErrors = {};
     if (!name.trim()) e.name = "Name is required.";
     if (!slug.trim()) e.slug = "Slug is required.";
     const priceCents = dollarsToCents(price);
@@ -127,6 +168,20 @@ export function PackageDialog({
     const sidesN = Number(sides);
     if (!Number.isInteger(meatsN) || meatsN < 0) e.meats = "Enter a whole number.";
     if (!Number.isInteger(sidesN) || sidesN < 0) e.sides = "Enter a whole number.";
+    // Catalog validation is mutually exclusive with mismatch checks: only
+    // classify saved selections against a successfully loaded catalog.
+    // Loading/idle and failed states block Save with a wait/retry message and
+    // never produce a removal message against missing data.
+    const eligibleError = validateCatalogEligibility(
+      {
+        isLoading: catalogQuery.isLoading,
+        isError: catalogQuery.isError,
+        isSuccess: catalogQuery.isSuccess,
+      },
+      eligible,
+      catalogItems,
+    );
+    if (eligibleError) e.eligible = eligibleError;
     setErrors(e);
     if (Object.keys(e).length > 0) return;
 
@@ -158,7 +213,7 @@ export function PackageDialog({
         mode === "create"
           ? await createFn({ data: payload })
           : await updateFn({
-              data: { ...payload, id: existing!.id, expectedUpdatedAt: existing!.updatedAt },
+              data: { ...payload, id: existing!.id, expectedUpdatedAt: existing?.updatedAt ?? "" },
             });
       if (!result.success) {
         if (result.conflict) setConflict(true);
@@ -177,7 +232,7 @@ export function PackageDialog({
   }
 
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
+    <Dialog open onOpenChange={(o) => !o && !submitting && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{mode === "create" ? "New meal package" : "Edit package"}</DialogTitle>
@@ -270,41 +325,126 @@ export function PackageDialog({
               <p className="text-sm text-muted-foreground">Loading catalog…</p>
             )}
             {catalogQuery.isError && (
-              <p className="text-sm text-destructive">Couldn't load the menu catalog.</p>
+              <div className="flex items-center gap-3">
+                <p className="text-sm text-destructive">Couldn't load the menu catalog.</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={submitting}
+                  onClick={() => catalogQuery.refetch()}
+                >
+                  Retry
+                </Button>
+              </div>
             )}
-            {catalogItems.length === 0 && !catalogQuery.isLoading && (
+            {catalogQuery.isSuccess && catalogItems.length === 0 && (
               <p className="text-sm text-muted-foreground">
                 No menu items found. Create menu items in the Menu CMS first.
               </p>
             )}
-            {catalogItems.length > 0 && (
+            {errors.eligible && <p className="text-sm text-destructive">{errors.eligible}</p>}
+            {catalogQuery.isSuccess && (
               <div className="space-y-4">
-                {SELECTION_CATS.map((cat) => (
-                  <div key={cat} className="space-y-1.5">
-                    <Label className="text-sm font-medium">{SELECTION_CATEGORY_LABELS[cat]}</Label>
-                    <div className="grid gap-1.5 sm:grid-cols-2">
-                      {catalogItems.map((item) => {
-                        const checked = eligible[cat].has(item.id);
-                        return (
-                          <label
-                            key={item.id}
-                            className="flex items-center gap-2 rounded-md border border-border px-2 py-1.5 text-sm"
-                          >
-                            <Checkbox
-                              checked={checked}
-                              onCheckedChange={() => toggleEligible(cat, item.id)}
-                            />
-                            <span className="flex-1 text-foreground">{item.name}</span>
-                            <span className="text-xs text-muted-foreground">{item.menuName}</span>
-                          </label>
-                        );
-                      })}
+                {SELECTION_CATS.map((cat) => {
+                  const candidates = itemsForSelectionCategory(catalogItems, cat);
+                  const { mismatched, unknown } = partitionSavedSelection(
+                    eligible[cat],
+                    catalogItems,
+                    cat,
+                  );
+                  return (
+                    <div key={cat} className="space-y-1.5">
+                      <Label className="text-sm font-medium">
+                        {SELECTION_CATEGORY_LABELS[cat]}
+                      </Label>
+                      {candidates.length === 0 &&
+                        mismatched.length === 0 &&
+                        unknown.length === 0 && (
+                          <p className="text-sm text-muted-foreground">
+                            No {SELECTION_CATEGORY_LABELS[cat].toLowerCase()} items available.
+                          </p>
+                        )}
+                      {(mismatched.length > 0 || unknown.length > 0) && (
+                        <div className="space-y-1 rounded-md border border-destructive/30 bg-destructive/5 p-2">
+                          {mismatched.map((item) => (
+                            <div
+                              key={item.id}
+                              className="flex items-center justify-between gap-2 text-sm"
+                            >
+                              <span className="text-destructive">
+                                {item.name} — belongs to a different category
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={submitting}
+                                onClick={() => removeEligible(cat, item.id)}
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          ))}
+                          {unknown.map((id) => (
+                            <div
+                              key={id}
+                              className="flex items-center justify-between gap-2 text-sm"
+                            >
+                              <span className="text-destructive">
+                                Unavailable item ({id}) — not found in the current menu catalog
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={submitting}
+                                onClick={() => removeEligible(cat, id)}
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {candidates.length > 0 && (
+                        <div className="grid gap-1.5 sm:grid-cols-2">
+                          {candidates.map((item) => {
+                            const checked = eligible[cat].has(item.id);
+                            return (
+                              <label
+                                key={item.id}
+                                className="flex items-center gap-2 rounded-md border border-border px-2 py-1.5 text-sm"
+                              >
+                                <Checkbox
+                                  checked={checked}
+                                  onCheckedChange={() => toggleEligible(cat, item.id)}
+                                />
+                                <span className="flex-1 text-foreground">{item.name}</span>
+                                <span className="text-xs text-muted-foreground">
+                                  {item.menuName}
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
+
+          {/* Navigate to Pricing rules for child & senior pricing */}
+          <p className="text-sm text-muted-foreground">
+            Manage child and senior pricing in{" "}
+            <button
+              type="button"
+              className="text-primary underline"
+              onClick={() => !submitting && goToRules()}
+            >
+              Pricing rules
+            </button>
+            .
+          </p>
 
           {serverError && <p className="text-sm text-destructive">{serverError}</p>}
           {conflict && (

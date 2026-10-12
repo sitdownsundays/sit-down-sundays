@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/layout/page-header";
-import { DataTable, type Column } from "@/components/layout/data-table";
-import { StatusBadge } from "@/components/layout/status-badge";
-import { MOCK_RESERVATIONS } from "@/lib/mock";
-import { RESERVATION_STATUS_LABELS, RESERVATION_STATUS_TONE } from "@/lib/domain/statuses";
-import { formatCurrency } from "@/components/layout/currency-display";
-import type { Reservation } from "@/lib/domain/types";
+import { EmptyState } from "@/components/layout/empty-state";
+import { ButtonLink } from "@/components/layout/button-link";
 import { internalHead } from "@/lib/head-meta";
+import { roleHasPermission } from "@/lib/domain/roles";
+import { useMockRole } from "@/lib/mock/mock-role-context";
+import { useAuth, useSessionUser } from "@/lib/auth/auth-context";
+import type { RoleKey } from "@/lib/domain/types";
 
 export const Route = createFileRoute("/staff/reservations/")({
   head: () =>
@@ -17,53 +17,41 @@ export const Route = createFileRoute("/staff/reservations/")({
   component: StaffReservationsIndex,
 });
 
-const columns: Column<Reservation>[] = [
-  {
-    key: "confirmation",
-    header: "Confirmation",
-    render: (r) => (
-      <Link
-        to="/staff/reservations/$reservationId"
-        params={{ reservationId: r.id }}
-        className="font-medium text-clay hover:underline"
-      >
-        {r.confirmationNumber}
-      </Link>
-    ),
-  },
-  { key: "party", header: "Party", render: (r) => r.partySize },
-  {
-    key: "experience",
-    header: "Experience",
-    render: (r) => (r.experienceType === "private_room" ? "Private Room" : "Standard"),
-    hideOnMobile: true,
-  },
-  {
-    key: "status",
-    header: "Status",
-    render: (r) => (
-      <StatusBadge tone={RESERVATION_STATUS_TONE[r.status]}>
-        {RESERVATION_STATUS_LABELS[r.status]}
-      </StatusBadge>
-    ),
-  },
-  {
-    key: "balance",
-    header: "Balance",
-    render: (r) => formatCurrency(r.remainingBalanceCents),
-    hideOnMobile: true,
-  },
-];
-
 function StaffReservationsIndex() {
+  const { dataMode } = useAuth();
+  const sessionUser = useSessionUser();
+  const mockRole = useMockRole();
+  // Same role resolution the InternalShell uses: Supabase mode reads the
+  // session role; mock mode reads the development-only role preview.
+  const activeRole: RoleKey = dataMode === "mock" ? mockRole : (sessionUser?.roleKey ?? "guest");
+
+  // The /admin layout guard admits any INTERNAL_ROLES user, but the real
+  // reservations dashboard is only useful to roles that can read all
+  // reservations. reservations.read_all is the exact permission that
+  // gates the admin reservations workspace (foh_staff, ops_manager,
+  // administrator). Do not show an admin link to a role that cannot use it.
+  const canOpenAdminReservations = roleHasPermission(activeRole, "reservations.read_all");
+
   return (
     <div className="space-y-8">
       <PageHeader
         eyebrow="Staff Operations"
         title="Reservations"
-        description="All reservations across upcoming Sundays."
+        description="Reservation requests and party bookings."
       />
-      <DataTable columns={columns} rows={MOCK_RESERVATIONS} rowKey={(r) => r.id} />
+      <EmptyState
+        title="Reservation management is available in the administration dashboard."
+        description={
+          canOpenAdminReservations
+            ? "Open the administration dashboard to review, confirm, assign tables, and manage reservation requests."
+            : "Please ask an authorized manager to review the reservation."
+        }
+        action={
+          canOpenAdminReservations ? (
+            <ButtonLink to="/admin/reservations">Open reservations</ButtonLink>
+          ) : undefined
+        }
+      />
     </div>
   );
 }

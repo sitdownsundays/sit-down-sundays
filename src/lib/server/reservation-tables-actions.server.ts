@@ -11,13 +11,22 @@
  * actor identity, room, capacity, status, and seating timestamps are never
  * accepted (the strict schema strips unknown keys).
  *
- * Raw Supabase errors are never exposed. Safe failure codes are mapped to
- * useful messages. The reservation is never marked confirmed or paid here.
+ * RPC responses are validated at runtime — missing fields, wrong types,
+ * mismatched reservation IDs, or inconsistent assignment sets never fabricate
+ * success. Raw Supabase errors are never exposed. Safe failure codes are
+ * mapped to useful messages. The reservation is never marked confirmed or
+ * paid here.
  */
 import { assignTablesSchema } from "@/lib/sundays/schema";
 import type { AssignTablesCode, AssignTablesResult } from "@/lib/sundays/types";
 import { resolveSundaysActorWithPermission } from "./sundays-auth.server";
 import { getAdminClient } from "./supabase-admin.server";
+import {
+  CANNOT_VERIFY,
+  ASSIGN_TABLES_FAILURE_CODES,
+  parseAssignTablesRpcSuccess,
+  parseRpcFailureCode,
+} from "./reservation-rpc-validation.server";
 
 /** Neutral, secret-free error returned when the caller is not authorized. */
 const UNAUTHORIZED: AssignTablesResult = {
@@ -49,7 +58,7 @@ function messageForCode(code: AssignTablesCode): string {
       return "Your session could not be verified. Sign in again and try again.";
     case "unexpected":
     default:
-      return "Could not assign tables. Please try again.";
+      return CANNOT_VERIFY;
   }
 }
 
@@ -92,37 +101,17 @@ export async function serverAssignReservationTables(
 
     if (error) {
       // Transport/database failure — never expose raw error text, never retry.
-      return {
-        ok: false,
-        code: "unexpected",
-        error: "Could not assign tables. Please try again.",
-      };
+      return { ok: false, code: "unexpected", error: CANNOT_VERIFY };
     }
 
-    const result = data as {
-      ok: boolean;
-      reservation_id?: string;
-      assigned_table_ids?: string[];
-      reservation_updated_at?: string;
-      code?: string;
-    };
-
-    if (!result.ok) {
-      const code = (result.code ?? "unexpected") as AssignTablesCode;
-      return { ok: false, code, error: messageForCode(code) };
+    const success = parseAssignTablesRpcSuccess(data, parsed.reservationId, parsed.tableIds);
+    if (success) {
+      return { ok: true, ...success };
     }
 
-    return {
-      ok: true,
-      reservationId: result.reservation_id ?? parsed.reservationId,
-      assignedTableIds: result.assigned_table_ids ?? [],
-      reservationUpdatedAt: result.reservation_updated_at ?? "",
-    };
+    const code = parseRpcFailureCode(data, ASSIGN_TABLES_FAILURE_CODES) as AssignTablesCode;
+    return { ok: false, code, error: messageForCode(code) };
   } catch {
-    return {
-      ok: false,
-      code: "unexpected",
-      error: "Could not assign tables. Please try again.",
-    };
+    return { ok: false, code: "unexpected", error: CANNOT_VERIFY };
   }
 }

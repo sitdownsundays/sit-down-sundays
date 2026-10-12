@@ -77,6 +77,7 @@ import { Route as StaffWalkInsRouteImport } from './routes/staff.walk-ins'
 import { Route as PublicAuthCallbackRouteImport } from './routes/_public.auth.callback'
 import { Route as AccountReservationsIndexRouteImport } from './routes/account.reservations.index'
 import { Route as AccountReservationsReservationIdRouteImport } from './routes/account.reservations.$reservationId'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
 import { Route as StaffReservationsIndexRouteImport } from './routes/staff.reservations.index'
 import { Route as StaffReservationsReservationIdRouteImport } from './routes/staff.reservations.$reservationId'
 
@@ -421,6 +422,11 @@ const AccountReservationsReservationIdRoute =
     path: '/$reservationId',
     getParentRoute: () => AccountReservationsRoute,
   } as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe/webhook',
+  path: '/api/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StaffReservationsIndexRoute = StaffReservationsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -500,6 +506,7 @@ export interface FileRoutesByFullPath {
   '/staff/': typeof StaffIndexRoute
   '/auth/callback': typeof PublicAuthCallbackRoute
   '/account/reservations/$reservationId': typeof AccountReservationsReservationIdRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/staff/reservations/$reservationId': typeof StaffReservationsReservationIdRoute
   '/account/reservations/': typeof AccountReservationsIndexRoute
   '/staff/reservations/': typeof StaffReservationsIndexRoute
@@ -565,6 +572,7 @@ export interface FileRoutesByTo {
   '/staff': typeof StaffIndexRoute
   '/auth/callback': typeof PublicAuthCallbackRoute
   '/account/reservations/$reservationId': typeof AccountReservationsReservationIdRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/staff/reservations/$reservationId': typeof StaffReservationsReservationIdRoute
   '/account/reservations': typeof AccountReservationsIndexRoute
   '/staff/reservations': typeof StaffReservationsIndexRoute
@@ -638,6 +646,7 @@ export interface FileRoutesById {
   '/staff/': typeof StaffIndexRoute
   '/_public/auth/callback': typeof PublicAuthCallbackRoute
   '/account/reservations/$reservationId': typeof AccountReservationsReservationIdRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/staff/reservations/$reservationId': typeof StaffReservationsReservationIdRoute
   '/account/reservations/': typeof AccountReservationsIndexRoute
   '/staff/reservations/': typeof StaffReservationsIndexRoute
@@ -711,6 +720,7 @@ export interface FileRouteTypes {
     | '/staff/'
     | '/auth/callback'
     | '/account/reservations/$reservationId'
+    | '/api/stripe/webhook'
     | '/staff/reservations/$reservationId'
     | '/account/reservations/'
     | '/staff/reservations/'
@@ -776,6 +786,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/auth/callback'
     | '/account/reservations/$reservationId'
+    | '/api/stripe/webhook'
     | '/staff/reservations/$reservationId'
     | '/account/reservations'
     | '/staff/reservations'
@@ -848,6 +859,7 @@ export interface FileRouteTypes {
     | '/staff/'
     | '/_public/auth/callback'
     | '/account/reservations/$reservationId'
+    | '/api/stripe/webhook'
     | '/staff/reservations/$reservationId'
     | '/account/reservations/'
     | '/staff/reservations/'
@@ -859,6 +871,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   KitchenRoute: typeof KitchenRouteWithChildren
   StaffRoute: typeof StaffRouteWithChildren
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1339,6 +1352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountReservationsReservationIdRouteImport
       parentRoute: typeof AccountReservationsRoute
     }
+    '/api/stripe/webhook': {
+      id: '/api/stripe/webhook'
+      path: '/api/stripe/webhook'
+      fullPath: '/api/stripe/webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/staff/reservations/': {
       id: '/staff/reservations/'
       path: '/'
@@ -1553,6 +1573,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   KitchenRoute: KitchenRouteWithChildren,
   StaffRoute: StaffRouteWithChildren,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

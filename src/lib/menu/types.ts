@@ -9,7 +9,7 @@
  * Framework-independent. No server-only imports. No mock data.
  */
 import type { ISODateString } from "../domain/types";
-import type { MenuCategory, MenuStatus } from "./constants";
+import type { MenuCategory, MenuStatus, PackageUseCategory } from "./constants";
 
 export interface MenuSectionDTO {
   id: string;
@@ -30,6 +30,7 @@ export interface MenuItemDTO {
   description: string;
   priceCents: number;
   category: MenuCategory;
+  packageUseCategories: PackageUseCategory[];
   imageUrl: string | null;
   imageAlt: string | null;
   dietaryTags: string[];
@@ -88,6 +89,13 @@ export interface MenuItemInput {
   description?: string;
   priceCents: number;
   category: MenuCategory;
+  /**
+   * Explicit package-use designations. On create, omitted → [] (no use
+   * assigned). On update, omitted → leave the existing classification
+   * unchanged; an explicit [] clears it. Null, unknown values, or
+   * duplicates are rejected by the schema.
+   */
+  packageUseCategories?: PackageUseCategory[];
   imageUrl?: string | null;
   imageAlt?: string | null;
   dietaryTags?: string[];

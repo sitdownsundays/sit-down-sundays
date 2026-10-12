@@ -10,16 +10,27 @@
  *
  * The verified session user ID is passed as p_actor_user_id. Browser-supplied
  * actor identity, status, and payment fields are never accepted (the strict
- * schema strips unknown keys).
+ * schema rejects unknown keys).
  *
- * Raw Supabase errors are never exposed. Safe failure codes are mapped to
- * useful messages. Cancellation does NOT refund money or change payment
- * status — the wrapper must not claim otherwise.
+ * RPC responses are validated at runtime — missing fields, wrong types,
+ * mismatched reservation IDs, or inconsistent values never fabricate success.
+ * Raw Supabase errors are never exposed. A failed validation NEVER claims the
+ * operation succeeded: the database may have committed before an invalid
+ * response was received.
+ *
+ * Cancellation does NOT refund money or change payment status — the wrapper
+ * must not claim otherwise.
  */
 import { cancelReservationSchema } from "@/lib/sundays/schema";
 import type { CancelReservationCode, CancelReservationResult } from "@/lib/sundays/types";
 import { resolveSundaysActorWithPermission } from "./sundays-auth.server";
 import { getAdminClient } from "./supabase-admin.server";
+import {
+  CANNOT_VERIFY,
+  CANCEL_FAILURE_CODES,
+  parseCancelRpcSuccess,
+  parseRpcFailureCode,
+} from "./reservation-rpc-validation.server";
 
 /** Neutral, secret-free error returned when the caller is not authorized. */
 const UNAUTHORIZED: CancelReservationResult = {
@@ -43,7 +54,7 @@ function messageForCode(code: CancelReservationCode): string {
       return "Your session could not be verified. Sign in again and try again.";
     case "unexpected":
     default:
-      return "Could not cancel the reservation. Please try again.";
+      return CANNOT_VERIFY;
   }
 }
 
@@ -84,37 +95,17 @@ export async function serverCancelReservation(rawInput: unknown): Promise<Cancel
 
     if (error) {
       // Transport/database failure — never expose raw error text, never retry.
-      return {
-        ok: false,
-        code: "unexpected",
-        error: "Could not cancel the reservation. Please try again.",
-      };
+      return { ok: false, code: "unexpected", error: CANNOT_VERIFY };
     }
 
-    const result = data as {
-      ok: boolean;
-      reservation_id?: string;
-      reservation_updated_at?: string;
-      already_cancelled?: boolean;
-      code?: string;
-    };
-
-    if (!result.ok) {
-      const code = (result.code ?? "unexpected") as CancelReservationCode;
-      return { ok: false, code, error: messageForCode(code) };
+    const success = parseCancelRpcSuccess(data, parsed.reservationId);
+    if (success) {
+      return { ok: true, ...success };
     }
 
-    return {
-      ok: true,
-      reservationId: result.reservation_id ?? parsed.reservationId,
-      reservationUpdatedAt: result.reservation_updated_at ?? "",
-      alreadyCancelled: result.already_cancelled ?? false,
-    };
+    const code = parseRpcFailureCode(data, CANCEL_FAILURE_CODES) as CancelReservationCode;
+    return { ok: false, code, error: messageForCode(code) };
   } catch {
-    return {
-      ok: false,
-      code: "unexpected",
-      error: "Could not cancel the reservation. Please try again.",
-    };
+    return { ok: false, code: "unexpected", error: CANNOT_VERIFY };
   }
 }

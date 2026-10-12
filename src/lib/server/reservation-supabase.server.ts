@@ -29,6 +29,7 @@ import type {
   ReservationGuestInput,
   ReservationPlatterInput,
 } from "@/lib/reservation/types";
+import { readReservationApproval } from "./reservation-approval-reader.server";
 
 /** Safe, secret-free error for unexpected failures. */
 const SAFE_ERROR = "We couldn't complete this reservation request. Please try again.";
@@ -175,6 +176,8 @@ export class SupabaseReservationRepository implements IReservationRepository {
       // Same key, different payload → safe mismatch. No write occurred.
       return {
         success: false,
+        outcome: "proven_rejection",
+        rejectionCode: "idempotency_key_mismatch",
         error: "This request key was used for a different reservation.",
       };
     }
@@ -256,25 +259,30 @@ export class SupabaseReservationRepository implements IReservationRepository {
       p_actor_user_id: input.actorUserId,
     };
 
-    const { data, error } = await this.client.rpc("submit_reservation_request_atomic", rpcInput);
+    const { data, error } = await this.client.rpc(
+      "submit_reservation_request_with_capacity_atomic",
+      rpcInput,
+    );
 
     if (error) {
-      // Never expose raw Supabase error text. Map known codes to safe messages.
+      // Never expose raw Supabase error text. The capacity-backed RPC may
+      // raise P0019 when capacity acquisition fails inside the delegated
+      // 0012 insert trigger — the whole transaction (reservation + guests +
+      // audit + hold) rolls back atomically. Map that to a safe proven
+      // rejection so the client knows nothing was saved.
       return { success: false, error: SAFE_ERROR };
     }
 
-    const result = data as {
-      ok: boolean;
-      reservation_id?: string;
-      reservation_number?: string;
-      status?: string;
-      payment_status?: string;
-      idempotent_replay?: boolean;
-      code?: string;
-    };
+    const result = data as Record<string, unknown> | null;
 
-    if (!result.ok) {
-      const code = result.code;
+    if (!result || typeof result !== "object") {
+      // Malformed response — persistence outcome unknown. Never fabricate
+      // success; surface a safe uncertain failure.
+      return { success: false, error: SAFE_ERROR };
+    }
+    const ok = result["ok"];
+    if (ok !== true) {
+      const code = result["code"];
       if (code === "idempotency_key_mismatch") {
         return {
           success: false,
@@ -282,6 +290,37 @@ export class SupabaseReservationRepository implements IReservationRepository {
           rejectionCode: "idempotency_key_mismatch",
           error: "This request key was used for a different reservation.",
         };
+      }
+      if (code === "capacity_not_ready") {
+        return {
+          success: false,
+          outcome: "proven_rejection",
+          rejectionCode: "capacity_not_ready",
+          error:
+            "Online reservations are not available yet. Please contact us to reserve your table.",
+        };
+      }
+      if (code === "capacity_unavailable") {
+        return {
+          success: false,
+          outcome: "proven_rejection",
+          rejectionCode: "capacity_unavailable",
+          error: "We couldn't reserve a table for that time. Please try another date or seating.",
+        };
+      }
+      if (code === "invalid_configuration") {
+        return {
+          success: false,
+          outcome: "proven_rejection",
+          rejectionCode: "invalid_configuration",
+          error: "Selected service or seating is no longer available.",
+        };
+      }
+      if (code === "conflict") {
+        // A serialization/deadlock conflict means the persistence outcome is
+        // unknown — the request may or may not have been saved. Do NOT return
+        // proven_rejection; the client must treat this as uncertain.
+        return { success: false, error: SAFE_ERROR };
       }
       if (code === "invalid_service" || code === "invalid_seating") {
         return {
@@ -311,14 +350,37 @@ export class SupabaseReservationRepository implements IReservationRepository {
       return { success: false, error: SAFE_ERROR };
     }
 
+    // Success: a NEW booking requires a valid reservation identity (UUID).
+    // A historical replay created before the capacity schema may legitimately
+    // lack hold metadata — never fabricate a hold/deadline. But a missing or
+    // non-UUID reservation_id is a malformed response: persistence outcome is
+    // unknown, so surface an uncertain failure rather than fabricated success.
+    const reservationId = result["reservation_id"];
+    const reservationNumber = result["reservation_number"];
+    if (typeof reservationId !== "string" || reservationId.length === 0) {
+      return { success: false, error: SAFE_ERROR };
+    }
+    const status = result["status"];
+    const paymentStatus = result["payment_status"];
+    // A valid success response MUST include status and payment_status as strings.
+    // A missing or non-string status/payment_status is a malformed response —
+    // the persistence outcome is unknown, so surface an uncertain failure rather
+    // than fabricating defaults that could mask a real issue.
+    if (typeof status !== "string" || typeof paymentStatus !== "string") {
+      return { success: false, error: SAFE_ERROR };
+    }
     return {
       success: true,
-      reservationId: result.reservation_id,
-      reservationNumber: result.reservation_number,
-      status: (result.status as SubmitReservationResult["status"]) ?? "pending_review",
-      paymentStatus:
-        (result.payment_status as SubmitReservationResult["paymentStatus"]) ?? "unpaid",
-      idempotentReplay: result.idempotent_replay === true,
+      reservationId,
+      reservationNumber: typeof reservationNumber === "string" ? reservationNumber : undefined,
+      status: status as SubmitReservationResult["status"],
+      paymentStatus: paymentStatus as SubmitReservationResult["paymentStatus"],
+      idempotentReplay: result["idempotent_replay"] === true,
+      holdId: typeof result["hold_id"] === "string" ? result["hold_id"] : undefined,
+      holdDeadline:
+        typeof result["hold_deadline"] === "string" ? result["hold_deadline"] : undefined,
+      capacityState:
+        typeof result["capacity_state"] === "string" ? result["capacity_state"] : undefined,
     };
   }
 
@@ -400,6 +462,14 @@ export class SupabaseReservationRepository implements IReservationRepository {
 
     const r = resData as unknown as ReservationRow;
 
+    // Read the 0022 approval columns directly from reservations (the detail
+    // view may not expose them). Verify identity + version before combining.
+    const approvalResult = await readReservationApproval(this.client, id, r.updated_at);
+    if (!approvalResult.success) {
+      return { success: false, error: approvalResult.error };
+    }
+    const { approval } = approvalResult;
+
     // Fetch guests, addons, and platters in parallel for deterministic assembly.
     const [guestsRes, plattersRes] = await Promise.all([
       this.client
@@ -479,6 +549,7 @@ export class SupabaseReservationRepository implements IReservationRepository {
       amountPaidCents: r.amount_paid_cents,
       remainingBalanceCents: r.remaining_balance_cents,
       balanceDeadline: r.balance_deadline,
+      approval,
       pricingSnapshot: r.pricing_snapshot,
       policySnapshot: r.policy_snapshot,
       guests: guestRows.map((g) => ({

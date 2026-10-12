@@ -128,6 +128,13 @@ export async function handleSubmitReservationRequest(
     // the client omitted the fields or sent empty strings. Different non-empty
     // notes produce different hashes. This preserves replayability of
     // existing no-note requests while making note changes detectable.
+    // Include the reviewed-price terms in the canonical request identity so a
+    // change to ANY reviewed financial term (subtotal, gratuity, tax, grand
+    // total, deposit, or applied rates/taxability/deposit%) changes the hash.
+    // This means a retry with changed terms is treated as a NEW request (not a
+    // replay of the old one). Legacy payloads that omit clientPreviewPrice are
+    // preserved: the field is only included when supplied, so an absent
+    // clientPreviewPrice hashes identically to the pre-change implementation.
     const payloadHash = buildPayloadHash({
       sundayServiceId: data.sundayServiceId,
       seatingTimeId: data.seatingTimeId,
@@ -156,6 +163,7 @@ export async function handleSubmitReservationRequest(
         mealRequests: g.mealRequests ?? "",
       })),
       platters: data.platters,
+      ...(data.clientPreviewPrice ? { clientPreviewPrice: data.clientPreviewPrice } : {}),
     });
 
     // Idempotency: short-circuit an already-saved matching request BEFORE any
@@ -176,12 +184,21 @@ export async function handleSubmitReservationRequest(
 
     // Resolve payment policy + selected service/seating/space for eligibility
     // and pricing context. All refetched server-side — never trusted from
-    // the browser.
+    // the browser. The three nullable tax/gratuity settings are populated
+    // from the server-fetched payment policy — never accepted from the
+    // browser. NULL means NOT CONFIGURED (never "zero charges"): if ANY of
+    // the three is null/undefined, calculateReservationPricing fails safely
+    // and this returns proven_rejection / pricing_failed before persistence.
+    // Only explicitly configured values (including explicit 0 rates and an
+    // explicit boolean) produce a valid charge calculation.
     const policyDTO = await sundaysRepo.getPaymentPolicy();
     const policy = {
       depositPercent: policyDTO.depositPercent,
       balanceDeadlineHours: policyDTO.defaultBalanceDeadlineHours,
       restaurantTimezone: policyDTO.restaurantTimezone,
+      taxRateBasisPoints: policyDTO.taxRateBasisPoints,
+      gratuityRateBasisPoints: policyDTO.gratuityRateBasisPoints,
+      taxOnGratuity: policyDTO.taxOnGratuity,
     };
     const service = await sundaysRepo.getSundayService(data.sundayServiceId);
     const seatings = await sundaysRepo.listSeatingTimesForService(data.sundayServiceId);
@@ -232,6 +249,7 @@ export async function handleSubmitReservationRequest(
       policy,
       seatingInstant,
       data.clientPreviewSubtotalCents,
+      data.clientPreviewPrice,
     );
 
     if (!pricing.success) {
@@ -251,6 +269,24 @@ export async function handleSubmitReservationRequest(
         rejectionCode: "unresolved_pricing",
         error:
           "Some pricing rules are not configured. Please contact us to complete this reservation.",
+      };
+    }
+
+    // NEW-REQUEST GUARD: after the idempotency replay check above confirmed
+    // there is NO saved matching request, a NEW request MUST carry a complete
+    // reviewed-price snapshot (clientPreviewPrice). Historical compatibility
+    // applies ONLY to matching already-saved requests (returned above before
+    // this point). A new request that omits clientPreviewPrice must NOT slip
+    // through the subtotal-only fallback in calculateReservationPricing — the
+    // customer must review the authoritative estimate before persistence.
+    // Zero writes: this returns before the snapshot/persistence path below.
+    if (!data.clientPreviewPrice) {
+      return {
+        success: false,
+        outcome: "proven_rejection",
+        rejectionCode: "review_required",
+        error:
+          "Our menu or pricing has changed since you started. Please review your selections and try again.",
       };
     }
 

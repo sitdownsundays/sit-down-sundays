@@ -55,6 +55,7 @@ import type {
   OrderingConfigDTO,
   EligibleItemDTO,
 } from "@/lib/ordering/types";
+import type { ChildRuleType } from "@/lib/ordering/constants";
 
 const SAFE_CONFLICT =
   "This record was modified by another user. Reload the latest data and try again.";
@@ -481,6 +482,12 @@ interface PackageRow {
   updated_at: string;
   created_by: string | null;
   updated_by: string | null;
+  child_rule_type: string | null;
+  child_fixed_price_cents: number | null;
+  child_discount_basis_points: number | null;
+  senior_rule_type: string | null;
+  senior_fixed_price_cents: number | null;
+  senior_discount_basis_points: number | null;
 }
 interface EligibleRow {
   id: string;
@@ -532,7 +539,20 @@ interface RulesRow {
   updated_at: string;
 }
 
+function validatePackageRuleType(value: string | null, columnName: string): ChildRuleType | null {
+  if (value === null) return null;
+  if (value === "none" || value === "fixed_package_price" || value === "percentage_discount") {
+    return value;
+  }
+  throw new Error(`ordering.packageRowToDTO: invalid ${columnName} "${value}"`);
+}
+
 function packageRowToDTO(row: PackageRow, eligible: EligibleItemDTO[]): MealPackageDTO {
+  // Validate per-package pricing rule types. The database CHECK constraints
+  // (0024) enforce valid combinations, but the columns are text/integer so
+  // we must not silently coerce an unexpected value into a valid rule.
+  // Malformed data throws (following the existing read-error convention)
+  // rather than fabricating a default pricing rule.
   return {
     id: row.id,
     name: row.name,
@@ -550,6 +570,12 @@ function packageRowToDTO(row: PackageRow, eligible: EligibleItemDTO[]): MealPack
     createdBy: row.created_by,
     updatedBy: row.updated_by,
     eligibleItems: eligible,
+    childRuleType: validatePackageRuleType(row.child_rule_type, "child_rule_type"),
+    childFixedPriceCents: row.child_fixed_price_cents,
+    childDiscountBasisPoints: row.child_discount_basis_points,
+    seniorRuleType: validatePackageRuleType(row.senior_rule_type, "senior_rule_type"),
+    seniorFixedPriceCents: row.senior_fixed_price_cents,
+    seniorDiscountBasisPoints: row.senior_discount_basis_points,
   };
 }
 function addonRowToDTO(row: AddonRow, eligiblePackageIds: string[]): IndividualAddonDTO {

@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Container } from "@/components/layout/container";
 import { cn } from "@/lib/utils";
 import { useMockRoleContext } from "@/lib/mock/mock-role-context";
+import { useActiveRole } from "@/lib/domain/active-role";
 import { useAuth, useSessionUser } from "@/lib/auth/auth-context";
 import { signOut } from "@/lib/auth.functions";
 import { ROLE_LABELS } from "@/lib/domain/roles";
@@ -31,9 +32,9 @@ export function InternalShell({ area, areaLabel, homeTo }: InternalShellProps) {
   const sessionUser = useSessionUser();
   const { role: mockRole, setRole: setMockRole, label } = useMockRoleContext();
 
-  // In Supabase mode, the active role comes from the session. In mock mode,
-  // the development-only role preview drives navigation filtering.
-  const activeRole: RoleKey = dataMode === "mock" ? mockRole : (sessionUser?.roleKey ?? "guest");
+  // Shared role resolution: mock role in mock mode, authenticated session
+  // roleKey in Supabase mode (never a mock administrator fallback).
+  const activeRole: RoleKey = useActiveRole();
   const isMockMode = dataMode === "mock";
 
   const sections: NavSection[] = filterNavByRole(AREA_NAV[area], activeRole);

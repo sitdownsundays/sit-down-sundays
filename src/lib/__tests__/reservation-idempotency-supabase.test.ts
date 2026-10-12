@@ -101,6 +101,8 @@ describe("SupabaseReservationRepository.findByIdempotencyKey (real method, mocke
     const r = await repo.findByIdempotencyKey("key-1", "hash-1");
     expect(r).toEqual({
       success: false,
+      outcome: "proven_rejection",
+      rejectionCode: "idempotency_key_mismatch",
       error: "This request key was used for a different reservation.",
     });
   });
@@ -218,6 +220,7 @@ function setupValid() {
     status: "open",
     spaceId: "space-1",
     onlineBookingLimit: 100,
+    capacityResourceId: null,
     isActive: true,
     displayOrder: 0,
     createdAt: "2026-01-01T00:00:00.000Z",

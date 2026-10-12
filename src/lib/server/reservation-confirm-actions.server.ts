@@ -10,17 +10,28 @@
  *
  * The verified session user ID is passed as p_actor_user_id. Browser-supplied
  * actor identity, status, and payment fields are never accepted (the strict
- * schema strips unknown keys).
+ * schema rejects unknown keys).
  *
- * Raw Supabase errors are never exposed. Safe failure codes are mapped to
- * useful messages. Confirmation accepts the reservation request; it does NOT
- * collect money, satisfy the deposit, or change payment status — the wrapper
- * must not claim otherwise.
+ * RPC responses are validated at runtime — missing fields, wrong types,
+ * mismatched reservation IDs, or inconsistent values never fabricate success.
+ * Raw Supabase errors are never exposed. A failed validation NEVER claims the
+ * operation succeeded: the database may have committed before an invalid
+ * response was received.
+ *
+ * Confirmation accepts the reservation request; it does NOT collect money,
+ * satisfy the deposit, or change payment status — the wrapper must not
+ * claim otherwise.
  */
 import { confirmReservationSchema } from "@/lib/sundays/schema";
 import type { ConfirmReservationCode, ConfirmReservationResult } from "@/lib/sundays/types";
 import { resolveSundaysActorWithPermission } from "./sundays-auth.server";
 import { getAdminClient } from "./supabase-admin.server";
+import {
+  CANNOT_VERIFY,
+  CONFIRM_FAILURE_CODES,
+  parseConfirmRpcSuccess,
+  parseRpcFailureCode,
+} from "./reservation-rpc-validation.server";
 
 /** Neutral, secret-free error returned when the caller is not authorized. */
 const UNAUTHORIZED: ConfirmReservationResult = {
@@ -44,7 +55,7 @@ function messageForCode(code: ConfirmReservationCode): string {
       return "Your session could not be verified. Sign in again and try again.";
     case "unexpected":
     default:
-      return "Could not confirm the reservation. Please try again.";
+      return CANNOT_VERIFY;
   }
 }
 
@@ -87,37 +98,17 @@ export async function serverConfirmReservation(
 
     if (error) {
       // Transport/database failure — never expose raw error text, never retry.
-      return {
-        ok: false,
-        code: "unexpected",
-        error: "Could not confirm the reservation. Please try again.",
-      };
+      return { ok: false, code: "unexpected", error: CANNOT_VERIFY };
     }
 
-    const result = data as {
-      ok: boolean;
-      reservation_id?: string;
-      reservation_updated_at?: string;
-      already_confirmed?: boolean;
-      code?: string;
-    };
-
-    if (!result.ok) {
-      const code = (result.code ?? "unexpected") as ConfirmReservationCode;
-      return { ok: false, code, error: messageForCode(code) };
+    const success = parseConfirmRpcSuccess(data, parsed.reservationId);
+    if (success) {
+      return { ok: true, ...success };
     }
 
-    return {
-      ok: true,
-      reservationId: result.reservation_id ?? parsed.reservationId,
-      reservationUpdatedAt: result.reservation_updated_at ?? "",
-      alreadyConfirmed: result.already_confirmed ?? false,
-    };
+    const code = parseRpcFailureCode(data, CONFIRM_FAILURE_CODES) as ConfirmReservationCode;
+    return { ok: false, code, error: messageForCode(code) };
   } catch {
-    return {
-      ok: false,
-      code: "unexpected",
-      error: "Could not confirm the reservation. Please try again.",
-    };
+    return { ok: false, code: "unexpected", error: CANNOT_VERIFY };
   }
 }

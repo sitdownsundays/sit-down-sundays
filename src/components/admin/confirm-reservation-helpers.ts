@@ -40,12 +40,16 @@ export function buildConfirmPayload(reservation: ReservationDetailDTO): {
 
 /**
  * Safe codes that require an explicit reload before another confirmation
- * attempt: conflict (stale timestamp) and unexpected (uncertain outcome).
- * For these, the outcome of the previous attempt is unknown until the user
- * reloads the reservation.
+ * attempt: conflict (stale timestamp), unexpected (uncertain outcome), and
+ * invalid_status (the reservation is no longer pending_review). For these,
+ * the outcome of the previous attempt is unknown until the user reloads.
+ *
+ * invalid_status is included because the server rejected the transition —
+ * the reservation may already have been confirmed by someone else, or moved
+ * to a different state. The user must see the current state before acting again.
  */
 export function requiresReloadBeforeRetry(code: string): boolean {
-  return code === "conflict" || code === "unexpected";
+  return code === "conflict" || code === "unexpected" || code === "invalid_status";
 }
 
 /** Party display name for the confirmation summary. */
@@ -56,4 +60,73 @@ export function partyDisplayName(reservation: ReservationDetailDTO): string {
   if (first) return first;
   if (last) return last;
   return reservation.reservationNumber;
+}
+
+/** Success feedback for a fresh confirmation. */
+export const CONFIRM_SUCCESS_MSG = "Reservation confirmed.";
+/** Success feedback for an already-confirmed recovery (idempotent retry). */
+export const ALREADY_CONFIRMED_MSG = "Reservation is already confirmed.";
+
+/**
+ * Result of an explicit "Reload latest" operation — a discriminated union.
+ *
+ * Success requires the freshly-fetched ReservationDetailDTO (the exact record
+ * the parent adopts into the displayed detail; no second fetch). Failure
+ * requires reservation:null and a safe error. There is no "unknown" success
+ * variant — a malformed server response is a failure.
+ */
+export type ConfirmReloadResult =
+  | { success: true; reservation: ReservationDetailDTO }
+  | { success: false; reservation: null; error: string };
+
+/** Assessment of a reloaded reservation for the confirmation flow. */
+export type ReloadAssessment =
+  | { kind: "confirmable"; reservation: ReservationDetailDTO }
+  | { kind: "already_confirmed"; reservation: ReservationDetailDTO }
+  | { kind: "inapplicable"; reservation: ReservationDetailDTO; status: string };
+
+/**
+ * Assess a freshly reloaded reservation to decide what to do next:
+ * - "confirmable": status is pending_review — show fresh detail and allow a
+ *   new confirmation using the fresh timestamp.
+ * - "already_confirmed": status is confirmed — show that state; do NOT mutate.
+ * - "inapplicable": any other status — show current status and remove the
+ *   confirmation action; do NOT mutate.
+ */
+export function assessReloadedReservation(reservation: ReservationDetailDTO): ReloadAssessment {
+  if (reservation.status === "confirmed") {
+    return { kind: "already_confirmed", reservation };
+  }
+  if (isConfirmableStatus(reservation.status)) {
+    return { kind: "confirmable", reservation };
+  }
+  return { kind: "inapplicable", reservation, status: reservation.status };
+}
+
+/**
+ * Success feedback label distinguishing a fresh confirmation from an
+ * already-confirmed recovery (idempotent retry).
+ */
+export function successMessage(alreadyConfirmed: boolean): string {
+  return alreadyConfirmed ? ALREADY_CONFIRMED_MSG : CONFIRM_SUCCESS_MSG;
+}
+
+/**
+ * Refresh-failure toast shown when the mutation succeeded but the display
+ * could not be refreshed. The mutation result is preserved; this does not
+ * invite another mutation.
+ */
+export const REFRESH_FAILURE_MSG =
+  "Confirmed, but the display could not be refreshed. Reload the page to see updates.";
+
+/**
+ * Status-specific message to show after a successful reload that did NOT
+ * yield a confirmable (pending_review) reservation. Returns null for
+ * pending_review — in that case the gate-block UI handles the message.
+ */
+export function reloadOutcomeMessage(status: string): string | null {
+  if (status === "confirmed") return ALREADY_CONFIRMED_MSG;
+  if (status === "pending_review") return null;
+  const label = status.replace(/_/g, " ");
+  return `This reservation is now ${label}. Confirmation is not available.`;
 }

@@ -234,8 +234,95 @@ export function validateParty(state: BookWizardState, ceiling: number | null): P
   return { error: null };
 }
 
-/** Schema-level party limit (mirrors the submission schema). */
-export const SCHEMA_PARTY_LIMIT = 200;
+/** Schema-level party limit (mirrors the submission schema: max 950). */
+export const SCHEMA_PARTY_LIMIT = 950;
+
+/** Capacity info extracted from a capacity-backed availability option. */
+export interface CapacityInfo {
+  /** Physical seats remaining during the requested interval. */
+  availableCapacity: number;
+  /** Smaller of remaining physical capacity and configured online limits. */
+  maxBookablePartySize: number;
+}
+
+/**
+ * Safely narrow a PublicAvailabilityOption to its capacity fields. Returns null
+ * when the fields are absent, malformed, or negative — never fabricates
+ * capacity. The wizard state types selectedOption as PublicAvailabilityOption,
+ * but the actual response from getPublicAvailability is CapacityAvailabilityOption
+ * (which extends PublicAvailabilityOption). Use this checked narrowing rather
+ * than an unchecked cast.
+ */
+export function capacityFromOption(opt: PublicAvailabilityOption | null): CapacityInfo | null {
+  if (!opt) return null;
+  if (!("availableCapacity" in opt) || !("maxBookablePartySize" in opt)) return null;
+  const avail = (opt as { availableCapacity: unknown }).availableCapacity;
+  const max = (opt as { maxBookablePartySize: unknown }).maxBookablePartySize;
+  const ceiling = (opt as { configuredRequestCeiling: unknown }).configuredRequestCeiling;
+  // Capacity values represent whole people — never floor, round, or coerce
+  // malformed values. Reject unless every field is a nonnegative safe integer
+  // (ceiling strictly positive) and max does not exceed avail or ceiling.
+  if (
+    typeof avail !== "number" ||
+    !Number.isSafeInteger(avail) ||
+    avail < 0 ||
+    typeof max !== "number" ||
+    !Number.isSafeInteger(max) ||
+    max < 0 ||
+    typeof ceiling !== "number" ||
+    !Number.isSafeInteger(ceiling) ||
+    ceiling <= 0 ||
+    max > avail ||
+    max > ceiling
+  ) {
+    return null;
+  }
+  return { availableCapacity: avail, maxBookablePartySize: max };
+}
+
+/**
+ * Validate party composition against authoritative capacity. Missing or
+ * malformed capacity blocks progression — does NOT fall back to configured
+ * room limits. Zero is valid unavailable capacity, not a missing value.
+ * maxBookablePartySize is the effective ceiling (min of physical and configured).
+ */
+export function validatePartyCapacity(
+  state: BookWizardState,
+  capacity: CapacityInfo | null,
+): PartyValidation {
+  const { adults, seniors, children } = state;
+  if (
+    !Number.isInteger(adults) ||
+    !Number.isInteger(seniors) ||
+    !Number.isInteger(children) ||
+    adults < 0 ||
+    seniors < 0 ||
+    children < 0
+  ) {
+    return { error: "Guest counts must be whole numbers." };
+  }
+  const total = adults + seniors + children;
+  if (total < 1) {
+    return { error: "Please enter at least one guest." };
+  }
+  if (capacity === null) {
+    return {
+      error:
+        "Availability for this seating could not be confirmed. Please choose another seating or try again.",
+    };
+  }
+  if (total > capacity.maxBookablePartySize) {
+    return {
+      error: `This seating allows up to ${capacity.maxBookablePartySize} guests per request based on current availability. Please choose a different seating or reduce your party size.`,
+    };
+  }
+  if (total > SCHEMA_PARTY_LIMIT) {
+    return {
+      error: `Party size cannot exceed ${SCHEMA_PARTY_LIMIT} guests. Please contact us for larger groups.`,
+    };
+  }
+  return { error: null };
+}
 
 /**
  * Format a service date (YYYY-MM-DD) for display.

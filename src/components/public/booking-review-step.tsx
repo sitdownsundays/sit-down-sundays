@@ -47,6 +47,7 @@ import type {
   SubmitReservationResult,
 } from "@/lib/reservation/types";
 import type { SubmissionController, SubmissionPhase } from "@/lib/booking/submission-controller";
+import { buildSuccessDisplay } from "@/lib/booking/success-display";
 
 interface Props {
   state: BookWizardState;
@@ -87,12 +88,22 @@ export function ReviewStep({
   const contactValid = validateContact(state).valid;
   const submittable = quoteIsSubmittable(quote, quoteLoading) && contactValid;
 
-  // Edit/Back are blocked while submitting OR uncertain (the request may be
-  // saved server-side; navigating away must not discard the recovery path).
-  const navBlocked = !controller.canEditOrBack();
+  // Edit/Back are blocked while submitting OR uncertain OR key_mismatch (the
+  // request may be saved server-side; navigating away must not discard the
+  // recovery path or let the user generate a duplicate under a new key).
+  const navBlocked = !controller.canEditOrBack() || controller.isKeyMismatch();
   const submitting = phase === "submitting";
   const uncertain = phase === "uncertain";
   const rejected = phase === "rejected";
+  const keyMismatch = controller.isKeyMismatch();
+  // A review_required rejection means pricing changed since the customer's
+  // last quote. The server confirmed nothing was booked. The customer must
+  // get a fresh authoritative quote and re-review before resubmitting.
+  const reviewRequiredRejection = rejected && result?.rejectionCode === "review_required";
+  // Capacity not ready — online reservation enforcement is disabled. The
+  // server rejected this request safely (nothing was booked). Direct the
+  // customer to contact the restaurant directly.
+  const capacityNotReady = rejected && result?.rejectionCode === "capacity_not_ready";
   // Secure key generation is only known to have failed when the controller
   // reached "rejected" WITHOUT ever calling submit (no payload). A fresh idle
   // request has key === null because start() generates the key — that must
@@ -101,15 +112,23 @@ export function ReviewStep({
 
   const handleSubmit = () => {
     if (submitting) return;
+    if (keyMismatch) return; // a row may exist; block any submission
     if (uncertain) {
       // Retry the SAME key + payload to recover the original result.
       void onRetry();
       return;
     }
     if (rejected) {
-      // After a proven rejection the user may have edited their selections.
-      // If the controller still holds the old payload, retry it; if they
-      // want to submit corrected data, resetForNewRequest is called first.
+      // A review_required rejection means pricing changed since the customer's
+      // last quote. The server confirmed nothing was booked. The obsolete
+      // payload MUST NOT be retried — the customer must get a fresh
+      // authoritative quote and re-review before resubmitting. The normal
+      // Submit action is disabled (see submitDisabled) and this guard prevents
+      // any programmatic retry of the stale payload.
+      if (reviewRequiredRejection) return;
+      // After a proven (non-review) rejection the user may have edited their
+      // selections. If the controller still holds the old payload, retry it;
+      // if they want to submit corrected data, resetForNewRequest is called first.
       if (controller.canRetry()) {
         void onRetry();
       }
@@ -120,12 +139,14 @@ export function ReviewStep({
     if (!controller.canStartNew()) return;
     void onStart((key) => {
       const previewSubtotal = quote?.ok ? quote.subtotalCents : undefined;
-      return buildSubmissionPayload(state, key, previewSubtotal);
+      const reviewedPrice = quote?.ok ? quote.reviewedPrice : undefined;
+      return buildSubmissionPayload(state, key, previewSubtotal, reviewedPrice);
     });
   };
 
   // ---- Success screen ----
   if (controller.isComplete() && result?.success && result.reservationNumber) {
+    const display = buildSuccessDisplay(result, state.selectedOption?.restaurantTimezone);
     return (
       <section aria-labelledby="step-review-heading">
         <h2 id="step-review-heading" className="font-display text-xl font-semibold text-foreground">
@@ -138,19 +159,52 @@ export function ReviewStep({
               <p className="font-display text-lg font-semibold text-foreground">
                 Reservation request received
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Your booking is <strong>not yet confirmed</strong>. Our team will review
-                availability and contact you about your deposit and final details.
-              </p>
               <p className="mt-3 text-sm">
                 <span className="text-muted-foreground">Your request number:</span>{" "}
                 <span className="font-mono font-medium text-foreground">
-                  {result.reservationNumber}
+                  {display.reservationNumber ?? "Unavailable"}
                 </span>
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Status: Pending review · Unpaid — no payment has been collected.
+                Status: {display.statusLabel ?? "Verification needed"} ·{" "}
+                {display.paymentLabel ?? "Verification needed"}
+                <br />
+                No payment has been collected.
               </p>
+
+              {display.hold.kind === "active_held" && !display.hold.deadlinePassed && (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Capacity hold deadline: {display.hold.deadlineFormatted}
+                </p>
+              )}
+              {display.hold.kind === "active_held" && display.hold.deadlinePassed && (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  The recorded hold deadline has passed. Please contact our team to verify your
+                  reservation.
+                </p>
+              )}
+              {display.hold.kind === "allocated" && (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Capacity for this reservation has been allocated.
+                </p>
+              )}
+              {display.hold.kind === "released" && (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  No active capacity hold for this reservation.
+                </p>
+              )}
+              {display.hold.kind === "unverified" && (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Hold details could not be verified. Please contact our team with your request
+                  number.
+                </p>
+              )}
+              {display.hold.kind === "none" && (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Your booking is not yet confirmed. Our team will review availability and contact
+                  you about final details.
+                </p>
+              )}
             </div>
           </div>
           <div className="mt-6">
@@ -177,7 +231,9 @@ export function ReviewStep({
 
   const submitDisabled =
     submitting ||
+    keyMismatch ||
     keyGenFailed ||
+    reviewRequiredRejection ||
     (phase === "idle" && !submittable) ||
     (phase === "uncertain" && !controller.canRetry()) ||
     (phase === "rejected" && !controller.canRetry() && !submittable);
@@ -198,6 +254,20 @@ export function ReviewStep({
           className="mt-4 rounded-md border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-foreground"
         >
           {error}
+        </div>
+      )}
+
+      {/* Idempotency-key mismatch — a reservation may already exist */}
+      {keyMismatch && (
+        <div
+          role="alert"
+          className="mt-4 rounded-md border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-foreground"
+        >
+          <p className="font-medium">We couldn&apos;t verify this request.</p>
+          <p className="mt-1 text-muted-foreground">
+            A reservation may already exist. Please contact our team before submitting another
+            request — submitting again could create a duplicate.
+          </p>
         </div>
       )}
 
@@ -431,15 +501,23 @@ export function ReviewStep({
               <dl className="mt-3 space-y-2 text-sm">
                 {quote.subtotalCents !== undefined && (
                   <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Subtotal</dt>
+                    <dt className="text-muted-foreground">Food &amp; beverage subtotal</dt>
                     <dd className="font-medium text-foreground">
                       {formatCents(quote.subtotalCents)}
                     </dd>
                   </div>
                 )}
+                {quote.lines
+                  ?.filter((l) => l.kind === "gratuity" || l.kind === "tax")
+                  .map((l, i) => (
+                    <div key={i} className="flex justify-between">
+                      <dt className="text-muted-foreground">{l.label}</dt>
+                      <dd className="text-foreground">{formatCents(l.amountCents)}</dd>
+                    </div>
+                  ))}
                 {quote.grandTotalCents !== undefined && (
                   <div className="flex justify-between border-t border-border pt-2">
-                    <dt className="font-medium text-foreground">Total</dt>
+                    <dt className="font-medium text-foreground">Grand total</dt>
                     <dd className="font-semibold text-foreground">
                       {formatCents(quote.grandTotalCents)}
                     </dd>
@@ -453,9 +531,17 @@ export function ReviewStep({
                 )}
                 {quote.remainingBalanceCents !== undefined && (
                   <div className="flex justify-between">
-                    <dt className="text-muted-foreground">Outstanding balance</dt>
+                    <dt className="text-muted-foreground">Balance due (full, unpaid)</dt>
+                    <dd className="text-foreground">{formatCents(quote.remainingBalanceCents)}</dd>
+                  </div>
+                )}
+                {quote.projectedBalanceAfterDepositCents !== undefined && (
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">
+                      Projected balance after deposit is paid
+                    </dt>
                     <dd className="font-medium text-foreground">
-                      {formatCents(quote.remainingBalanceCents)}
+                      {formatCents(quote.projectedBalanceAfterDepositCents)}
                     </dd>
                   </div>
                 )}
@@ -473,8 +559,46 @@ export function ReviewStep({
             </p>
           </div>
 
-          {/* Submit error (definitive rejection) */}
-          {error && rejected && (
+          {/* Submit error — review_required (pricing changed, nothing booked) */}
+          {error && rejected && reviewRequiredRejection && (
+            <div className="space-y-3">
+              <div
+                role="alert"
+                className="rounded-md border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-foreground"
+              >
+                <p className="font-medium">Pricing has changed since you started.</p>
+                <p className="mt-1 text-muted-foreground">
+                  Your selections, contact details, and dietary notes are preserved, but nothing was
+                  booked by this attempt. Please get a fresh estimate and review the updated
+                  breakdown before submitting again.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    // Reset the controller (permitted only after a proven
+                    // rejection) so the next attempt generates a fresh key.
+                    // Then explicitly request a fresh authoritative quote so
+                    // the customer sees the updated breakdown. Submission stays
+                    // blocked while the quote is loading, missing, failed, or
+                    // unresolved — the customer must submit again explicitly.
+                    onResetForNewRequest();
+                    onRetryQuote();
+                  }}
+                  disabled={quoteLoading}
+                >
+                  Get fresh estimate &amp; review
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Nothing was booked — it&apos;s safe to review the updated pricing and submit again.
+              </p>
+            </div>
+          )}
+
+          {/* Submit error (definitive rejection, non-review) */}
+          {error && rejected && !reviewRequiredRejection && (
             <div className="space-y-3">
               <div
                 role="alert"

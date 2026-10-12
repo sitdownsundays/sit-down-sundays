@@ -22,6 +22,8 @@ import {
   resolveOrderingActor,
   resolveOrderingPreviewActor,
 } from "@/lib/server/ordering-auth.server";
+import { serverSavePackagePricing } from "@/lib/server/ordering-package-pricing-actions.server";
+import { updatePackageGuestPricingSchema } from "@/lib/ordering/schema";
 import {
   createMealPackageSchema,
   updateMealPackageSchema,
@@ -38,6 +40,7 @@ import type {
   GuestPricingRulesOperationResult,
   OrderingConfigDTO,
 } from "@/lib/ordering/types";
+import type { PackagePricingSaveResult } from "@/lib/ordering/package-pricing-types";
 
 /* ----------------------------- Config reads ----------------------------- */
 
@@ -145,6 +148,14 @@ export const updateGuestPricingRules = createServerFn({ method: "POST" })
     } catch {
       return { success: false, error: "You are not authorized to manage ordering configuration." };
     }
+  });
+
+/* --------------------- Per-package guest pricing (0025) --------------------- */
+
+export const savePackagePricing = createServerFn({ method: "POST" })
+  .validator((d: unknown) => updatePackageGuestPricingSchema.parse(d))
+  .handler(async ({ data }): Promise<PackagePricingSaveResult> => {
+    return serverSavePackagePricing(data);
   });
 
 /* ----------------------------- Order preview ----------------------------- */

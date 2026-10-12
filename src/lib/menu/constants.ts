@@ -25,6 +25,16 @@ export const MENU_CATEGORIES = [
 
 export type MenuCategory = (typeof MENU_CATEGORIES)[number];
 
+/**
+ * Explicit package-use designation for a menu item (migration 0026).
+ * A meat/protein, side, bread/rolls, or included beverage selection within
+ * a meal package. Multiple distinct values are allowed. This is independent
+ * of the course `category` and must never be inferred from it.
+ */
+export const PACKAGE_USE_CATEGORIES = ["meat", "side", "bread", "drink"] as const;
+
+export type PackageUseCategory = (typeof PACKAGE_USE_CATEGORIES)[number];
+
 /** Length limits aligned with the database varchar constraints. */
 export const MENU_LIMITS = {
   menuName: 160,

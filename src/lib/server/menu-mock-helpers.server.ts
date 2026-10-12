@@ -4,7 +4,7 @@
  * Pure mapping functions extracted from MockMenuRepository to keep that file
  * focused. Server-only (blocked from the client bundle by filename).
  */
-import type { MenuCategory, MenuStatus } from "@/lib/menu/constants";
+import type { MenuCategory, MenuStatus, PackageUseCategory } from "@/lib/menu/constants";
 import type { MenuItemDTO, MenuSectionDTO, MenuWithContentDTO } from "@/lib/menu/types";
 
 export interface MockMenuRow {
@@ -39,6 +39,8 @@ export interface MockItemRow {
   description: string;
   priceCents: number;
   category: MenuCategory;
+  /** Explicit package-use designations (migration 0026). Defaults to []. */
+  packageUseCategories: PackageUseCategory[];
   imageUrl: string | null;
   imageAlt: string | null;
   dietaryTags: string[];
@@ -72,6 +74,7 @@ export function itemToDTO(i: MockItemRow): MenuItemDTO {
     description: i.description,
     priceCents: i.priceCents,
     category: i.category,
+    packageUseCategories: i.packageUseCategories,
     imageUrl: i.imageUrl,
     imageAlt: i.imageAlt,
     dietaryTags: i.dietaryTags,

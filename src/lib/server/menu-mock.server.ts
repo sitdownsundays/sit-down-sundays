@@ -423,6 +423,7 @@ export class MockMenuRepository implements MenuRepository {
       description: input.description ?? "",
       priceCents: input.priceCents,
       category: input.category,
+      packageUseCategories: input.packageUseCategories ?? [],
       imageUrl: input.imageUrl ?? null,
       imageAlt: input.imageAlt ?? null,
       dietaryTags: input.dietaryTags ?? [],
@@ -480,6 +481,8 @@ export class MockMenuRepository implements MenuRepository {
     if (input.description !== undefined) i.description = input.description;
     if (input.priceCents !== undefined) i.priceCents = input.priceCents;
     if (input.category !== undefined) i.category = input.category;
+    if (input.packageUseCategories !== undefined)
+      i.packageUseCategories = input.packageUseCategories;
     if (input.imageUrl !== undefined) i.imageUrl = input.imageUrl;
     if (input.imageAlt !== undefined) i.imageAlt = input.imageAlt;
     if (input.dietaryTags !== undefined) i.dietaryTags = input.dietaryTags;

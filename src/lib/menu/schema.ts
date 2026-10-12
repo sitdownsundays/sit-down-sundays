@@ -12,11 +12,48 @@ import {
   MENU_CATEGORIES,
   MENU_LIMITS,
   MENU_STATUSES,
+  PACKAGE_USE_CATEGORIES,
   normalizeSlug,
 } from "./constants";
 
 export const menuStatusSchema = z.enum(MENU_STATUSES as unknown as [string, ...string[]]);
 export const menuCategorySchema = z.enum(MENU_CATEGORIES as unknown as [string, ...string[]]);
+
+/**
+ * Package-use designations (migration 0026). Distinct values only; the
+ * `.strict()` array rejects unknown values and duplicates are rejected by
+ * the refinement below. Mirrors the database CHECK constraint.
+ */
+export const packageUseCategoriesSchema = z
+  .array(z.enum(PACKAGE_USE_CATEGORIES))
+  .superRefine((arr, ctx) => {
+    const seen = new Set<string>();
+    for (const v of arr) {
+      if (seen.has(v)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Package-use categories must not contain duplicates.",
+        });
+        return;
+      }
+      seen.add(v);
+    }
+  });
+
+/**
+ * Validate a raw `package_use_categories` value read from the database.
+ * Returns the validated array, or null when the value is missing/malformed
+ * so the repository can route it through its safe-error path rather than
+ * silently defaulting to an empty array.
+ */
+export function validatePackageUseCategories(value: unknown): PackageUseCategory[] | null {
+  if (!Array.isArray(value)) return null;
+  const result = packageUseCategoriesSchema.safeParse(value);
+  if (!result.success) return null;
+  return result.data;
+}
+
+import type { PackageUseCategory } from "./constants";
 
 /**
  * Create schema for a new menu. Status is INTENTIONALLY EXCLUDED and the
@@ -169,6 +206,7 @@ const menuItemFieldsSchema = z.object({
   description: z.string().trim().max(MENU_LIMITS.description).optional().default(""),
   priceCents: z.number().int().min(0).max(MAX_PRICE_CENTS),
   category: menuCategorySchema,
+  packageUseCategories: packageUseCategoriesSchema.optional(),
   imageUrl: nullableTrimmedString(MENU_LIMITS.imageUrl),
   imageAlt: nullableTrimmedString(MENU_LIMITS.imageAlt),
   dietaryTags: tagListField(),

@@ -6,26 +6,19 @@
  * (resolveSundaysActorWithPermission) and the admin Supabase client
  * (getAdminClient) are mocked at their real module boundaries via vi.mock,
  * so the action wiring — permission requested, actor passed to the RPC,
- * input validation, code/message mapping, error handling — is what is under
- * test.
+ * input validation, runtime response validation, code/message mapping, and
+ * error handling — is what is under test.
  *
  * These are MOCKED-BOUNDARY tests, not live PostgreSQL. They do not prove the
  * RPC's atomic/rollback behavior; they verify the application wrapper.
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
-// ---------------------------------------------------------------------------
-// Mock the admin Supabase client so we can assert RPC call args and control
-// results. getAdminClient returns an object with an .rpc() mock.
-// ---------------------------------------------------------------------------
 const mockRpc = vi.fn();
 vi.mock("@/lib/server/supabase-admin.server", () => ({
   getAdminClient: () => ({ rpc: mockRpc }),
 }));
 
-// ---------------------------------------------------------------------------
-// Mock the authorization helper so we can control auth outcomes per test.
-// ---------------------------------------------------------------------------
 const mockResolve = vi.fn();
 vi.mock("@/lib/server/sundays-auth.server", () => ({
   resolveSundaysActorWithPermission: (permission: string) => mockResolve(permission),
@@ -37,11 +30,11 @@ vi.mock("@/lib/server/sundays-auth.server", () => ({
   },
 }));
 
-// Import AFTER mocks are registered.
 const { serverCancelReservation } = await import("@/lib/server/reservation-cancel-actions.server");
 
 const ACTOR_ID = "verified-session-user-id";
 const RES_ID = "11111111-1111-1111-1111-111111111111";
+const OTHER_ID = "44444444-4444-4444-4444-444444444444";
 const EXPECTED_AT = "2026-01-01T00:00:00.000Z";
 const NEW_AT = "2026-01-02T00:00:00.000Z";
 const REASON = "Guest changed plans.";
@@ -59,11 +52,13 @@ function authReject(): never {
   })();
 }
 
-function rpcSuccess(overrides: Partial<{ updatedAt: string; alreadyCancelled: boolean }> = {}) {
+function rpcSuccess(
+  overrides: Partial<{ updatedAt: string; alreadyCancelled: boolean; reservationId: string }> = {},
+) {
   return {
     data: {
       ok: true,
-      reservation_id: RES_ID,
+      reservation_id: overrides.reservationId ?? RES_ID,
       reservation_updated_at: overrides.updatedAt ?? NEW_AT,
       already_cancelled: overrides.alreadyCancelled ?? false,
     },
@@ -166,8 +161,6 @@ describe("serverCancelReservation", () => {
       status: "confirmed",
       paymentStatus: "paid_in_full",
     });
-    // The strict schema rejects unknown keys, so the RPC is never called and
-    // no injected actor/status/payment field can reach the database.
     expect(result.ok).toBe(false);
     expect(mockRpc).not.toHaveBeenCalled();
   });
@@ -237,6 +230,19 @@ describe("serverCancelReservation", () => {
     }
   });
 
+  it("preserves fractional-second timestamp precision from the response", async () => {
+    mockResolve.mockImplementation(authActor);
+    const fractional = "2026-01-02T00:00:00.123456Z";
+    mockRpc.mockResolvedValue(rpcSuccess({ updatedAt: fractional }));
+    const result = await serverCancelReservation({
+      reservationId: RES_ID,
+      expectedUpdatedAt: EXPECTED_AT,
+      reason: REASON,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.reservationUpdatedAt).toBe(fractional);
+  });
+
   it("maps conflict code to a reload message", async () => {
     mockResolve.mockImplementation(authActor);
     mockRpc.mockResolvedValue(rpcFailure("conflict"));
@@ -281,6 +287,18 @@ describe("serverCancelReservation", () => {
     }
   });
 
+  it("an unknown failure code becomes unexpected", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue(rpcFailure("totally_made_up"));
+    const result = await serverCancelReservation({
+      reservationId: RES_ID,
+      expectedUpdatedAt: EXPECTED_AT,
+      reason: REASON,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("unexpected");
+  });
+
   it("database/transport error produces a safe failure, not success", async () => {
     mockResolve.mockImplementation(authActor);
     mockRpc.mockResolvedValue({ data: null, error: { message: "connection reset" } });
@@ -308,7 +326,7 @@ describe("serverCancelReservation", () => {
     if (!result.ok) expect(result.error).not.toContain("db down");
   });
 
-  it("a malformed RPC response (ok true but missing fields) still returns a safe result", async () => {
+  it("a malformed response (ok true but missing fields) is unexpected, not success", async () => {
     mockResolve.mockImplementation(authActor);
     mockRpc.mockResolvedValue({ data: { ok: true }, error: null });
     const result = await serverCancelReservation({
@@ -316,16 +334,116 @@ describe("serverCancelReservation", () => {
       expectedUpdatedAt: EXPECTED_AT,
       reason: REASON,
     });
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.reservationId).toBe(RES_ID);
-      expect(result.alreadyCancelled).toBe(false);
-    }
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("unexpected");
   });
 
-  it("a malformed RPC response (no ok field) produces a safe failure", async () => {
+  it("a malformed response (ok true but missing timestamp) is unexpected", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue({
+      data: { ok: true, reservation_id: RES_ID, already_cancelled: false },
+      error: null,
+    });
+    const result = await serverCancelReservation({
+      reservationId: RES_ID,
+      expectedUpdatedAt: EXPECTED_AT,
+      reason: REASON,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("unexpected");
+  });
+
+  it("a malformed response (invalid timestamp, no timezone) is unexpected", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue({
+      data: {
+        ok: true,
+        reservation_id: RES_ID,
+        reservation_updated_at: "2026-01-02T00:00:00",
+        already_cancelled: false,
+      },
+      error: null,
+    });
+    const result = await serverCancelReservation({
+      reservationId: RES_ID,
+      expectedUpdatedAt: EXPECTED_AT,
+      reason: REASON,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("unexpected");
+  });
+
+  it("a response with a wrong reservation ID is unexpected", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue(rpcSuccess({ reservationId: OTHER_ID }));
+    const result = await serverCancelReservation({
+      reservationId: RES_ID,
+      expectedUpdatedAt: EXPECTED_AT,
+      reason: REASON,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("unexpected");
+  });
+
+  it("a response with a non-boolean already_cancelled is unexpected", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue({
+      data: {
+        ok: true,
+        reservation_id: RES_ID,
+        reservation_updated_at: NEW_AT,
+        already_cancelled: "yes",
+      },
+      error: null,
+    });
+    const result = await serverCancelReservation({
+      reservationId: RES_ID,
+      expectedUpdatedAt: EXPECTED_AT,
+      reason: REASON,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("unexpected");
+  });
+
+  it("a null response is unexpected", async () => {
     mockResolve.mockImplementation(authActor);
     mockRpc.mockResolvedValue({ data: null, error: null });
+    const result = await serverCancelReservation({
+      reservationId: RES_ID,
+      expectedUpdatedAt: EXPECTED_AT,
+      reason: REASON,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("unexpected");
+  });
+
+  it("a non-object response is unexpected", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue({ data: "cancelled", error: null });
+    const result = await serverCancelReservation({
+      reservationId: RES_ID,
+      expectedUpdatedAt: EXPECTED_AT,
+      reason: REASON,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("unexpected");
+  });
+
+  it("a response with a non-boolean ok field is unexpected", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue({ data: { ok: "true", reservation_id: RES_ID }, error: null });
+    const result = await serverCancelReservation({
+      reservationId: RES_ID,
+      expectedUpdatedAt: EXPECTED_AT,
+      reason: REASON,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("unexpected");
+  });
+
+  it("a failure response with an unknown code is unexpected", async () => {
+    mockResolve.mockImplementation(authActor);
+    mockRpc.mockResolvedValue({ data: { ok: false, code: 42 }, error: null });
     const result = await serverCancelReservation({
       reservationId: RES_ID,
       expectedUpdatedAt: EXPECTED_AT,

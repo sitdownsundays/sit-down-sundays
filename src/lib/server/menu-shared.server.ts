@@ -12,6 +12,7 @@ import {
   type MenuCategory,
   type MenuStatus,
 } from "@/lib/menu/constants";
+import { validatePackageUseCategories } from "@/lib/menu/schema";
 import type {
   MenuItemDTO,
   MenuItemInput,
@@ -170,6 +171,7 @@ export interface ItemRow {
   description: string | null;
   price_cents: number;
   category: string;
+  package_use_categories: unknown;
   image_url: string | null;
   image_alt: string | null;
   dietary_tags: string[] | null;
@@ -212,6 +214,12 @@ export function sectionRowToDTO(s: SectionRow): MenuSectionDTO {
 }
 
 export function itemRowToDTO(i: ItemRow): MenuItemDTO {
+  // Migration 0026 column. Missing/malformed values must not silently become
+  // an empty array — the repository maps this to a safe read failure.
+  const packageUseCategories = validatePackageUseCategories(i.package_use_categories);
+  if (packageUseCategories === null) {
+    throw new Error("Menu item could not be loaded due to invalid package-use data.");
+  }
   return {
     id: i.id,
     menuId: i.menu_id,
@@ -220,6 +228,7 @@ export function itemRowToDTO(i: ItemRow): MenuItemDTO {
     description: i.description ?? "",
     priceCents: i.price_cents,
     category: i.category as MenuCategory,
+    packageUseCategories,
     imageUrl: i.image_url,
     imageAlt: i.image_alt,
     dietaryTags: i.dietary_tags ?? [],

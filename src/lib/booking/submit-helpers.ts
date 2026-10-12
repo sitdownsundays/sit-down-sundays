@@ -33,6 +33,7 @@ export function buildSubmissionPayload(
   state: BookWizardState,
   idempotencyKey: string,
   clientPreviewSubtotalCents?: number,
+  reviewedPrice?: import("@/lib/reservation/types").ReviewedPrice,
 ): SubmitReservationRequestInput {
   const partySize = state.adults + state.seniors + state.children;
   const payload: SubmitReservationRequestInput = {
@@ -47,23 +48,31 @@ export function buildSubmissionPayload(
     contactLastName: state.contact.contactLastName.trim(),
     contactEmail: state.contact.contactEmail.trim(),
     contactPhone: state.contact.contactPhone.trim(),
-    guests: state.meals.allocations.map((a) => ({
-      guestIndex: a.guestIndex,
-      category: a.category,
-      name: a.name.trim() || undefined,
-      packageId: a.packageId!,
-      included: a.included,
-      addons: a.addons,
-      // Per-guest notes: include only when non-empty (omit otherwise for
-      // backward compatibility with older callers). The server defaults
-      // missing values to empty strings. Guard against undefined for older
-      // allocations created before note fields existed.
-      ...((a.foodAllergies ?? "").trim() ? { foodAllergies: (a.foodAllergies ?? "").trim() } : {}),
-      ...((a.dietaryPreferences ?? "").trim()
-        ? { dietaryPreferences: (a.dietaryPreferences ?? "").trim() }
-        : {}),
-      ...((a.mealRequests ?? "").trim() ? { mealRequests: (a.mealRequests ?? "").trim() } : {}),
-    })),
+    guests: state.meals.allocations.map((a) => {
+      // Omit name when blank/undefined rather than explicitly assigning
+      // undefined (exactOptionalPropertyTypes). A blank name is treated as
+      // "not supplied" — the server sees its absence, not an empty string.
+      const trimmedName = a.name.trim();
+      return {
+        guestIndex: a.guestIndex,
+        category: a.category,
+        ...(trimmedName ? { name: trimmedName } : {}),
+        packageId: a.packageId!,
+        included: a.included,
+        addons: a.addons,
+        // Per-guest notes: include only when non-empty (omit otherwise for
+        // backward compatibility with older callers). The server defaults
+        // missing values to empty strings. Guard against undefined for older
+        // allocations created before note fields existed.
+        ...((a.foodAllergies ?? "").trim()
+          ? { foodAllergies: (a.foodAllergies ?? "").trim() }
+          : {}),
+        ...((a.dietaryPreferences ?? "").trim()
+          ? { dietaryPreferences: (a.dietaryPreferences ?? "").trim() }
+          : {}),
+        ...((a.mealRequests ?? "").trim() ? { mealRequests: (a.mealRequests ?? "").trim() } : {}),
+      };
+    }),
     platters: state.meals.platters,
     idempotencyKey,
   };
@@ -77,6 +86,9 @@ export function buildSubmissionPayload(
 
   if (clientPreviewSubtotalCents !== undefined) {
     payload.clientPreviewSubtotalCents = clientPreviewSubtotalCents;
+  }
+  if (reviewedPrice) {
+    payload.clientPreviewPrice = reviewedPrice;
   }
   return payload;
 }

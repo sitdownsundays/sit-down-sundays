@@ -262,6 +262,49 @@ describe("SubmissionController", () => {
     expect(controller.payload).toBe(heldPayload);
   });
 
+  it("an idempotency-key mismatch is key_mismatch, not rejected — no reset, no new key, original payload intact", async () => {
+    const submitFn = vi.fn(async (): Promise<SubmitReservationResult> => ({
+      success: false,
+      outcome: "proven_rejection",
+      rejectionCode: "idempotency_key_mismatch",
+      error: "This request key was used for a different reservation.",
+    }));
+    const controller = new SubmissionController({ submit: submitFn });
+
+    await controller.start(makePayload);
+    // Distinct phase — NOT the ordinary rejected flow.
+    expect(controller.phase).toBe("key_mismatch");
+    expect(controller.isKeyMismatch()).toBe(true);
+
+    // The original key + payload are preserved (not reset to null).
+    const firstKey = submitFn.mock.calls[0][0].data.idempotencyKey;
+    const firstPayload = submitFn.mock.calls[0][0].data;
+    expect(controller.key).toBe(firstKey);
+    expect(controller.payload).toBe(firstPayload);
+
+    // Reset is BLOCKED — a row may exist; a new key could create a duplicate.
+    controller.resetForNewRequest();
+    expect(controller.phase).toBe("key_mismatch");
+    expect(controller.key).toBe(firstKey);
+    expect(controller.payload).toBe(firstPayload);
+
+    // A new start is BLOCKED — no new key generated, no new submit call.
+    const beforeCalls = submitFn.mock.calls.length;
+    await controller.start(makePayload);
+    expect(submitFn.mock.calls.length).toBe(beforeCalls);
+    expect(controller.phase).toBe("key_mismatch");
+    expect(controller.key).toBe(firstKey);
+
+    // Edit/Back is BLOCKED — cannot navigate away from the recovery path.
+    expect(controller.canEditOrBack()).toBe(false);
+    expect(controller.canStartNew()).toBe(false);
+    expect(controller.canRetry()).toBe(false);
+
+    // The recovery message does NOT claim nothing was booked.
+    expect(controller.error).not.toContain("nothing was booked");
+    expect(controller.error).toContain("different reservation");
+  });
+
   it("does not fall back to Math.random when Web Crypto is unavailable", async () => {
     // Inject a generateKey that simulates unavailable Web Crypto.
     const submitFn = vi.fn(async (): Promise<SubmitReservationResult> => ({

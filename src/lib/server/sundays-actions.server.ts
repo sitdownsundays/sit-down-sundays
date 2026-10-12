@@ -181,6 +181,9 @@ export async function serverGetPaymentPolicy(): Promise<PaymentPolicyDTO> {
       depositPercent: 50,
       defaultBalanceDeadlineHours: 72,
       restaurantTimezone: null,
+      taxRateBasisPoints: null,
+      gratuityRateBasisPoints: null,
+      taxOnGratuity: null,
       updatedAt: "",
     };
   }

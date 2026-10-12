@@ -76,6 +76,12 @@ function seedPackages(): MealPackageDTO[] {
     createdBy: null,
     updatedBy: null,
     eligibleItems: [],
+    childRuleType: null,
+    childFixedPriceCents: null,
+    childDiscountBasisPoints: null,
+    seniorRuleType: null,
+    seniorFixedPriceCents: null,
+    seniorDiscountBasisPoints: null,
   });
   return [
     mk(
@@ -166,6 +172,12 @@ export class MockOrderingRepository implements IOrderingRepository {
         menuItemName: menuItemNameFor(e.menuItemId),
         selectionCategory: e.selectionCategory,
       })),
+      childRuleType: null,
+      childFixedPriceCents: null,
+      childDiscountBasisPoints: null,
+      seniorRuleType: null,
+      seniorFixedPriceCents: null,
+      seniorDiscountBasisPoints: null,
     };
     pkg.eligibleItems.forEach((e) => (e.packageId = pkg.id));
     this.packages.push(pkg);

@@ -424,6 +424,7 @@ export class SupabaseMenuRepository implements MenuRepository {
       description: input.description ?? "",
       price_cents: input.priceCents,
       category: input.category,
+      package_use_categories: input.packageUseCategories ?? [],
       image_url: input.imageUrl ?? null,
       image_alt: input.imageAlt ?? null,
       dietary_tags: input.dietaryTags ?? [],
@@ -486,6 +487,8 @@ export class SupabaseMenuRepository implements MenuRepository {
     if (input.description !== undefined) patch.description = input.description;
     if (input.priceCents !== undefined) patch.price_cents = input.priceCents;
     if (input.category !== undefined) patch.category = input.category;
+    if (input.packageUseCategories !== undefined)
+      patch.package_use_categories = input.packageUseCategories;
     if (input.imageUrl !== undefined) patch.image_url = input.imageUrl;
     if (input.imageAlt !== undefined) patch.image_alt = input.imageAlt;
     if (input.dietaryTags !== undefined) patch.dietary_tags = input.dietaryTags;

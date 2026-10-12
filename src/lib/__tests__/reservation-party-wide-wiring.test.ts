@@ -216,6 +216,21 @@ function baseInput(over: Record<string, unknown> = {}) {
     ],
     platters: [],
     idempotencyKey: "key-1",
+    // Required for new requests: a complete ReviewedPrice matching the
+    // authoritative recalculation (2 × 2950 = 5900 food, 0 gratuity, 0 tax,
+    // 50% deposit). Without this the handler returns review_required before
+    // reaching the mocked repository.
+    clientPreviewPrice: {
+      subtotalCents: 5900,
+      gratuityCents: 0,
+      taxCents: 0,
+      grandTotalCents: 5900,
+      depositRequiredCents: 2950,
+      appliedGratuityRateBasisPoints: 0,
+      appliedTaxRateBasisPoints: 0,
+      appliedTaxOnGratuity: false,
+      appliedDepositPercent: 50,
+    },
     ...over,
   };
 }
@@ -228,6 +243,7 @@ function setupSubmission() {
     status: "open",
     spaceId: "space-1",
     onlineBookingLimit: 80,
+    capacityResourceId: null,
     isActive: true,
     displayOrder: 0,
     createdAt: "2026-01-01T00:00:00.000Z",
@@ -255,6 +271,11 @@ function setupSubmission() {
     depositPercent: 50,
     defaultBalanceDeadlineHours: 72,
     restaurantTimezone: "America/Chicago",
+    // Explicit "no charges" — valid configured policy (food-only total).
+    // NULL/undefined would fail pricing under the corrected contract.
+    taxRateBasisPoints: 0,
+    gratuityRateBasisPoints: 0,
+    taxOnGratuity: false,
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
     createdBy: null,

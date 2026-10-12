@@ -107,24 +107,28 @@ describe("representative route availability", () => {
 });
 
 describe("dynamic route parameter handling", () => {
-  it("account reservation detail uses $reservationId param", () => {
+  it("account reservation detail declares the $reservationId dynamic route", () => {
     const content = readFileSync(
       join(ROUTES_DIR, "account.reservations.$reservationId.tsx"),
       "utf-8",
     );
     expect(content).toContain("$reservationId");
-    expect(content).toContain("useParams");
     expect(content).toContain("/account/reservations/$reservationId");
+    // The account detail route no longer looks up demo data by param; it
+    // shows an informational state regardless of the reservation ID.
   });
 
-  it("staff reservation detail uses $reservationId param", () => {
+  it("staff reservation detail declares the $reservationId dynamic route", () => {
     const content = readFileSync(
       join(ROUTES_DIR, "staff.reservations.$reservationId.tsx"),
       "utf-8",
     );
     expect(content).toContain("$reservationId");
-    expect(content).toContain("useParams");
     expect(content).toContain("/staff/reservations/$reservationId");
+    // The staff detail route no longer looks up demo data by param; it shows
+    // an informational state and an access-gated admin dashboard link.
+    expect(content).not.toContain("MOCK_RESERVATIONS");
+    expect(content).not.toContain("useParams");
   });
 });
 

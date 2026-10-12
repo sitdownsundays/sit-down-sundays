@@ -30,6 +30,25 @@ import type { VenueSpaceDTO } from "@/lib/spaces/types";
 import type { PublicAvailabilityOption } from "@/lib/reservation/types";
 import { isValidTimezone, seatingStartISO } from "@/lib/reservation/timezone";
 
+// Public reads need only these fields, not full admin DTOs or audit actors.
+// Full repository DTOs remain structurally compatible. Rules are unchanged.
+export type EligibilityService = Pick<
+  SundayServiceDTO,
+  "id" | "date" | "label" | "spaceId" | "status" | "isActive" | "onlineBookingLimit"
+>;
+
+export type EligibilitySeating = Pick<
+  SeatingTimeDTO,
+  "id" | "sundayServiceId" | "label" | "startTime" | "endTime" | "isActive" | "onlineBookingLimit"
+>;
+
+export type EligibilitySpace = Pick<
+  VenueSpaceDTO,
+  "id" | "name" | "spaceType" | "isActive" | "onlineBookingLimit"
+>;
+
+export type EligibilityPolicy = Pick<PaymentPolicyDTO, "restaurantTimezone">;
+
 /** Only the "open" status is intentionally open for public requests. */
 const OPEN_STATUS = "open";
 
@@ -59,10 +78,10 @@ export interface EligibilityResult {
  * submission call this so the rules cannot drift.
  */
 export function evaluateEligibility(
-  service: SundayServiceDTO | null,
-  seating: SeatingTimeDTO | null,
-  space: VenueSpaceDTO | null,
-  policy: PaymentPolicyDTO,
+  service: EligibilityService | null,
+  seating: EligibilitySeating | null,
+  space: EligibilitySpace | null,
+  policy: EligibilityPolicy,
   now: Date = new Date(),
 ): EligibilityResult {
   if (!service)
@@ -207,10 +226,10 @@ export function validatePartySizeAgainstCeiling(partySize: number, ceiling: numb
  * configured limits — a request ceiling, NOT measured live inventory.
  */
 export function buildEligibleOptions(
-  services: SundayServiceDTO[],
-  seatingsByService: Map<string, SeatingTimeDTO[]>,
-  spaces: VenueSpaceDTO[],
-  policy: PaymentPolicyDTO,
+  services: EligibilityService[],
+  seatingsByService: Map<string, EligibilitySeating[]>,
+  spaces: EligibilitySpace[],
+  policy: EligibilityPolicy,
   now: Date = new Date(),
 ): PublicAvailabilityOption[] {
   const spaceById = new Map(spaces.map((s) => [s.id, s]));

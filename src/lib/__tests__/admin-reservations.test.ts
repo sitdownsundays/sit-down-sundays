@@ -78,6 +78,15 @@ function makeDetail(): ReservationDetailDTO {
     amountPaidCents: 0,
     remainingBalanceCents: 5000,
     balanceDeadline: "2026-10-08T12:00:00Z",
+    approval: {
+      requiresManagementApproval: false,
+      approvedAt: null,
+      approvedBy: null,
+      timingBasis: "historical_unverified",
+      submittedAt: null,
+      seatingStart: null,
+      restaurantTimezone: null,
+    },
     pricingSnapshot: {},
     policySnapshot: {},
     guests: [

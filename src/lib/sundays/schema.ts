@@ -33,6 +33,7 @@ export const createSundayServiceSchema = z.object({
   status: sundayStatusEnum.optional(),
   spaceId: z.string().uuid("Select a venue space."),
   onlineBookingLimit: z.number().int().min(0).max(10000).nullable().optional(),
+  capacityResourceId: z.string().uuid().nullable().optional(),
   isActive: z.boolean().optional(),
   displayOrder: z.number().int().min(0).optional(),
 });
@@ -45,6 +46,7 @@ export const updateSundayServiceSchema = z.object({
   status: sundayStatusEnum.optional(),
   spaceId: z.string().uuid().optional(),
   onlineBookingLimit: z.number().int().min(0).max(10000).nullable().optional(),
+  capacityResourceId: z.string().uuid().nullable().optional(),
   isActive: z.boolean().optional(),
   displayOrder: z.number().int().min(0).optional(),
 });
@@ -94,6 +96,24 @@ export const updatePaymentPolicySchema = z.object({
   depositPercent: z.number().min(0).max(100),
   defaultBalanceDeadlineHours: z.number().int().min(0).max(720),
   restaurantTimezone: z.string().trim().max(120).nullable(),
+  /**
+   * Optional tax rate. Omitted/undefined = leave existing unchanged. Explicit
+   * null = clear to "not configured". 0 is a valid supplied value (0% tax).
+   * When supplied, must be an integer 0–10000 inclusive.
+   */
+  taxRateBasisPoints: z.number().int().min(0).max(10000).nullable().optional(),
+  /**
+   * Optional gratuity rate. Omitted/undefined = leave existing unchanged.
+   * Explicit null = clear to "not configured". 0 is a valid supplied value.
+   * When supplied, must be an integer 0–10000 inclusive.
+   */
+  gratuityRateBasisPoints: z.number().int().min(0).max(10000).nullable().optional(),
+  /**
+   * Optional tax-on-gratuity flag. Omitted/undefined = leave existing
+   * unchanged. Explicit null = clear to "not configured". false is a valid
+   * supplied value (tax applies to food subtotal only).
+   */
+  taxOnGratuity: z.boolean().nullable().optional(),
 });
 
 export type CreateSundayServiceInput = z.infer<typeof createSundayServiceSchema>;
@@ -194,3 +214,84 @@ export function isValidOffsetOrZTimestamp(value: string): boolean {
   if (!/[zZ]$/.test(value) && !/[+-]\d{2}:?\d{2}$/.test(value)) return false;
   return true;
 }
+
+/* ----------------------------- Management approval ----------------------------- */
+
+/**
+ * Strict browser input for approve_reservation_for_payment_atomic.
+ *
+ * Only reservationId, expectedUpdatedAt, the deadline choice, and an
+ * optional reason are accepted. The actor user ID is derived from the verified
+ * session server-side — never from the browser. Unknown keys are rejected.
+ *
+ * The deadline-type combination rules match the 0022 RPC exactly:
+ *   - hours_before requires customHours (integer 1–720).
+ *   - custom requires customDeadline (timezone-bearing timestamp).
+ *   - default and at_check_in must NOT supply either.
+ *   - Every non-default choice requires a nonblank reason (≤1000 chars).
+ */
+const APPROVAL_DEADLINE_TYPES = ["default", "hours_before", "custom", "at_check_in"] as const;
+
+export const approvalSchema = z
+  .object({
+    reservationId: z.string().uuid("Select a valid reservation."),
+    expectedUpdatedAt: z
+      .string()
+      .min(1)
+      .refine((v) => isValidOffsetOrZTimestamp(v), {
+        message: "Provide a valid timestamp with a timezone (Z or numeric offset).",
+      }),
+    balanceDeadlineType: z.enum(APPROVAL_DEADLINE_TYPES, {
+      errorMap: () => ({ message: "Select a valid balance deadline option." }),
+    }),
+    customHours: z
+      .number()
+      .int("Hours must be a whole number.")
+      .min(1, "Hours must be at least 1.")
+      .max(720, "Hours must be 720 or fewer.")
+      .nullish(),
+    customDeadline: z
+      .string()
+      .nullish()
+      .refine((v) => v === undefined || v === null || isValidOffsetOrZTimestamp(v), {
+        message: "Provide a valid custom deadline with a timezone (Z or numeric offset).",
+      }),
+    reason: z.string().max(1000, "Reason must be 1,000 characters or fewer.").nullish(),
+  })
+  .strict()
+  .refine(
+    (data) => {
+      if (data.balanceDeadlineType === "hours_before") {
+        return (
+          data.customHours !== undefined &&
+          data.customHours !== null &&
+          data.customDeadline === undefined
+        );
+      }
+      if (data.balanceDeadlineType === "custom") {
+        return (
+          data.customDeadline !== undefined &&
+          data.customDeadline !== null &&
+          data.customHours === undefined
+        );
+      }
+      // default and at_check_in: neither field may be supplied.
+      return data.customHours === undefined && data.customDeadline === undefined;
+    },
+    {
+      message: "The selected deadline option does not match the supplied hours or custom date.",
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.balanceDeadlineType === "default") return true;
+      const reason = data.reason;
+      if (reason === undefined || reason === null) return false;
+      return reason.trim().length >= 1;
+    },
+    {
+      message: "A reason is required for any deadline choice other than the default.",
+    },
+  );
+
+export type ApprovalInput = z.infer<typeof approvalSchema>;

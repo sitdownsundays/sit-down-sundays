@@ -40,6 +40,27 @@ export interface MealPackageDTO {
   createdBy: string | null;
   updatedBy: string | null;
   eligibleItems: EligibleItemDTO[];
+  /**
+   * Package-specific child pricing override.
+   * null = use the existing global child-pricing behavior (not configured).
+   * "none" = explicitly charge this package's regular price (no discount).
+   * "fixed_package_price" = charge childFixedPriceCents.
+   * "percentage_discount" = reduce by childDiscountBasisPoints.
+   */
+  childRuleType: ChildRuleType | null;
+  /** Final child package price in cents. Required for fixed_package_price; null otherwise. */
+  childFixedPriceCents: number | null;
+  /** Child discount in basis points (100 = 1%). Required for percentage_discount; null otherwise. */
+  childDiscountBasisPoints: number | null;
+  /**
+   * Package-specific senior pricing override (same semantics as childRuleType).
+   * Independent of the global senior rule and the per-package child rule.
+   */
+  seniorRuleType: ChildRuleType | null;
+  /** Final senior package price in cents. Required for fixed_package_price; null otherwise. */
+  seniorFixedPriceCents: number | null;
+  /** Senior discount in basis points (100 = 1%). Required for percentage_discount; null otherwise. */
+  seniorDiscountBasisPoints: number | null;
 }
 
 export interface CreateMealPackageInput {

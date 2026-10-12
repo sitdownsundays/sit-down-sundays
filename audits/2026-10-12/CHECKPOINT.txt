@@ -1,0 +1,70 @@
+SIT DOWN SUNDAYS — 2026-10-12 CAPACITY, PAYMENTS AND PRICING CHECKPOINT
+
+STATUS: VERIFIED LOCAL SOURCE CHECKPOINT, NOT LAUNCH APPROVAL
+
+Branch: checkpoint/2026-10-12-capacity-payments-pricing
+Base: 7e49de6 (October 9 reservations/seating checkpoint).
+Source: owner-supplied sunday-supper-2 (6).zip.
+ZIP SHA-256: daf2764996a4bebfb0860a63355a06f3d2f481915ebfa843392190879ef91f42
+
+All export files match the checkout byte-for-byte except the three final
+zero-retrieve assertions in checkout-failure-code-narrowing.test.ts. The owner
+reported those assertions added in AI Studio after the ZIP was produced; they
+have been reproduced here and independently tested. No production-code or SQL
+fixes were made while preparing this checkpoint. Existing audit history retained.
+Main is untouched; no history rewrite, migration execution or deployment.
+
+OBSERVED VALIDATION ON THE CHECKPOINT CHECKOUT
+- Vitest: 117 files passed; 2,441 tests passed; zero failures.
+- Vite production build: exit 0, passed (client and server bundles).
+- ESLint: exit 0; zero errors, 27 existing react-refresh warnings.
+- Standalone TypeScript: exit 2; 890 diagnostics: 548 in test files, 342 outside
+  tests. These counts are unchanged from the final ZIP audit. They are not 890
+  demonstrated runtime defects; the project does not have a clean typecheck.
+- Git diff whitespace validation: clean.
+- Bounded credential-pattern/sensitive-filename scan: no matches in 554 source
+  and existing audit files before adding this checkpoint's evidence. Not a
+  comprehensive security certification.
+
+LATEST CLOSED FINDINGS
+- Catalog validation: loading/failed reads retain wait/retry messages; unknown
+  saved selections remain explicitly removable after a successful empty read.
+- Checkout failure-code narrowing safely recognizes approval-required and
+  checkout-requires-review responses and rejects unknown codes safely.
+- Stripe SDK creation parameters use the installed SDK's supported field.
+- Stripe mocked-call counters now increment on actual entry. Every preparation
+  rejection case asserts zero create and retrieve calls, including the final
+  three unknown/missing/malformed-code cases.
+- Adapter tests capture the actual SDK request options and verify the exact
+  idempotency key for first and repeated calls, not just request-body equality.
+- Prior independent audit probes verified pricing lock/recovery behavior,
+  catalog validation/removal and rounding with mocked boundaries. Those separate
+  audit-only probes are not part of the 2,441 checked-in tests.
+
+SOURCE INCLUDED SINCE PRIOR GITHUB CHECKPOINT
+Capacity-read/submission foundations and admin configuration, approval backend
+and dialog, Stripe Checkout service/webhook deposit processor foundations,
+payment-access primitives, per-package child/senior pricing engine/save/editor,
+menu package-use read/save contract, and the related tests and SQL files.
+Inclusion is not a claim that every feature is wired into the public flow.
+
+REMAINING LIMITATIONS
+- Standalone TypeScript still fails as quantified above.
+- No live PostgreSQL, concurrency, Stripe or end-to-end customer deposit flow
+  was exercised while preparing this checkpoint.
+- Customer payment-access issuance/binding and customer Checkout UI are not
+  established as operational by these tests. Do not infer them from the internal
+  service or token helpers alone. Email and remaining-balance workflows are not
+  certified complete.
+- Package-use classification read/save exists, but authoritative item editor
+  classification and package selector adoption remain separate integration work;
+  broad course-category mappings are not breads-only classification.
+- Capacity activation, service opening, live-mode payments, publishing and
+  migration application are separate owner-controlled actions, not performed.
+- Some SQL files retain UNAPPLIED/pending labels despite owner-reported manual
+  application. This checkpoint does not reconcile live migration state; do not
+  execute all pending files blindly or assume the folder indicates live state.
+
+Evidence files: tests.txt, build.txt, lint.txt, typecheck.txt.
+Historical audit notes describe their own snapshots; this document is the
+current checkpoint summary and closes the final payment-test omissions.

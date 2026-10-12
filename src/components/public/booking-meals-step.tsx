@@ -122,7 +122,7 @@ export function MealsStep({ state, meals, onBack, onContinue }: Props) {
         <div className="mt-6">
           <ErrorState
             title="Couldn't load the menu"
-            message={catalogError ?? undefined}
+            {...(catalogError ? { message: catalogError } : {})}
             action={
               <Button variant="outline" onClick={() => void loadCatalog()}>
                 Try again

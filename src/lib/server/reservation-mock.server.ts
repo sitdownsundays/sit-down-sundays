@@ -142,6 +142,15 @@ export class MockReservationRepository implements IReservationRepository {
       amountPaidCents: 0,
       remainingBalanceCents: input.pricing.grandTotalCents,
       balanceDeadline: input.pricing.balanceDeadline,
+      approval: {
+        requiresManagementApproval: false,
+        approvedAt: null,
+        approvedBy: null,
+        timingBasis: "historical_unverified",
+        submittedAt: null,
+        seatingStart: null,
+        restaurantTimezone: null,
+      },
       pricingSnapshot: input.pricing.pricingSnapshot,
       policySnapshot: input.pricing.policySnapshot,
       guests: input.snapshots.guests.map((g) => {

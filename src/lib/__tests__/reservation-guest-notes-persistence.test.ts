@@ -390,6 +390,7 @@ describe("SupabaseReservationRepository.getReservation — note column mapping",
     guestData?: unknown;
     platterData?: unknown;
     addonData?: unknown;
+    approvalData?: unknown;
     error?: unknown;
   }) {
     const reservationChain = {
@@ -398,6 +399,18 @@ describe("SupabaseReservationRepository.getReservation — note column mapping",
       maybeSingle: vi.fn(async () => ({
         data: opts.reservationData ?? null,
         error: opts.error ?? null,
+      })),
+    };
+    // readReservationApproval queries the reservations table directly for the
+    // 0022 approval columns. Supply a valid approval row with matching id +
+    // updated_at so the real reader validates and returns approval metadata.
+    const approvalRow = (opts.approvalData ?? null) as Record<string, unknown> | null;
+    const approvalChain = {
+      select: vi.fn(() => approvalChain),
+      eq: vi.fn(() => approvalChain),
+      maybeSingle: vi.fn(async () => ({
+        data: approvalRow,
+        error: null,
       })),
     };
     const guestChain = {
@@ -420,6 +433,7 @@ describe("SupabaseReservationRepository.getReservation — note column mapping",
     };
     const fromMock = vi.fn((table: string) => {
       if (table === "reservation_detail_view") return reservationChain;
+      if (table === "reservations") return approvalChain;
       if (table === "reservation_guests") return guestChain;
       if (table === "reservation_platter_lines") return platterChain;
       if (table === "reservation_guest_addons") return addonChain;
@@ -498,6 +512,17 @@ describe("SupabaseReservationRepository.getReservation — note column mapping",
       guestData: guestRows,
       platterData: [],
       addonData: [],
+      approvalData: {
+        id: "res-1",
+        updated_at: "2026-10-09T00:00:00Z",
+        requires_management_approval: false,
+        approved_at: null,
+        approved_by: null,
+        approval_timing_basis: "historical_unverified",
+        approval_submitted_at: null,
+        approval_seating_start: null,
+        approval_timezone: null,
+      },
     });
     const repo = new SupabaseReservationRepository(harness.client);
     const result = await repo.getReservation("res-1");
@@ -564,6 +589,17 @@ describe("SupabaseReservationRepository.getReservation — note column mapping",
       guestData: guestRows,
       platterData: [],
       addonData: [],
+      approvalData: {
+        id: "res-1",
+        updated_at: "2026-10-09T00:00:00Z",
+        requires_management_approval: false,
+        approved_at: null,
+        approved_by: null,
+        approval_timing_basis: "historical_unverified",
+        approval_submitted_at: null,
+        approval_seating_start: null,
+        approval_timezone: null,
+      },
     });
     const repo = new SupabaseReservationRepository(harness.client);
     const result = await repo.getReservation("res-1");

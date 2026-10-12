@@ -12,6 +12,8 @@ import {
   findOption,
   reconcileSelection,
   validateParty,
+  validatePartyCapacity,
+  capacityFromOption,
   totalGuests,
   formatServiceDate,
   formatSeatingTime,
@@ -19,6 +21,7 @@ import {
   SCHEMA_PARTY_LIMIT,
 } from "@/lib/booking/wizard-helpers";
 import type { PublicAvailabilityOption } from "@/lib/reservation/types";
+import type { CapacityAvailabilityOption } from "@/lib/reservation/capacity-availability";
 import type { BookWizardState } from "@/lib/booking/wizard-helpers";
 import {
   buildAllocations,
@@ -45,13 +48,17 @@ function opt(
   label = "",
   space = "Grand Ballroom",
   timezone = "America/Chicago",
-): PublicAvailabilityOption {
+  availableCapacity = ceiling,
+  maxBookablePartySize = ceiling,
+): CapacityAvailabilityOption {
   return {
     sundayService: { id: serviceId, date, label },
     seatingTime: { id: seatingId, label: start, startTime: start, endTime: end },
     spaceName: space,
     configuredRequestCeiling: ceiling,
     restaurantTimezone: timezone,
+    availableCapacity,
+    maxBookablePartySize,
   };
 }
 

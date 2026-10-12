@@ -54,7 +54,9 @@ export function HomeHero() {
             id="home-hero-heading"
             className="mt-5 font-display text-4xl font-bold leading-[1.05] text-cream drop-shadow-sm sm:text-5xl lg:text-6xl"
           >
-            {headline}
+            {headline.replace(" With Us", "")}
+            <br />
+            With Us
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-cream/90 drop-shadow-sm">
             {supportingText}

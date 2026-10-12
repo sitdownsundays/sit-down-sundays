@@ -90,8 +90,34 @@ export interface SubmitReservationRequestInput {
   platters: ReservationPlatterInput[];
   /** Idempotency key supplied by the client. */
   idempotencyKey: string;
-  /** Client-computed preview result for review-required detection. */
+  /** Client-computed preview subtotal for review-required detection (legacy). */
   clientPreviewSubtotalCents?: number;
+  /**
+   * Full reviewed-price snapshot the customer saw at quote time. When present,
+   * the server compares every financial term (subtotal, gratuity, tax, grand
+   * total, deposit, and applied policy rates/taxability/deposit%) against the
+   * authoritative recalculation. If ANY term changed, reviewRequired is set so
+   * the customer must re-review before persistence. Legacy submissions omitting
+   * this field fall back to the subtotal-only comparison for hash compatibility.
+   */
+  clientPreviewPrice?: ReviewedPrice;
+}
+
+/**
+ * A typed snapshot of the reviewed price terms shown to the customer at quote
+ * time. Carried through the quote → wizard → submission → server comparison so
+ * a change to ANY term forces a fresh review.
+ */
+export interface ReviewedPrice {
+  subtotalCents: number;
+  gratuityCents: number;
+  taxCents: number;
+  grandTotalCents: number;
+  depositRequiredCents: number;
+  appliedGratuityRateBasisPoints: number;
+  appliedTaxRateBasisPoints: number;
+  appliedTaxOnGratuity: boolean;
+  appliedDepositPercent: number;
 }
 
 /** Public-facing availability option (sanitized — no contact details). */
@@ -134,14 +160,32 @@ export interface ReservationPricingResult {
   success: boolean;
   lines: ReservationPriceLine[];
   subtotalCents: number;
+  /** Mandatory gratuity in integer cents (0 when rate is 0). */
+  gratuityCents?: number;
+  /** Sales tax in integer cents (0 when rate is 0). */
+  taxCents?: number;
   depositRequiredCents: number;
   grandTotalCents: number;
   remainingBalanceCents: number;
+  /**
+   * Projected balance AFTER the required deposit is paid (grandTotal − deposit).
+   * This is a PROJECTION, not the actual outstanding balance. The actual
+   * outstanding balance before any payment is `remainingBalanceCents` (the full
+   * grand total). Nothing is marked paid by computing this projection.
+   */
+  projectedBalanceAfterDepositCents?: number;
   balanceDeadline: string | null;
   hasUnresolvedRules: boolean;
   unresolvedNotes: string[];
   /** True when config changed since the client preview and review is required. */
   reviewRequired?: boolean;
+  /**
+   * The authoritative reviewed-price snapshot for the client to carry through
+   * to submission. The server compares this against a fresh recalculation at
+   * submission time; a mismatch sets reviewRequired so the customer must
+   * re-review before persistence.
+   */
+  reviewedPrice?: ReviewedPrice;
   /** Snapshot of the itemized order for persistence. */
   pricingSnapshot: Record<string, unknown>;
   /** Snapshot of the agreed payment terms for persistence. */
@@ -178,7 +222,10 @@ export type RejectionCode =
   | "eligibility_failed"
   | "pricing_failed"
   | "review_required"
-  | "unresolved_pricing";
+  | "unresolved_pricing"
+  | "capacity_not_ready"
+  | "capacity_unavailable"
+  | "invalid_configuration";
 
 /** Submit result. */
 export interface SubmitReservationResult {
@@ -197,9 +244,48 @@ export interface SubmitReservationResult {
   paymentStatus?: ReservationPaymentStatus;
   /** True when the same idempotency key + payload returned the existing reservation. */
   idempotentReplay?: boolean;
+  /**
+   * Capacity-hold metadata from the capacity-backed submission RPC. A
+   * historical replay may legitimately lack these — never fabricate a hold or
+   * deadline. The hold deadline is the server-generated two-hour window, NOT
+   * money received or a paid deposit.
+   */
+  holdId?: string;
+  holdDeadline?: string;
+  /** Capacity-hold lifecycle state from the RPC (e.g. "held", "allocated"). */
+  capacityState?: string;
   error?: string;
   /** Validation/authorization field errors. */
   fieldErrors?: Record<string, string>;
+}
+
+/**
+ * Approval timing basis derived by 0022's set_approval_requirement_0022
+ * trigger at insert time. Stored on the reservations row.
+ */
+export type ApprovalTimingBasis =
+  "historical_unverified" | "early_booking_168h_or_more" | "late_booking_under_168h";
+
+/**
+ * Persisted approval state exposed through the authorized reservation-detail
+ * read path. Derived from the actual reservations columns added by 0022 —
+ * never inferred from reservation status, payment status, or today's date.
+ */
+export interface ReservationApprovalDetail {
+  /** Whether the 168-hour late-booking rule flagged this request for review. */
+  requiresManagementApproval: boolean;
+  /** Timestamp of a verified management approval, or null if not yet approved. */
+  approvedAt: string | null;
+  /** UUID of the approving actor, or null if not yet approved. */
+  approvedBy: string | null;
+  /** Server-derived timing classification set at submission. */
+  timingBasis: ApprovalTimingBasis;
+  /** Submission time used to compute the 168-hour rule, or null for historical rows. */
+  submittedAt: string | null;
+  /** Seating start used to compute the 168-hour rule, or null for historical rows. */
+  seatingStart: string | null;
+  /** Restaurant timezone used for the timing calculation, or null for historical rows. */
+  restaurantTimezone: string | null;
 }
 
 /** Reservation detail for staff/admin. */
@@ -234,6 +320,8 @@ export interface ReservationDetailDTO {
   amountPaidCents: number;
   remainingBalanceCents: number;
   balanceDeadline: string | null;
+  /** Persisted approval state from the 0022 columns. */
+  approval: ReservationApprovalDetail;
   pricingSnapshot: Record<string, unknown>;
   policySnapshot: Record<string, unknown>;
   guests: Array<{
@@ -270,6 +358,28 @@ export interface ReservationDetailDTO {
   createdAt: string;
   updatedAt: string;
 }
+
+/**
+ * JSON-safe primitive tree for transport across the server-function boundary.
+ * `Record<string, unknown>` is not serializable; `JsonObject` is.
+ */
+export type JsonValue = string | number | boolean | null | JsonValue[] | JsonObject;
+
+export type JsonObject = { [key: string]: JsonValue };
+
+/**
+ * Transport DTO for getReservationDetail. Structurally identical to
+ * ReservationDetailDTO except the two snapshot fields are typed as JsonObject
+ * (JSON-safe) instead of Record<string, unknown> (not serializable).
+ * Assignable to ReservationDetailDTO, so existing consumers are unaffected.
+ */
+export type ReservationDetailTransport = Omit<
+  ReservationDetailDTO,
+  "pricingSnapshot" | "policySnapshot"
+> & {
+  pricingSnapshot: JsonObject;
+  policySnapshot: JsonObject;
+};
 
 /** List item for the admin reservation table. */
 export interface ReservationListItemDTO {

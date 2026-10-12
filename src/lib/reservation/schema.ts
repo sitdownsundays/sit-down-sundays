@@ -22,7 +22,10 @@ const includedSelectionSchema = z.object({
 
 const guestInputSchema = z.object({
   guestIndex: z.number().int().min(0),
-  category: z.enum(GUEST_CATEGORIES as unknown as [string, ...string[]]),
+  // Pass the readonly literal tuple directly so z.enum infers the exact
+  // GuestCategory union ("adult" | "senior" | "child") rather than widening
+  // to string through an `as unknown as [string, ...string[]]` cast.
+  category: z.enum(GUEST_CATEGORIES),
   name: z.string().max(160).optional(),
   packageId: z.string().uuid("Invalid package"),
   included: z.array(includedSelectionSchema),
@@ -52,7 +55,7 @@ export const submitReservationRequestSchema = z
       .number()
       .int()
       .min(1, "Party must include at least one guest")
-      .max(200, "Party is too large"),
+      .max(950, "Party exceeds venue capacity"),
     adults: z.number().int().min(0),
     seniors: z.number().int().min(0),
     children: z.number().int().min(0),
@@ -93,6 +96,19 @@ export const submitReservationRequestSchema = z
     ),
     idempotencyKey: z.string().min(8, "Missing request key").max(120),
     clientPreviewSubtotalCents: z.number().int().min(0).optional(),
+    clientPreviewPrice: z
+      .object({
+        subtotalCents: z.number().int().min(0),
+        gratuityCents: z.number().int().min(0),
+        taxCents: z.number().int().min(0),
+        grandTotalCents: z.number().int().min(0),
+        depositRequiredCents: z.number().int().min(0),
+        appliedGratuityRateBasisPoints: z.number().int().min(0).max(10000),
+        appliedTaxRateBasisPoints: z.number().int().min(0).max(10000),
+        appliedTaxOnGratuity: z.boolean(),
+        appliedDepositPercent: z.number().min(0).max(100),
+      })
+      .optional(),
   })
   .strict()
   .superRefine((val, ctx) => {

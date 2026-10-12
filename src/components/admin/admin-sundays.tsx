@@ -38,6 +38,7 @@ import { LoadingState } from "@/components/layout/loading-state";
 import { Button } from "@/components/ui/button";
 import { SundayServiceTable } from "./sundays-service-table";
 import { SeatingTimesPanel } from "./sundays-seating-panel";
+import { ServiceCapacityPanel } from "./service-capacity-panel";
 import { CreateServiceDialog, type CreateServiceInput } from "./sundays-create-service-dialog";
 
 type LoadState = "loading" | "loaded" | "error";
@@ -74,9 +75,12 @@ export function AdminSundaysPage() {
     loadServices();
   }, [loadServices]);
 
+  const [creating, setCreating] = useState(false);
+
   async function handleCreateService(input: CreateServiceInput) {
-    if (actionLockRef.current) return;
+    if (actionLockRef.current || creating) return;
     actionLockRef.current = true;
+    setCreating(true);
     try {
       const result: SundayServiceOperationResult = await createServiceFn({
         data: {
@@ -85,19 +89,29 @@ export function AdminSundaysPage() {
           spaceId: input.spaceId,
           status: input.status,
           onlineBookingLimit: input.onlineBookingLimit,
+          capacityResourceId: input.capacityResourceId,
         },
       });
-      if (result.success && result.data) {
+      if (result.success) {
         toast.success("Sunday service created.");
         setCreateOpen(false);
-        await loadServices();
+        try {
+          await loadServices();
+        } catch {
+          // Refresh failure is not a failed creation.
+          toast.error("Created, but the list could not be refreshed. Reload the page.");
+        }
+      } else if (result.conflict) {
+        toast.error("This service was modified by another user. Reload and try again.");
       } else {
+        // Preserve entered values — keep the dialog open so the user can retry.
         toast.error(result.error ?? "Could not create Sunday service.");
       }
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      toast.error("Could not confirm creation. Reload and try again.");
     } finally {
       actionLockRef.current = false;
+      setCreating(false);
     }
   }
 
@@ -190,7 +204,12 @@ export function AdminSundaysPage() {
           spaces={spaces}
           selectedServiceId={selectedServiceId}
           onSelect={setSelectedServiceId}
-          renderSeatingPanel={(service) => <SeatingTimesPanel service={service} />}
+          renderSeatingPanel={(service) => (
+            <div className="space-y-4">
+              <ServiceCapacityPanel service={service} onRefreshParent={loadServices} />
+              <SeatingTimesPanel service={service} />
+            </div>
+          )}
         />
       )}
 
@@ -199,6 +218,7 @@ export function AdminSundaysPage() {
         onOpenChange={setCreateOpen}
         spaces={spaces}
         onCreate={handleCreateService}
+        saving={creating}
       />
     </div>
   );

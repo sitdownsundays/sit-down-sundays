@@ -18,6 +18,12 @@ export interface SundayServiceDTO {
   spaceId: string;
   /** Staff-configured online booking limit for this service (separate from reported capacity). */
   onlineBookingLimit: number | null;
+  /**
+   * Optional capacity-resource override. NULL uses the default resource mapped
+   * to spaceId. For a Mayoral section service this may select the whole-room
+   * parent, never another room. Capacity enforcement is gated separately.
+   */
+  capacityResourceId: string | null;
   isActive: boolean;
   displayOrder: number;
   createdAt: string;
@@ -32,6 +38,8 @@ export interface CreateSundayServiceInput {
   status?: SundayStatus;
   spaceId: string;
   onlineBookingLimit?: number | null;
+  /** NULL/omitted uses the default mapped resource. */
+  capacityResourceId?: string | null;
   isActive?: boolean;
   displayOrder?: number;
 }
@@ -44,6 +52,12 @@ export interface UpdateSundayServiceInput {
   status?: SundayStatus;
   spaceId?: string;
   onlineBookingLimit?: number | null;
+  /**
+   * Omitted/undefined = leave existing. Explicit null = restore default
+   * mapping. A UUID = select that resource (must be a compatible whole-room
+   * parent for a section service).
+   */
+  capacityResourceId?: string | null;
   isActive?: boolean;
   displayOrder?: number;
 }
@@ -176,6 +190,25 @@ export interface PaymentPolicyDTO {
   defaultBalanceDeadlineHours: number;
   /** Restaurant timezone (IANA, e.g. America/Chicago). Required for scheduling. */
   restaurantTimezone: string | null;
+  /**
+   * Sales-tax rate in basis points (1000 = 10%). NULL means not configured —
+   * NOT zero and NOT tax-exempt. Tax is an additional charge never in the
+   * deposit base.
+   */
+  taxRateBasisPoints: number | null;
+  /**
+   * Mandatory gratuity rate in basis points (1800 = 18%). NULL means not
+   * configured — NOT zero and NOT waived. Gratuity is an additional charge
+   * never in the deposit base.
+   */
+  gratuityRateBasisPoints: number | null;
+  /**
+   * When true, gratuity is included in the taxable amount; when false, tax
+   * applies to the food subtotal only. NULL means not configured. The
+   * authoritative pricing path must reject an unconfigured tax scenario
+   * rather than guessing.
+   */
+  taxOnGratuity: boolean | null;
   createdAt: string;
   updatedAt: string;
   createdBy: string | null;
@@ -187,6 +220,22 @@ export interface UpdatePaymentPolicyInput {
   depositPercent: number;
   defaultBalanceDeadlineHours: number;
   restaurantTimezone: string | null;
+  /**
+   * Optional: omitted/undefined leaves the existing value unchanged; an
+   * explicit null clears to "not configured"; 0 is a valid supplied value.
+   */
+  taxRateBasisPoints?: number | null;
+  /**
+   * Optional: omitted/undefined leaves the existing value unchanged; an
+   * explicit null clears to "not configured"; 0 is a valid supplied value.
+   */
+  gratuityRateBasisPoints?: number | null;
+  /**
+   * Optional: omitted/undefined leaves the existing value unchanged; an
+   * explicit null clears to "not configured"; false is a valid supplied
+   * value.
+   */
+  taxOnGratuity?: boolean | null;
 }
 
 export interface PaymentPolicyOperationResult {
@@ -361,5 +410,63 @@ export type CancelReservationResult =
   | {
       ok: false;
       code: CancelReservationCode;
+      error: string;
+    };
+
+/* ----------------------------- Management approval ----------------------------- */
+
+/**
+ * Canonical balance-deadline choice. Matches the 0022 migration's
+ * reservation_balance_overrides.deadline_type enum exactly:
+ *   - default     → 72 hours before seating
+ *   - hours_before → a relative offset (custom_hours)
+ *   - custom      → an absolute timestamp (custom_deadline)
+ *   - at_check_in → due at seating start
+ */
+export type ApprovalBalanceDeadlineType = "default" | "hours_before" | "custom" | "at_check_in";
+
+/**
+ * Safe machine-readable codes returned by approve_reservation_for_payment_atomic.
+ * The application wrapper maps these to user-facing messages.
+ */
+export type ApprovalCode =
+  | "conflict"
+  | "invalid_status"
+  | "invalid_capacity"
+  | "invalid_configuration"
+  | "default_deadline_passed"
+  | "invalid_deadline"
+  | "checkout_requires_review"
+  | "not_found"
+  | "invalid_data"
+  | "invalid_actor"
+  | "unexpected";
+
+/**
+ * Result of approving a reservation for deposit payment (management approval).
+ *
+ * Success carries the reservation ID, the reservation's new updatedAt, the
+ * approval timestamp, the deposit and balance deadlines, the deadline type,
+ * and whether the reservation was already approved (idempotent recovery).
+ * Failure carries a safe code + message. Raw database errors are never exposed.
+ *
+ * Approval authorizes the deposit-payment window; it does NOT collect money,
+ * satisfy the deposit, confirm the reservation, or change payment status. The
+ * wrapper must not claim otherwise.
+ */
+export type ApprovalResult =
+  | {
+      ok: true;
+      reservationId: string;
+      reservationUpdatedAt: string;
+      approvedAt: string;
+      depositDeadline: string;
+      balanceDeadline: string;
+      balanceDeadlineType: ApprovalBalanceDeadlineType;
+      alreadyApproved: boolean;
+    }
+  | {
+      ok: false;
+      code: ApprovalCode;
       error: string;
     };

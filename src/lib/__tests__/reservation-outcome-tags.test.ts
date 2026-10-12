@@ -67,6 +67,7 @@ function space(over: Partial<VenueSpaceDTO> = {}): VenueSpaceDTO {
     spaceType: "general_dining",
     reportedCapacity: 950,
     onlineBookingLimit: 100,
+    capacityResourceId: null,
     isActive: true,
     displayOrder: 0,
     createdAt: "2026-01-01T00:00:00.000Z",
@@ -118,6 +119,9 @@ function policy(over: Partial<PaymentPolicyDTO> = {}): PaymentPolicyDTO {
     depositPercent: 50,
     defaultBalanceDeadlineHours: 72,
     restaurantTimezone: "America/Chicago",
+    taxRateBasisPoints: 0,
+    gratuityRateBasisPoints: 0,
+    taxOnGratuity: false,
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
     createdBy: null,
@@ -252,6 +256,21 @@ function baseInput(over: Record<string, unknown> = {}) {
     guests: validGuests(2),
     platters: [] as Array<{ platterId: string; quantity: number }>,
     idempotencyKey: "key-1",
+    // Required for new requests: a complete ReviewedPrice matching the
+    // authoritative recalculation (2 × 2950 = 5900 food, 0 gratuity, 0 tax,
+    // 50% deposit). Without this the handler returns review_required before
+    // reaching the mocked repository.
+    clientPreviewPrice: {
+      subtotalCents: 5900,
+      gratuityCents: 0,
+      taxCents: 0,
+      grandTotalCents: 5900,
+      depositRequiredCents: 2950,
+      appliedGratuityRateBasisPoints: 0,
+      appliedTaxRateBasisPoints: 0,
+      appliedTaxOnGratuity: false,
+      appliedDepositPercent: 50,
+    },
     ...over,
   };
 }
@@ -315,7 +334,19 @@ describe("handleSubmitReservationRequest — outcome tags", () => {
 
   it("tags a preview-to-submit drift as proven_rejection (review_required) and never writes", async () => {
     const r = await handleSubmitReservationRequest(
-      baseInput({ clientPreviewSubtotalCents: 999999 }) as never,
+      baseInput({
+        clientPreviewPrice: {
+          subtotalCents: 999999,
+          gratuityCents: 0,
+          taxCents: 0,
+          grandTotalCents: 999999,
+          depositRequiredCents: 2950,
+          appliedGratuityRateBasisPoints: 0,
+          appliedTaxRateBasisPoints: 0,
+          appliedTaxOnGratuity: false,
+          appliedDepositPercent: 50,
+        },
+      }) as never,
     );
     expect(r.success).toBe(false);
     expect(r.outcome).toBe("proven_rejection");

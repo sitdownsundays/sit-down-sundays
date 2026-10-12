@@ -68,6 +68,7 @@ interface SundayServiceRow {
   status: string;
   space_id: string;
   online_booking_limit: number | null;
+  capacity_resource_id: string | null;
   is_active: boolean;
   display_order: number;
   created_at: string;
@@ -96,6 +97,9 @@ interface PaymentPolicyRow {
   deposit_percent: number;
   default_balance_deadline_hours: number;
   restaurant_timezone: string | null;
+  tax_rate_basis_points: number | null;
+  gratuity_rate_basis_points: number | null;
+  tax_on_gratuity: boolean | null;
   created_at: string;
   updated_at: string;
   created_by: string | null;
@@ -138,6 +142,7 @@ function serviceRowToDTO(row: SundayServiceRow): SundayServiceDTO {
     status: row.status as SundayStatus,
     spaceId: row.space_id,
     onlineBookingLimit: row.online_booking_limit,
+    capacityResourceId: row.capacity_resource_id,
     isActive: row.is_active,
     displayOrder: row.display_order,
     createdAt: row.created_at,
@@ -168,11 +173,30 @@ const DEFAULT_POLICY: PaymentPolicyDTO = {
   depositPercent: 50,
   defaultBalanceDeadlineHours: 72,
   restaurantTimezone: null,
+  taxRateBasisPoints: null,
+  gratuityRateBasisPoints: null,
+  taxOnGratuity: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   createdBy: null,
   updatedBy: null,
 };
+
+/** Map a payment_policy database row to the client-safe DTO. */
+function paymentPolicyRowToDTO(row: PaymentPolicyRow): PaymentPolicyDTO {
+  return {
+    depositPercent: row.deposit_percent,
+    defaultBalanceDeadlineHours: row.default_balance_deadline_hours,
+    restaurantTimezone: row.restaurant_timezone,
+    taxRateBasisPoints: row.tax_rate_basis_points ?? null,
+    gratuityRateBasisPoints: row.gratuity_rate_basis_points ?? null,
+    taxOnGratuity: row.tax_on_gratuity ?? null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    createdBy: row.created_by,
+    updatedBy: row.updated_by,
+  };
+}
 
 export class SupabaseSundaysRepository implements ISundaysRepository {
   private getAdmin(): SupabaseClient {
@@ -212,6 +236,7 @@ export class SupabaseSundaysRepository implements ISundaysRepository {
       status: input.status ?? "scheduled",
       space_id: input.spaceId,
       online_booking_limit: input.onlineBookingLimit ?? null,
+      capacity_resource_id: input.capacityResourceId ?? null,
       is_active: input.isActive ?? true,
       display_order: input.displayOrder ?? 0,
       created_by: actorUserId,
@@ -244,6 +269,8 @@ export class SupabaseSundaysRepository implements ISundaysRepository {
     if (input.spaceId !== undefined) patch.space_id = input.spaceId;
     if (input.onlineBookingLimit !== undefined)
       patch.online_booking_limit = input.onlineBookingLimit;
+    if (input.capacityResourceId !== undefined)
+      patch.capacity_resource_id = input.capacityResourceId;
     if (input.isActive !== undefined) patch.is_active = input.isActive;
     if (input.displayOrder !== undefined) patch.display_order = input.displayOrder;
 
@@ -387,16 +414,7 @@ export class SupabaseSundaysRepository implements ISundaysRepository {
       // Table not yet applied or empty — return safe defaults.
       return { ...DEFAULT_POLICY };
     }
-    const row = data as PaymentPolicyRow;
-    return {
-      depositPercent: row.deposit_percent,
-      defaultBalanceDeadlineHours: row.default_balance_deadline_hours,
-      restaurantTimezone: row.restaurant_timezone,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-      createdBy: row.created_by,
-      updatedBy: row.updated_by,
-    };
+    return paymentPolicyRowToDTO(data as PaymentPolicyRow);
   }
 
   async updatePaymentPolicy(
@@ -414,9 +432,10 @@ export class SupabaseSundaysRepository implements ISundaysRepository {
       console.error("Failed to load payment policy:", fetchError.message);
       return { success: false, error: "Could not load payment policy." };
     }
-    // If no row exists yet, upsert with the singleton id.
+    // If no row exists yet, upsert with the singleton id. Supplied optional
+    // fields are included; omitted ones default to null (not configured).
     if (!current) {
-      const payload = {
+      const payload: Record<string, unknown> = {
         id: 1,
         deposit_percent: input.depositPercent,
         default_balance_deadline_hours: input.defaultBalanceDeadlineHours,
@@ -424,6 +443,11 @@ export class SupabaseSundaysRepository implements ISundaysRepository {
         created_by: actorUserId,
         updated_by: actorUserId,
       };
+      payload.tax_rate_basis_points =
+        input.taxRateBasisPoints !== undefined ? input.taxRateBasisPoints : null;
+      payload.gratuity_rate_basis_points =
+        input.gratuityRateBasisPoints !== undefined ? input.gratuityRateBasisPoints : null;
+      payload.tax_on_gratuity = input.taxOnGratuity !== undefined ? input.taxOnGratuity : null;
       const { data, error } = await this.getAdmin()
         .from("payment_policy")
         .upsert(payload)
@@ -434,25 +458,26 @@ export class SupabaseSundaysRepository implements ISundaysRepository {
         return { success: false, error: "Could not save payment policy." };
       }
       const row = data as PaymentPolicyRow;
-      return {
-        success: true,
-        data: {
-          depositPercent: row.deposit_percent,
-          defaultBalanceDeadlineHours: row.default_balance_deadline_hours,
-          restaurantTimezone: row.restaurant_timezone,
-          createdAt: row.created_at,
-          updatedAt: row.updated_at,
-          createdBy: row.created_by,
-          updatedBy: row.updated_by,
-        },
-      };
+      return { success: true, data: paymentPolicyRowToDTO(row) };
     }
-    const patch = {
+    // Include the three new fields in the patch only when supplied (undefined
+    // = leave existing value unchanged). Explicit null clears to "not
+    // configured". 0 and false are valid supplied values, preserved exactly.
+    const patch: Record<string, unknown> = {
       deposit_percent: input.depositPercent,
       default_balance_deadline_hours: input.defaultBalanceDeadlineHours,
       restaurant_timezone: input.restaurantTimezone,
       updated_by: actorUserId,
     };
+    if (input.taxRateBasisPoints !== undefined) {
+      patch.tax_rate_basis_points = input.taxRateBasisPoints;
+    }
+    if (input.gratuityRateBasisPoints !== undefined) {
+      patch.gratuity_rate_basis_points = input.gratuityRateBasisPoints;
+    }
+    if (input.taxOnGratuity !== undefined) {
+      patch.tax_on_gratuity = input.taxOnGratuity;
+    }
     const { data, error } = await this.getAdmin()
       .from("payment_policy")
       .update(patch)
@@ -473,18 +498,7 @@ export class SupabaseSundaysRepository implements ISundaysRepository {
       };
     }
     const row = data as PaymentPolicyRow;
-    return {
-      success: true,
-      data: {
-        depositPercent: row.deposit_percent,
-        defaultBalanceDeadlineHours: row.default_balance_deadline_hours,
-        restaurantTimezone: row.restaurant_timezone,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-        createdBy: row.created_by,
-        updatedBy: row.updated_by,
-      },
-    };
+    return { success: true, data: paymentPolicyRowToDTO(row) };
   }
 
   // ------------------------------------------------------------------------
@@ -589,5 +603,19 @@ export class SupabaseSundaysRepository implements ISundaysRepository {
       };
     }
     return { success: true, data: diningRowToDTO(data as DiningTableRow) };
+  }
+
+  // Capacity enforcement readiness (from capacity_control.ready). Installed
+  // as false in 0019. The atomic submission RPC rejects new requests with
+  // capacity_not_ready until activation. This read is advisory only — the RPC
+  // remains authoritative. A read failure is treated as not-ready (fail safe).
+  async capacityReady(): Promise<boolean> {
+    const { data, error } = await this.getAdmin()
+      .from("capacity_control")
+      .select("ready")
+      .eq("id", 1)
+      .maybeSingle();
+    if (error || !data) return false;
+    return Boolean((data as { ready: boolean }).ready);
   }
 }

@@ -57,6 +57,13 @@ function makePackage(overrides: Partial<MealPackageDTO> = {}): MealPackageDTO {
       makeEligible(id, SIDE_A, "side"),
       makeEligible(id, SIDE_B, "side"),
     ],
+    // 0024 per-package pricing fields — null = legacy global behavior.
+    childRuleType: null,
+    childFixedPriceCents: null,
+    childDiscountBasisPoints: null,
+    seniorRuleType: null,
+    seniorFixedPriceCents: null,
+    seniorDiscountBasisPoints: null,
     ...overrides,
   };
 }

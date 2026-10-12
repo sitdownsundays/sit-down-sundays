@@ -36,7 +36,8 @@ import type {
 } from "@/lib/reservation/types";
 import { generateIdempotencyKey } from "@/lib/booking/submit-helpers";
 
-export type SubmissionPhase = "idle" | "submitting" | "uncertain" | "rejected" | "success";
+export type SubmissionPhase =
+  "idle" | "submitting" | "uncertain" | "rejected" | "key_mismatch" | "success";
 
 export type { SubmissionOutcome };
 
@@ -50,6 +51,8 @@ export interface SubmissionControllerOptions {
 const UNCERTAIN_MESSAGE =
   "We couldn't confirm whether your request was received. Retry to check its status — we'll reuse your exact request so no duplicate is created.";
 const REJECTED_MESSAGE = "We couldn't submit your request. Please try again.";
+const KEY_MISMATCH_MESSAGE =
+  "We couldn't verify this request. A reservation may already exist. Please contact our team before submitting another request.";
 
 /**
  * Classify a resolved submit result into a deterministic outcome WITHOUT
@@ -119,6 +122,17 @@ export class SubmissionController {
   }
 
   /**
+   * Whether the last result was an idempotency-key mismatch — the server PROVED
+   * the submitted key was already used for a DIFFERENT reservation. A row MAY
+   * already exist under that key with different terms. Reset/new-key submission
+   * is BLOCKED (could create a duplicate); only staff reconciliation is safe.
+   * The original key and payload are preserved.
+   */
+  isKeyMismatch(): boolean {
+    return this.phase === "key_mismatch";
+  }
+
+  /**
    * Start a NEW submission. Builds a fresh key + payload via buildPayload.
    * Reused for an edited request after a definitive rejection. If the outcome
    * is uncertain, the caller MUST use retry() instead.
@@ -129,6 +143,7 @@ export class SubmissionController {
     if (this.submitting) return;
     if (this.isComplete()) return;
     if (this.phase === "uncertain") return; // must retry, not start anew
+    if (this.phase === "key_mismatch") return; // a row may exist; new key could duplicate
     if (!this.canStartNew()) return;
 
     const key = this.generateKeyFn();
@@ -186,6 +201,18 @@ export class SubmissionController {
       const outcome = classifyOutcome(res);
       if (outcome === "confirmed_success") {
         this.phase = "success";
+      } else if (
+        outcome === "proven_rejection" &&
+        res.rejectionCode === "idempotency_key_mismatch"
+      ) {
+        // The server PROVED the key was already used for a DIFFERENT
+        // reservation. A row MAY already exist under that key with different
+        // terms. Do NOT unlock editing or a new key — that could create a
+        // duplicate. Preserve the original key + payload and require staff
+        // reconciliation. This is distinct from an ordinary proven rejection
+        // (nothing was saved).
+        this.phase = "key_mismatch";
+        this.error = res.error ?? KEY_MISMATCH_MESSAGE;
       } else if (outcome === "proven_rejection") {
         this.phase = "rejected";
         this.error = res.error ?? REJECTED_MESSAGE;
